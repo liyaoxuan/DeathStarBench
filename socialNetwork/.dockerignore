@@ -7,3 +7,8 @@
 !/scripts/
 !/third_party/
 !/wrk2/
+!/config/
+!/gen-go/
+!/go1.22.1.linux-amd64.tar.gz
+!/go.mod
+!/go.sum
