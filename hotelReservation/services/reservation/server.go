@@ -265,7 +265,7 @@ func (s *Server) CheckAvailability(ctx context.Context, req *pb.Request) (*pb.Re
 		if err != nil {
 			log.Error().Msgf("Failed get reservation number data: ", err)
 		}
-		curr.All(context.TODO(), &nums)
+		err = curr.All(context.TODO(), &nums)
 		if err != nil {
 			log.Error().Msgf("Failed get reservation number data: ", err)
 		}

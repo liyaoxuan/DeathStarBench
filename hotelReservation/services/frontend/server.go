@@ -157,23 +157,56 @@ func (s *Server) searchHandler(w http.ResponseWriter, r *http.Request) {
 
 	log.Trace().Msg("starts searchHandler")
 
-	// in/out dates from query params
-	inDate, outDate := r.URL.Query().Get("inDate"), r.URL.Query().Get("outDate")
+	//// in/out dates from query params
+	//inDate, outDate := r.URL.Query().Get("inDate"), r.URL.Query().Get("outDate")
+	//if inDate == "" || outDate == "" {
+	//	http.Error(w, "Please specify inDate/outDate params", http.StatusBadRequest)
+	//	return
+	//}
+
+	//// lan/lon from query params
+	//sLat, sLon := r.URL.Query().Get("lat"), r.URL.Query().Get("lon")
+	//if sLat == "" || sLon == "" {
+	//	http.Error(w, "Please specify location params", http.StatusBadRequest)
+	//	return
+	//}
+
+	//Lat, _ := strconv.ParseFloat(sLat, 32)
+	//lat := float32(Lat)
+	//Lon, _ := strconv.ParseFloat(sLon, 32)
+	//lon := float32(Lon)
+	// 解析表单数据
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "Unable to parse form data", http.StatusBadRequest)
+		return
+	}
+
+	// in/out dates from form data
+	inDate, outDate := r.FormValue("inDate"), r.FormValue("outDate")
 	if inDate == "" || outDate == "" {
 		http.Error(w, "Please specify inDate/outDate params", http.StatusBadRequest)
 		return
 	}
 
-	// lan/lon from query params
-	sLat, sLon := r.URL.Query().Get("lat"), r.URL.Query().Get("lon")
+	// lat/lon from form data
+	sLat, sLon := r.FormValue("lat"), r.FormValue("lon")
 	if sLat == "" || sLon == "" {
 		http.Error(w, "Please specify location params", http.StatusBadRequest)
 		return
 	}
 
-	Lat, _ := strconv.ParseFloat(sLat, 32)
+	Lat, err := strconv.ParseFloat(sLat, 32)
+	if err != nil {
+		http.Error(w, "Invalid latitude", http.StatusBadRequest)
+		return
+	}
 	lat := float32(Lat)
-	Lon, _ := strconv.ParseFloat(sLon, 32)
+
+	Lon, err := strconv.ParseFloat(sLon, 32)
+	if err != nil {
+		http.Error(w, "Invalid longitude", http.StatusBadRequest)
+		return
+	}
 	lon := float32(Lon)
 
 	log.Trace().Msg("starts searchHandler querying downstream")
@@ -238,19 +271,52 @@ func (s *Server) recommendHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	ctx := r.Context()
 
-	sLat, sLon := r.URL.Query().Get("lat"), r.URL.Query().Get("lon")
+	//sLat, sLon := r.URL.Query().Get("lat"), r.URL.Query().Get("lon")
+	//if sLat == "" || sLon == "" {
+	//	http.Error(w, "Please specify location params", http.StatusBadRequest)
+	//	return
+	//}
+	//Lat, _ := strconv.ParseFloat(sLat, 64)
+	//lat := float64(Lat)
+	//Lon, _ := strconv.ParseFloat(sLon, 64)
+	//lon := float64(Lon)
+
+	//require := r.URL.Query().Get("require")
+	//if require != "dis" && require != "rate" && require != "price" {
+	//	http.Error(w, "Please specify require params", http.StatusBadRequest)
+	//	return
+	//}
+	// 解析表单数据
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "Unable to parse form data", http.StatusBadRequest)
+		return
+	}
+
+	// lat/lon from form data
+	sLat, sLon := r.FormValue("lat"), r.FormValue("lon")
 	if sLat == "" || sLon == "" {
 		http.Error(w, "Please specify location params", http.StatusBadRequest)
 		return
 	}
-	Lat, _ := strconv.ParseFloat(sLat, 64)
+
+	Lat, err := strconv.ParseFloat(sLat, 64)
+	if err != nil {
+		http.Error(w, "Invalid latitude", http.StatusBadRequest)
+		return
+	}
 	lat := float64(Lat)
-	Lon, _ := strconv.ParseFloat(sLon, 64)
+
+	Lon, err := strconv.ParseFloat(sLon, 64)
+	if err != nil {
+		http.Error(w, "Invalid longitude", http.StatusBadRequest)
+		return
+	}
 	lon := float64(Lon)
 
-	require := r.URL.Query().Get("require")
+	// require from form data
+	require := r.FormValue("require")
 	if require != "dis" && require != "rate" && require != "price" {
-		http.Error(w, "Please specify require params", http.StatusBadRequest)
+		http.Error(w, "Please specify valid require params", http.StatusBadRequest)
 		return
 	}
 
@@ -288,7 +354,17 @@ func (s *Server) userHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	ctx := r.Context()
 
-	username, password := r.URL.Query().Get("username"), r.URL.Query().Get("password")
+	//username, password := r.URL.Query().Get("username"), r.URL.Query().Get("password")
+	//if username == "" || password == "" {
+	//	http.Error(w, "Please specify username and password", http.StatusBadRequest)
+	//	return
+	//}
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "Unable to parse form data", http.StatusBadRequest)
+		return
+	}
+
+	username, password := r.FormValue("username"), r.FormValue("password")
 	if username == "" || password == "" {
 		http.Error(w, "Please specify username and password", http.StatusBadRequest)
 		return
@@ -320,7 +396,47 @@ func (s *Server) reservationHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	ctx := r.Context()
 
-	inDate, outDate := r.URL.Query().Get("inDate"), r.URL.Query().Get("outDate")
+	//inDate, outDate := r.URL.Query().Get("inDate"), r.URL.Query().Get("outDate")
+	//if inDate == "" || outDate == "" {
+	//	http.Error(w, "Please specify inDate/outDate params", http.StatusBadRequest)
+	//	return
+	//}
+
+	//if !checkDataFormat(inDate) || !checkDataFormat(outDate) {
+	//	http.Error(w, "Please check inDate/outDate format (YYYY-MM-DD)", http.StatusBadRequest)
+	//	return
+	//}
+
+	//hotelId := r.URL.Query().Get("hotelId")
+	//if hotelId == "" {
+	//	http.Error(w, "Please specify hotelId params", http.StatusBadRequest)
+	//	return
+	//}
+
+	//customerName := r.URL.Query().Get("customerName")
+	//if customerName == "" {
+	//	http.Error(w, "Please specify customerName params", http.StatusBadRequest)
+	//	return
+	//}
+
+	//username, password := r.URL.Query().Get("username"), r.URL.Query().Get("password")
+	//if username == "" || password == "" {
+	//	http.Error(w, "Please specify username and password", http.StatusBadRequest)
+	//	return
+	//}
+
+	//numberOfRoom := 0
+	//num := r.URL.Query().Get("number")
+	//if num != "" {
+	//	numberOfRoom, _ = strconv.Atoi(num)
+	//}
+	// 解析表单数据
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "Unable to parse form data", http.StatusBadRequest)
+		return
+	}
+
+	inDate, outDate := r.FormValue("inDate"), r.FormValue("outDate")
 	if inDate == "" || outDate == "" {
 		http.Error(w, "Please specify inDate/outDate params", http.StatusBadRequest)
 		return
@@ -331,28 +447,33 @@ func (s *Server) reservationHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	hotelId := r.URL.Query().Get("hotelId")
+	hotelId := r.FormValue("hotelId")
 	if hotelId == "" {
 		http.Error(w, "Please specify hotelId params", http.StatusBadRequest)
 		return
 	}
 
-	customerName := r.URL.Query().Get("customerName")
+	customerName := r.FormValue("customerName")
 	if customerName == "" {
 		http.Error(w, "Please specify customerName params", http.StatusBadRequest)
 		return
 	}
 
-	username, password := r.URL.Query().Get("username"), r.URL.Query().Get("password")
+	username, password := r.FormValue("username"), r.FormValue("password")
 	if username == "" || password == "" {
 		http.Error(w, "Please specify username and password", http.StatusBadRequest)
 		return
 	}
 
 	numberOfRoom := 0
-	num := r.URL.Query().Get("number")
+	num := r.FormValue("number")
 	if num != "" {
-		numberOfRoom, _ = strconv.Atoi(num)
+		var err error
+		numberOfRoom, err = strconv.Atoi(num)
+		if err != nil {
+			http.Error(w, "Invalid number of rooms", http.StatusBadRequest)
+			return
+		}
 	}
 
 	// Check username and password

@@ -16,7 +16,8 @@ COPY tune/ tune/
 
 RUN CGO_ENABLED=0 GOOS=linux GO111MODULE=on go install -ldflags="-s -w" -mod=vendor ./cmd/...
 
-FROM gcr.io/distroless/static:nonroot
+#FROM gcr.lank8s.cn/distroless/static:nonroot
+FROM ubuntu:22.04
 
 WORKDIR /
 
