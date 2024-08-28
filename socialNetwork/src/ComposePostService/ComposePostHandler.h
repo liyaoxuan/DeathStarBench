@@ -1,6 +1,7 @@
 #ifndef SOCIAL_NETWORK_MICROSERVICES_SRC_COMPOSEPOSTSERVICE_COMPOSEPOSTHANDLER_H_
 #define SOCIAL_NETWORK_MICROSERVICES_SRC_COMPOSEPOSTSERVICE_COMPOSEPOSTHANDLER_H_
 
+#include <sys/syscall.h>
 #include <chrono>
 #include <future>
 #include <iostream>
@@ -110,10 +111,17 @@ ComposePostHandler::ComposePostHandler(
 Creator ComposePostHandler::_ComposeCreaterHelper(
     int64_t req_id, int64_t user_id, const std::string &username,
     const std::map<std::string, std::string> &carrier) {
+  struct timespec ts;
+  clock_gettime(CLOCK_MONOTONIC, &ts);
+  uint64_t t = ts.tv_sec*1000*1000*1000 + ts.tv_nsec;
+  auto tid = syscall(__NR_gettid);
   TextMapReader reader(carrier);
   auto parent_span = opentracing::Tracer::Global()->Extract(reader);
   auto span = opentracing::Tracer::Global()->StartSpan(
-      "compose_creator_client", {opentracing::ChildOf(parent_span->get())});
+      "compose_creator_client",
+      {opentracing::ChildOf(parent_span->get()),
+      opentracing::SetTag{"time", t},
+      opentracing::SetTag{"tid", tid}});
   std::map<std::string, std::string> writer_text_map;
   TextMapWriter writer(writer_text_map);
   opentracing::Tracer::Global()->Inject(span->context(), writer);
@@ -147,10 +155,17 @@ Creator ComposePostHandler::_ComposeCreaterHelper(
 TextServiceReturn ComposePostHandler::_ComposeTextHelper(
     int64_t req_id, const std::string &text,
     const std::map<std::string, std::string> &carrier) {
+  struct timespec ts;
+  clock_gettime(CLOCK_MONOTONIC, &ts);
+  uint64_t t = ts.tv_sec*1000*1000*1000 + ts.tv_nsec;
+  auto tid = syscall(__NR_gettid);
   TextMapReader reader(carrier);
   auto parent_span = opentracing::Tracer::Global()->Extract(reader);
   auto span = opentracing::Tracer::Global()->StartSpan(
-      "compose_text_client", {opentracing::ChildOf(parent_span->get())});
+      "compose_text_client",
+      {opentracing::ChildOf(parent_span->get()),
+      opentracing::SetTag{"time", t},
+      opentracing::SetTag{"tid", tid}});
   std::map<std::string, std::string> writer_text_map;
   TextMapWriter writer(writer_text_map);
   opentracing::Tracer::Global()->Inject(span->context(), writer);
@@ -185,10 +200,17 @@ std::vector<Media> ComposePostHandler::_ComposeMediaHelper(
     int64_t req_id, const std::vector<std::string> &media_types,
     const std::vector<int64_t> &media_ids,
     const std::map<std::string, std::string> &carrier) {
+  struct timespec ts;
+  clock_gettime(CLOCK_MONOTONIC, &ts);
+  uint64_t t = ts.tv_sec*1000*1000*1000 + ts.tv_nsec;
+  auto tid = syscall(__NR_gettid);
   TextMapReader reader(carrier);
   auto parent_span = opentracing::Tracer::Global()->Extract(reader);
   auto span = opentracing::Tracer::Global()->StartSpan(
-      "compose_media_client", {opentracing::ChildOf(parent_span->get())});
+      "compose_media_client",
+      {opentracing::ChildOf(parent_span->get()),
+      opentracing::SetTag{"time", t},
+      opentracing::SetTag{"tid", tid}});
   std::map<std::string, std::string> writer_text_map;
   TextMapWriter writer(writer_text_map);
   opentracing::Tracer::Global()->Inject(span->context(), writer);
@@ -223,10 +245,17 @@ std::vector<Media> ComposePostHandler::_ComposeMediaHelper(
 int64_t ComposePostHandler::_ComposeUniqueIdHelper(
     int64_t req_id, const PostType::type post_type,
     const std::map<std::string, std::string> &carrier) {
+  struct timespec ts;
+  clock_gettime(CLOCK_MONOTONIC, &ts);
+  uint64_t t = ts.tv_sec*1000*1000*1000 + ts.tv_nsec;
+  auto tid = syscall(__NR_gettid);
   TextMapReader reader(carrier);
   auto parent_span = opentracing::Tracer::Global()->Extract(reader);
   auto span = opentracing::Tracer::Global()->StartSpan(
-      "compose_unique_id_client", {opentracing::ChildOf(parent_span->get())});
+      "compose_unique_id_client",
+      {opentracing::ChildOf(parent_span->get()),
+      opentracing::SetTag{"time", t},
+      opentracing::SetTag{"tid", tid}});
   std::map<std::string, std::string> writer_text_map;
   TextMapWriter writer(writer_text_map);
   opentracing::Tracer::Global()->Inject(span->context(), writer);
@@ -260,10 +289,17 @@ int64_t ComposePostHandler::_ComposeUniqueIdHelper(
 void ComposePostHandler::_UploadPostHelper(
     int64_t req_id, const Post &post,
     const std::map<std::string, std::string> &carrier) {
+  struct timespec ts;
+  clock_gettime(CLOCK_MONOTONIC, &ts);
+  uint64_t t = ts.tv_sec*1000*1000*1000 + ts.tv_nsec;
+  auto tid = syscall(__NR_gettid);
   TextMapReader reader(carrier);
   auto parent_span = opentracing::Tracer::Global()->Extract(reader);
   auto span = opentracing::Tracer::Global()->StartSpan(
-      "store_post_client", {opentracing::ChildOf(parent_span->get())});
+      "store_post_client",
+      {opentracing::ChildOf(parent_span->get()),
+      opentracing::SetTag{"time", t},
+      opentracing::SetTag{"tid", tid}});
   std::map<std::string, std::string> writer_text_map;
   TextMapWriter writer(writer_text_map);
   opentracing::Tracer::Global()->Inject(span->context(), writer);
@@ -293,10 +329,17 @@ void ComposePostHandler::_UploadPostHelper(
 void ComposePostHandler::_UploadUserTimelineHelper(
     int64_t req_id, int64_t post_id, int64_t user_id, int64_t timestamp,
     const std::map<std::string, std::string> &carrier) {
+  struct timespec ts;
+  clock_gettime(CLOCK_MONOTONIC, &ts);
+  uint64_t t = ts.tv_sec*1000*1000*1000 + ts.tv_nsec;
+  auto tid = syscall(__NR_gettid);
   TextMapReader reader(carrier);
   auto parent_span = opentracing::Tracer::Global()->Extract(reader);
   auto span = opentracing::Tracer::Global()->StartSpan(
-      "write_user_timeline_client", {opentracing::ChildOf(parent_span->get())});
+      "write_user_timeline_client",
+      {opentracing::ChildOf(parent_span->get()),
+      opentracing::SetTag{"time", t},
+      opentracing::SetTag{"tid", tid}});
   std::map<std::string, std::string> writer_text_map;
   TextMapWriter writer(writer_text_map);
   opentracing::Tracer::Global()->Inject(span->context(), writer);
@@ -327,10 +370,17 @@ void ComposePostHandler::_UploadHomeTimelineHelper(
     int64_t req_id, int64_t post_id, int64_t user_id, int64_t timestamp,
     const std::vector<int64_t> &user_mentions_id,
     const std::map<std::string, std::string> &carrier) {
+  struct timespec ts;
+  clock_gettime(CLOCK_MONOTONIC, &ts);
+  uint64_t t = ts.tv_sec*1000*1000*1000 + ts.tv_nsec;
+  auto tid = syscall(__NR_gettid);
   TextMapReader reader(carrier);
   auto parent_span = opentracing::Tracer::Global()->Extract(reader);
   auto span = opentracing::Tracer::Global()->StartSpan(
-      "write_home_timeline_client", {opentracing::ChildOf(parent_span->get())});
+      "write_home_timeline_client",
+      {opentracing::ChildOf(parent_span->get()),
+      opentracing::SetTag{"time", t},
+      opentracing::SetTag{"tid", tid}});
   std::map<std::string, std::string> writer_text_map;
   TextMapWriter writer(writer_text_map);
   opentracing::Tracer::Global()->Inject(span->context(), writer);
@@ -365,8 +415,15 @@ void ComposePostHandler::ComposePost(
     const std::map<std::string, std::string> &carrier) {
   TextMapReader reader(carrier);
   auto parent_span = opentracing::Tracer::Global()->Extract(reader);
+  struct timespec ts;
+  clock_gettime(CLOCK_MONOTONIC, &ts);
+  uint64_t t = ts.tv_sec*1000*1000*1000 + ts.tv_nsec;
+  auto tid = syscall(__NR_gettid);
   auto span = opentracing::Tracer::Global()->StartSpan(
-      "compose_post_server", {opentracing::ChildOf(parent_span->get())});
+      "compose_post_server",
+      {opentracing::ChildOf(parent_span->get()),
+      opentracing::SetTag{"time", t},
+      opentracing::SetTag{"tid", tid}});
   std::map<std::string, std::string> writer_text_map;
   TextMapWriter writer(writer_text_map);
   opentracing::Tracer::Global()->Inject(span->context(), writer);
@@ -374,15 +431,54 @@ void ComposePostHandler::ComposePost(
   auto text_future =
       std::async(std::launch::async, &ComposePostHandler::_ComposeTextHelper,
                  this, req_id, text, writer_text_map);
+
+  TextMapReader reader_1(writer_text_map);
+  auto parent_span_1 = opentracing::Tracer::Global()->Extract(reader_1);
+  clock_gettime(CLOCK_MONOTONIC, &ts);
+  t = ts.tv_sec*1000*1000*1000 + ts.tv_nsec;
+  auto span_1 = opentracing::Tracer::Global()->StartSpan(
+      "async_creater",
+      {opentracing::ChildOf(parent_span_1->get()),
+      opentracing::SetTag{"time", t}});
+  std::map<std::string, std::string> writer_text_map_1;
+  TextMapWriter writer_1(writer_text_map_1);
+  opentracing::Tracer::Global()->Inject(span->context(), writer_1);
   auto creator_future =
       std::async(std::launch::async, &ComposePostHandler::_ComposeCreaterHelper,
                  this, req_id, user_id, username, writer_text_map);
+  span_1->Finish();
+
+  TextMapReader reader_2(writer_text_map);
+  auto parent_span_2 = opentracing::Tracer::Global()->Extract(reader_2);
+  clock_gettime(CLOCK_MONOTONIC, &ts);
+  t = ts.tv_sec*1000*1000*1000 + ts.tv_nsec;
+  auto span_2 = opentracing::Tracer::Global()->StartSpan(
+      "async_media",
+      {opentracing::ChildOf(parent_span_2->get()),
+      opentracing::SetTag{"time", t}});
+  std::map<std::string, std::string> writer_text_map_2;
+  TextMapWriter writer_2(writer_text_map_2);
+  opentracing::Tracer::Global()->Inject(span->context(), writer_2);
   auto media_future =
       std::async(std::launch::async, &ComposePostHandler::_ComposeMediaHelper,
                  this, req_id, media_types, media_ids, writer_text_map);
+  span_2->Finish();
+
+  TextMapReader reader_3(writer_text_map);
+  auto parent_span_3 = opentracing::Tracer::Global()->Extract(reader_3);
+  clock_gettime(CLOCK_MONOTONIC, &ts);
+  t = ts.tv_sec*1000*1000*1000 + ts.tv_nsec;
+  auto span_3 = opentracing::Tracer::Global()->StartSpan(
+      "async_unique_id",
+      {opentracing::ChildOf(parent_span_3->get()),
+      opentracing::SetTag{"time", t}});
+  std::map<std::string, std::string> writer_text_map_3;
+  TextMapWriter writer_3(writer_text_map_3);
+  opentracing::Tracer::Global()->Inject(span->context(), writer_3);
   auto unique_id_future = std::async(
       std::launch::async, &ComposePostHandler::_ComposeUniqueIdHelper, this,
       req_id, post_type, writer_text_map);
+  span_3->Finish();
 
   Post post;
   auto timestamp =
@@ -392,10 +488,55 @@ void ComposePostHandler::ComposePost(
 
   // try
   // {
+  
+  TextMapReader reader_7(writer_text_map);
+  auto parent_span_7 = opentracing::Tracer::Global()->Extract(reader_7);
+  auto span_7 = opentracing::Tracer::Global()->StartSpan(
+      "async_unique_id_get",
+      {opentracing::ChildOf(parent_span_7->get()),
+      });
+  std::map<std::string, std::string> writer_text_map_7;
+  TextMapWriter writer_7(writer_text_map_7);
+  opentracing::Tracer::Global()->Inject(span->context(), writer_7);
   post.post_id = unique_id_future.get();
+  span_7->Finish();
+
+  TextMapReader reader_8(writer_text_map);
+  auto parent_span_8 = opentracing::Tracer::Global()->Extract(reader_8);
+  auto span_8 = opentracing::Tracer::Global()->StartSpan(
+      "async_creator_get",
+      {opentracing::ChildOf(parent_span_8->get()),
+      });
+  std::map<std::string, std::string> writer_text_map_8;
+  TextMapWriter writer_8(writer_text_map_8);
+  opentracing::Tracer::Global()->Inject(span->context(), writer_8);
   post.creator = creator_future.get();
+  span_8->Finish();
+
+  TextMapReader reader_9(writer_text_map);
+  auto parent_span_9 = opentracing::Tracer::Global()->Extract(reader_9);
+  auto span_9 = opentracing::Tracer::Global()->StartSpan(
+      "async_media_get",
+      {opentracing::ChildOf(parent_span_9->get()),
+      });
+  std::map<std::string, std::string> writer_text_map_9;
+  TextMapWriter writer_9(writer_text_map_9);
+  opentracing::Tracer::Global()->Inject(span->context(), writer_9);
   post.media = media_future.get();
+  span_9->Finish();
+
+  TextMapReader reader_10(writer_text_map);
+  auto parent_span_10 = opentracing::Tracer::Global()->Extract(reader_10);
+  auto span_10 = opentracing::Tracer::Global()->StartSpan(
+      "async_text_get",
+      {opentracing::ChildOf(parent_span_10->get()),
+      });
+  std::map<std::string, std::string> writer_text_map_10;
+  TextMapWriter writer_10(writer_text_map_10);
+  opentracing::Tracer::Global()->Inject(span->context(), writer_10);
   auto text_return = text_future.get();
+  span_10->Finish();
+
   post.text = text_return.text;
   post.urls = text_return.urls;
   post.user_mentions = text_return.user_mentions;
@@ -416,16 +557,54 @@ void ComposePostHandler::ComposePost(
   //Before _UploadUserTimelineHelper and _UploadHomeTimelineHelper.
   //Change _UploadUserTimelineHelper and _UploadHomeTimelineHelper to deferred.
   //To let them start execute after post_future.get() return.
-  auto post_future =
-      std::async(std::launch::async, &ComposePostHandler::_UploadPostHelper,
-                 this, req_id, post, writer_text_map);
+  TextMapReader reader_4(writer_text_map);
+  auto parent_span_4 = opentracing::Tracer::Global()->Extract(reader_4);
+  clock_gettime(CLOCK_MONOTONIC, &ts);
+  t = ts.tv_sec*1000*1000*1000 + ts.tv_nsec;
+  auto span_4 = opentracing::Tracer::Global()->StartSpan(
+      "async_upload_post",
+      {opentracing::ChildOf(parent_span_4->get()),
+      opentracing::SetTag{"time", t}});
+  std::map<std::string, std::string> writer_text_map_4;
+  TextMapWriter writer_4(writer_text_map_4);
+  opentracing::Tracer::Global()->Inject(span->context(), writer_4);
+  auto post_future = std::async(
+      std::launch::async, &ComposePostHandler::_UploadPostHelper, this,
+      req_id, post, writer_text_map);
+  span_4->Finish();
+
+  TextMapReader reader_5(writer_text_map);
+  auto parent_span_5 = opentracing::Tracer::Global()->Extract(reader_5);
+  clock_gettime(CLOCK_MONOTONIC, &ts);
+  t = ts.tv_sec*1000*1000*1000 + ts.tv_nsec;
+  auto span_5 = opentracing::Tracer::Global()->StartSpan(
+      "async_user_timeline",
+      {opentracing::ChildOf(parent_span_5->get()),
+      opentracing::SetTag{"time", t}});
+  std::map<std::string, std::string> writer_text_map_5;
+  TextMapWriter writer_5(writer_text_map_5);
+  opentracing::Tracer::Global()->Inject(span->context(), writer_5);
   auto user_timeline_future = std::async(
       std::launch::deferred, &ComposePostHandler::_UploadUserTimelineHelper, this,
       req_id, post.post_id, user_id, timestamp, writer_text_map);
+  span_5->Finish();
+
+  TextMapReader reader_6(writer_text_map);
+  auto parent_span_6 = opentracing::Tracer::Global()->Extract(reader_6);
+  clock_gettime(CLOCK_MONOTONIC, &ts);
+  t = ts.tv_sec*1000*1000*1000 + ts.tv_nsec;
+  auto span_6 = opentracing::Tracer::Global()->StartSpan(
+      "async_user_timeline",
+      {opentracing::ChildOf(parent_span_6->get()),
+      opentracing::SetTag{"time", t}});
+  std::map<std::string, std::string> writer_text_map_6;
+  TextMapWriter writer_6(writer_text_map_6);
+  opentracing::Tracer::Global()->Inject(span->context(), writer_6);
   auto home_timeline_future = std::async(
       std::launch::deferred, &ComposePostHandler::_UploadHomeTimelineHelper, this,
       req_id, post.post_id, user_id, timestamp, user_mention_ids,
       writer_text_map);
+  span_6->Finish();
 
   // try
   // {
