@@ -1,6 +1,8 @@
 name: jaeger
 
 replicas: 1
+nodeSelector: {kubernetes.io/hostname: "cpu-16"}
+serviceType: NodePort
 
 ports:
   - port: 14269
@@ -13,6 +15,7 @@ ports:
     targetPort: 14267
   - port: 16686
     targetPort: 16686
+    nodePort: 30915
   - port: 5775
     protocol: UDP
     targetPort: 5775
@@ -25,7 +28,7 @@ ports:
 
 container:
   image: jaegertracing/all-in-one
-  imageVersion: 1.21.0
+  imageVersion: latest #1.21.0
   name: hotel-reserv-jaeger
   ports:
   - containerPort: 14269

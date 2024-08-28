@@ -20,6 +20,12 @@ spec:
         service: {{ .Values.name }}-{{ include "hotel-reservation.fullname" . }}
         app: {{ .Values.name }}-{{ include "hotel-reservation.fullname" . }}
     spec:
+      {{- if .Values.nodeName}}
+      nodeName: {{ .Values.nodeName }}
+      {{ end }}
+      {{- if .Values.hostPID}}
+      hostPID: {{ .Values.hostPID }}
+      {{ end }}
       containers:
       {{- with .Values.container }}
       - name: "{{ .name }}"
