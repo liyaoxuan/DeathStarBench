@@ -5,6 +5,11 @@ global:
   serviceType: ClusterIP
   dockerRegistry: docker.io
   defaultImageVersion: latest
+  resources: |
+    requests:
+      cpu: "1000m"
+    limits:
+      cpu: "32000m"
   redis:
     cluster:
       enabled: false
@@ -36,8 +41,8 @@ global:
     localAgentHostPort: jaeger:6831
     queueSize: 1000000
     bufferFlushInterval: 10
-    samplerType: probabilistic
-    samplerParam: 0.1
+    samplerType: const #probabilistic
+    samplerParam: 1 #0.1
     disabled: false
     logSpans: false
 

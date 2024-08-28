@@ -1,4 +1,5 @@
 name: user-mention-service
+nodeName: cpu-16
 
 ports:
   - port: 9090

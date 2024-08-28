@@ -1,4 +1,5 @@
 name: home-timeline-service
+nodeName: cpu-16
 
 ports:
   - port: 9090

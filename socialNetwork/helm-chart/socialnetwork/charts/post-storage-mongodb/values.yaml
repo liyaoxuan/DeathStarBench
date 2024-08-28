@@ -1,4 +1,5 @@
 name: post-storage-mongodb
+nodeName: cpu-16
 
 ports:
   - port: 27017

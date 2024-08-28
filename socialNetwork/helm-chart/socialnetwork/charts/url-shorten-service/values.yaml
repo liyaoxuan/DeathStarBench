@@ -1,4 +1,5 @@
 name: url-shorten-service
+nodeName: cpu-16
 
 ports:
   - port: 9090

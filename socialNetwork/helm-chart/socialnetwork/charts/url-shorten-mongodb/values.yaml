@@ -1,4 +1,5 @@
 name: url-shorten-mongodb
+nodeName: cpu-16
 
 ports:
   - port: 27017

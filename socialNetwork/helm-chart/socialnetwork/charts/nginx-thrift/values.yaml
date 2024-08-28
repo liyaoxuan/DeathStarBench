@@ -1,14 +1,17 @@
 name: nginx-thrift
+nodeName: cpu-16
+type: NodePort
 
 ports:
   - port: 8080
     targetPort: 8080
+    nodePort: 32080
 
 container:
   image: yg397/openresty-thrift
   imageVersion: xenial
   name: nginx-thrift
-  ports: 
+  ports:
   - containerPort: 8080
   env:
   - name: fqdn_suffix
@@ -41,7 +44,7 @@ initContainer:
     mountPath: /gen-lua
   - name: keys
     mountPath: /keys
-  command: "/bin/sh" 
+  command: "/bin/sh"
   args: ["-c", "git clone https://github.com/delimitrou/DeathStarBench.git /DeathStarBench &&
             cp -r /DeathStarBench/socialNetwork/gen-lua/* /gen-lua/ &&
             cp -r /DeathStarBench/socialNetwork/docker/openresty-thrift/lua-thrift/* /lua-thrift/ &&
@@ -62,5 +65,5 @@ configMaps:
     value: jaeger-config
 
   - name: nginx.conf
-    mountPath: /usr/local/openresty/nginx/conf/nginx.conf 
+    mountPath: /usr/local/openresty/nginx/conf/nginx.conf
     value: nginx

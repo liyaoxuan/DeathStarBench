@@ -1,14 +1,16 @@
 name: compose-post-service
+nodeName: cpu-16
 
 ports:
   - port: 9090
     targetPort: 9090
+hostPID: true
 
 container:
   command: ComposePostService
-  image: deathstarbench/social-network-microservices
+  image: yxlee/socialnetwork-profile #deathstarbench/social-network-microservices
   name: compose-post-service
-  ports: 
+  ports:
   - containerPort: 9090
 
 configMaps:

@@ -1,4 +1,5 @@
 name: unique-id-service
+nodeName: cpu-16
 
 ports:
   - port: 9090

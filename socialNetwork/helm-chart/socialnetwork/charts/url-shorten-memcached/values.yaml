@@ -1,4 +1,5 @@
 name: url-shorten-memcached
+nodeName: cpu-16
 
 ports:
   - port: 11211
