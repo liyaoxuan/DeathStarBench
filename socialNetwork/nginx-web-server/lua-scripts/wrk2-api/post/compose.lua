@@ -12,6 +12,16 @@ function _M.ComposePost()
   local bridge_tracer = require "opentracing_bridge_tracer"
   local ngx = ngx
   local cjson = require "cjson"
+  local ffi = require "ffi"
+  ffi.cdef[[
+    typedef struct {
+      long s;
+      long ns;
+    } time_timespec;
+  
+    int time_clock_gettime(int clock_id, time_timespec *tp) asm("clock_gettime");
+    int getpid();
+  ]]
 
   local GenericObjectPool = require "GenericObjectPool"
   local social_network_ComposePostService = require "social_network_ComposePostService"
@@ -39,9 +49,18 @@ function _M.ComposePost()
 
   local client = GenericObjectPool:connection(
       ComposePostServiceClient, "compose-post-service" .. k8s_suffix, 9090)
-
+  local t = ffi.new'time_timespec'
+  local CLOCK_MONOTONIC = 1
+  local function tos(t)
+    return tonumber(t.s)*1e9 + tonumber(t.ns)
+  end
+  ffi.C.time_clock_gettime(CLOCK_MONOTONIC, t)
+  local time = tos(t)
+  local pid = ffi.C.getpid()
   local span = tracer:start_span("compose_post_client",
       { ["references"] = { { "child_of", parent_span_context } } })
+  span:set_tag("time", time)
+  span:set_tag("tid", pid)
   local carrier = {}
   tracer:text_map_inject(span:context(), carrier)
 
