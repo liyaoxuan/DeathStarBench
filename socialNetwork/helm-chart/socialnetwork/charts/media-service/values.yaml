@@ -1,5 +1,6 @@
 name: media-service
 nodeName: cpu-16
+hostPID: true
 
 ports:
   - port: 9090

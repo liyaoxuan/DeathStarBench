@@ -1,5 +1,6 @@
 name: text-service
 nodeName: cpu-16
+hostPID: true
 
 ports:
   - port: 9090
@@ -7,10 +8,11 @@ ports:
 
 container:
   command: TextService
-  image: deathstarbench/social-network-microservices
+  image: yxlee/socialnetwork-profile #deathstarbench/social-network-microservices
   name: text-service
   ports: 
   - containerPort: 9090
+  imageVersion: debug
 
 configMaps:
   - name: jaeger-config.yml
