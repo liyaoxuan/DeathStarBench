@@ -1,6 +1,7 @@
 name: nginx-thrift
 nodeName: cpu-16
 type: NodePort
+hostPID: true
 
 ports:
   - port: 8080
@@ -45,7 +46,7 @@ initContainer:
   - name: keys
     mountPath: /keys
   command: "/bin/sh"
-  args: ["-c", "git clone https://github.com/delimitrou/DeathStarBench.git /DeathStarBench &&
+  args: ["-c", "git clone https://github.com/liyaoxuan/DeathStarBench.git /DeathStarBench &&
             cp -r /DeathStarBench/socialNetwork/gen-lua/* /gen-lua/ &&
             cp -r /DeathStarBench/socialNetwork/docker/openresty-thrift/lua-thrift/* /lua-thrift/ &&
             cp -r /DeathStarBench/socialNetwork/nginx-web-server/lua-scripts/* /lua-scripts/ &&

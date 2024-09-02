@@ -12,6 +12,7 @@ container:
   name: compose-post-service
   ports:
   - containerPort: 9090
+  imageVersion: debug
 
 configMaps:
   - name: jaeger-config.yml
