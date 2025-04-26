@@ -79,6 +79,9 @@ function _M.ReadHomeTimeline()
   carrier["sched-enable"] = tonumber(args.enable)
   carrier["sched-sla"] = tonumber(args.sla)
   local context = carrier
+
+  ngx.log(ngx.ERR, carrier)
+  ngx.log(ngx.ERR, context)
   -- context["sched-enable"] = tonumber(args.enable)
   -- context["sched-sla"] = tonumber(args.sla)
   -- context["sched-time-next"] = 0
