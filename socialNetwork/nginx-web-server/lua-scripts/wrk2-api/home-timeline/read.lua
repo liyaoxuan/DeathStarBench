@@ -82,6 +82,10 @@ function _M.ReadHomeTimeline()
   context["sched-time-next"] = 0
   context["sched-time-remaining"] = 0
   context["sched-time-start"] = math.floor(socket.gettime() * 1000)
+
+  carrier["sched-enable"] = tonumber(args.enable)
+  carrier["sched-sla"] = tonumber(args.sla)
+
   ngx.log(ngx.ERR, "reschedule: enable=" .. args.enable .. ", sla=" .. args.sla)
   local client = GenericObjectPool:connection(
       HomeTimelineServiceClient, "home-timeline-service" .. k8s_suffix, 9090)
