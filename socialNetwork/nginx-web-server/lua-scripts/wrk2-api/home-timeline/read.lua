@@ -54,6 +54,7 @@ function _M.ReadHomeTimeline()
   local HomeTimelineServiceClient = social_network_HomeTimelineService.HomeTimelineServiceClient
   local cjson = require "cjson"
   local liblualongnumber = require "liblualongnumber"
+  local socket = require "socket"
 
   local req_id = tonumber(string.sub(ngx.var.request_id, 0, 15), 16)
   local tracer = bridge_tracer.new_from_global()
@@ -68,13 +69,16 @@ function _M.ReadHomeTimeline()
   ngx.req.read_body()
   local args = ngx.req.get_uri_args()
 
-  if (_StrIsEmpty(args.user_id) or _StrIsEmpty(args.start) or _StrIsEmpty(args.stop)) then
+  if (_StrIsEmpty(args.user_id) or _StrIsEmpty(args.start) or _StrIsEmpty(args.stop) or _StrIsEmpty(args.sla)) then
     ngx.status = ngx.HTTP_BAD_REQUEST
     ngx.say("Incomplete arguments")
     ngx.log(ngx.ERR, "Incomplete arguments")
     ngx.exit(ngx.HTTP_BAD_REQUEST)
   end
 
+  carrier["sched-enable"] = tonumber(args.enable)
+  carrier["sched-sla"] = tonumber(args.sla)
+  carrier["sched-time-start"] = math.floor(socket.gettime() * 1000)
 
   local client = GenericObjectPool:connection(
       HomeTimelineServiceClient, "home-timeline-service" .. k8s_suffix, 9090)
