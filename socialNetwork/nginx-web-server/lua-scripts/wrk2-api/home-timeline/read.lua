@@ -76,15 +76,15 @@ function _M.ReadHomeTimeline()
     ngx.exit(ngx.HTTP_BAD_REQUEST)
   end
 
-  local context = {}
-  context["sched-enable"] = tonumber(args.enable)
-  context["sched-sla"] = tonumber(args.sla)
-  context["sched-time-next"] = 0
-  context["sched-time-remaining"] = 0
-  context["sched-time-start"] = math.floor(socket.gettime() * 1000)
-
   carrier["sched-enable"] = tonumber(args.enable)
   carrier["sched-sla"] = tonumber(args.sla)
+  local context = carrier
+  -- context["sched-enable"] = tonumber(args.enable)
+  -- context["sched-sla"] = tonumber(args.sla)
+  -- context["sched-time-next"] = 0
+  -- context["sched-time-remaining"] = 0
+  -- context["sched-time-start"] = math.floor(socket.gettime() * 1000)
+
 
   ngx.log(ngx.ERR, "reschedule: enable=" .. args.enable .. ", sla=" .. args.sla)
   local client = GenericObjectPool:connection(
