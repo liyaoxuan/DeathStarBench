@@ -79,6 +79,7 @@ function _M.ReadHomeTimeline()
   carrier["sched-enable"] = tonumber(args.enable)
   carrier["sched-sla"] = tonumber(args.sla)
   carrier["sched-time-next"] = 0
+  carrier["sched-time-remaining"] = 0
   carrier["sched-time-start"] = math.floor(socket.gettime() * 1000)
 
   local client = GenericObjectPool:connection(
