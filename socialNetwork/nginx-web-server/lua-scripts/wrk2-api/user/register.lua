@@ -36,10 +36,17 @@ function _M.RegisterUser()
     ngx.exit(ngx.HTTP_BAD_REQUEST)
   end
 
+  local socket = require "socket"
+  local context = {}
+  context["sched-enable"] = tonumber(args.enable)
+  context["sched-sla"] = tonumber(args.sla)
+  context["sched-time-next"] = 0
+  context["sched-time-remaining"] = 0
+  context["sched-time-start"] = math.floor(socket.gettime() * 1000)
   local client = GenericObjectPool:connection(UserServiceClient, "user-service" .. k8s_suffix, 9090)
 
   local status, err = pcall(client.RegisterUserWithId, client, req_id, post.first_name,
-      post.last_name, post.username, post.password, tonumber(post.user_id), carrier)
+      post.last_name, post.username, post.password, tonumber(post.user_id), carrier, context)
 
   if not status then
     ngx.status = ngx.HTTP_INTERNAL_SERVER_ERROR

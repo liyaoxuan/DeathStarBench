@@ -49,30 +49,37 @@ function _M.ComposePost()
 
   local client = GenericObjectPool:connection(
       ComposePostServiceClient, "compose-post-service" .. k8s_suffix, 9090)
-  local t = ffi.new'time_timespec'
-  local CLOCK_MONOTONIC = 1
-  local function tos(t)
-    return tonumber(t.s)*1e9 + tonumber(t.ns)
-  end
-  ffi.C.time_clock_gettime(CLOCK_MONOTONIC, t)
-  local time = tos(t)
-  local pid = ffi.C.getpid()
+  -- local t = ffi.new'time_timespec'
+  -- local CLOCK_MONOTONIC = 1
+  -- local function tos(t)
+  --   return tonumber(t.s)*1e9 + tonumber(t.ns)
+  -- end
+  -- ffi.C.time_clock_gettime(CLOCK_MONOTONIC, t)
+  -- local time = tos(t)
+  -- local pid = ffi.C.getpid()
   local span = tracer:start_span("compose_post_client",
       { ["references"] = { { "child_of", parent_span_context } } })
-  span:set_tag("time", time)
-  span:set_tag("tid", pid)
+  -- span:set_tag("time", time)
+  -- span:set_tag("tid", pid)
   local carrier = {}
   tracer:text_map_inject(span:context(), carrier)
 
+  local socket = require "socket"
+  local context = {}
+  context["sched-enable"] = tonumber(args.enable)
+  context["sched-sla"] = tonumber(args.sla)
+  context["sched-time-next"] = 0
+  context["sched-time-remaining"] = 0
+  context["sched-time-start"] = math.floor(socket.gettime() * 1000)
   if (not _StrIsEmpty(post.media_ids) and not _StrIsEmpty(post.media_types)) then
     status, ret = pcall(client.ComposePost, client,
         req_id, post.username, tonumber(post.user_id), post.text,
         cjson.decode(post.media_ids), cjson.decode(post.media_types),
-        tonumber(post.post_type), carrier)
+        tonumber(post.post_type), carrier, context)
   else
     status, ret = pcall(client.ComposePost, client,
         req_id, post.username, tonumber(post.user_id), post.text,
-        {}, {}, tonumber(post.post_type), carrier)
+        {}, {}, tonumber(post.post_type), carrier, context)
   end
   if not status then
     ngx.status = ngx.HTTP_INTERNAL_SERVER_ERROR

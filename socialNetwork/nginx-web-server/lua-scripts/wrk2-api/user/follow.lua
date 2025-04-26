@@ -30,14 +30,21 @@ function _M.Follow()
   local client = GenericObjectPool:connection(
       SocialGraphServiceClient, "social-graph-service" .. k8s_suffix, 9090)
 
+  local socket = require "socket"
+  local context = {}
+  context["sched-enable"] = tonumber(args.enable)
+  context["sched-sla"] = tonumber(args.sla)
+  context["sched-time-next"] = 0
+  context["sched-time-remaining"] = 0
+  context["sched-time-start"] = math.floor(socket.gettime() * 1000)
   local status
   local err
   if (not _StrIsEmpty(post.user_id) and not _StrIsEmpty(post.followee_id)) then
     status, err = pcall(client.Follow, client,req_id,
-        tonumber(post.user_id), tonumber(post.followee_id), carrier )
+        tonumber(post.user_id), tonumber(post.followee_id), carrier, context)
   elseif (not _StrIsEmpty(post.user_name) and not _StrIsEmpty(post.followee_name)) then
     status, err = pcall(client.FollowWithUsername, client,req_id,
-        post.user_name, post.followee_name, carrier )
+        post.user_name, post.followee_name, carrier, context)
   else
     ngx.status = ngx.HTTP_BAD_REQUEST
     ngx.say("Incomplete arguments")

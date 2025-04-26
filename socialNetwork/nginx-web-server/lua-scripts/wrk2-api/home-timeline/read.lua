@@ -76,16 +76,17 @@ function _M.ReadHomeTimeline()
     ngx.exit(ngx.HTTP_BAD_REQUEST)
   end
 
-  carrier["sched-enable"] = tonumber(args.enable)
-  carrier["sched-sla"] = tonumber(args.sla)
-  carrier["sched-time-next"] = 0
-  carrier["sched-time-remaining"] = 0
-  carrier["sched-time-start"] = math.floor(socket.gettime() * 1000)
+  local context = {}
+  context["sched-enable"] = tonumber(args.enable)
+  context["sched-sla"] = tonumber(args.sla)
+  context["sched-time-next"] = 0
+  context["sched-time-remaining"] = 0
+  context["sched-time-start"] = math.floor(socket.gettime() * 1000)
 
   local client = GenericObjectPool:connection(
       HomeTimelineServiceClient, "home-timeline-service" .. k8s_suffix, 9090)
   local status, ret = pcall(client.ReadHomeTimeline, client, req_id,
-      tonumber(args.user_id), tonumber(args.start), tonumber(args.stop), carrier)
+      tonumber(args.user_id), tonumber(args.start), tonumber(args.stop), carrier, context)
   if not status then
     ngx.status = ngx.HTTP_INTERNAL_SERVER_ERROR
     if (ret.message) then
