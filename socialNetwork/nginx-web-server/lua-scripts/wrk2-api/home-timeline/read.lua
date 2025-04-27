@@ -63,8 +63,6 @@ function _M.ReadHomeTimeline()
 
   local span = tracer:start_span("read_home_timeline_client",
       { ["references"] = { { "child_of", parent_span_context } } })
-  local carrier = {}
-  tracer:text_map_inject(span:context(), carrier)
 
   ngx.req.read_body()
   local args = ngx.req.get_uri_args()
@@ -89,6 +87,10 @@ function _M.ReadHomeTimeline()
     end
   end
 
+  span:set_tag("enable", tonumber(args.enable))
+  span:set_tag("sla", tonumber(args.sla))
+  local carrier = {}
+  tracer:text_map_inject(span:context(), carrier)
   local context = {}
   context["sched-enable"] = tonumber(args.enable)
   context["sched-sla"] = tonumber(args.sla)
@@ -97,6 +99,7 @@ function _M.ReadHomeTimeline()
   context["sched-time-start"] = math.floor(socket.gettime() * 1000)
 
 
+  ngx.log(ngx.ERR, "ReadHomeTimeline: " .. dump(carrier))
 
   local client = GenericObjectPool:connection(
       HomeTimelineServiceClient, "home-timeline-service" .. k8s_suffix, 9090)
