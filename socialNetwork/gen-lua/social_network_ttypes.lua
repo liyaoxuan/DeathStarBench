@@ -6,8 +6,10 @@
 --
 
 
-require 'Thrift'
-require 'social_network_constants'
+local Thrift = require 'Thrift'
+local TType = Thrift.TType
+local __TObject = Thrift.__TObject
+local TException = Thrift.TException
 
 ErrorCode = {
   SE_CONNPOOL_TIMEOUT = 0,
