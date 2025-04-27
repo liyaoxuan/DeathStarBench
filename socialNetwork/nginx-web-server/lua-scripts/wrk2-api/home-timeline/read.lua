@@ -54,7 +54,6 @@ function _M.ReadHomeTimeline()
   local HomeTimelineServiceClient = social_network_HomeTimelineService.HomeTimelineServiceClient
   local cjson = require "cjson"
   local liblualongnumber = require "liblualongnumber"
-  local socket = require "socket"
 
   local req_id = tonumber(string.sub(ngx.var.request_id, 0, 15), 16)
   local tracer = bridge_tracer.new_from_global()
@@ -76,24 +75,21 @@ function _M.ReadHomeTimeline()
     ngx.exit(ngx.HTTP_BAD_REQUEST)
   end
 
-  local function dump(o)
-    if type(o) == 'table' then
-        local s = '{ '
-        for k,v in pairs(o) do
-          if type(k) ~= 'number' then k = '"'..k..'"' end
-          s = s .. '['..k..'] = ' .. dump(v) .. ','
-        end
-        return s .. '} '
-    else
-        return tostring(o)
-    end
-  end
+  local carrier = {}
+  tracer:text_map_inject(span:context(), carrier)
 
-  carrier["sched-enable"] = tonumber(args.enable)
-  carrier["sched-sla"] = tonumber(args.sla)
+  local socket = require "socket"
   local context = {}
-  context["sched-enable"] = tonumber(args.enable)
-  context["sched-sla"] = tonumber(args.sla)
+  local enable = 0
+  local sla = 10000000
+  if (not _StrIsEmpty(args.enable)) then
+    enable = tonumber(args.enable)
+  end
+  if (not _StrIsEmpty(args.sla)) then
+    sla = tonumber(args.sla)
+  end
+  context["sched-enable"] = enable
+  context["sched-sla"] = sla
   context["sched-time-next"] = 0
   context["sched-time-remaining"] = 0
   context["sched-time-start"] = math.floor(socket.gettime() * 1000)
@@ -101,8 +97,6 @@ function _M.ReadHomeTimeline()
   ngx.log(ngx.ERR, dump(carrier))
   ngx.log(ngx.ERR, dump(context))
 
-
-  ngx.log(ngx.ERR, "reschedule: enable=" .. args.enable .. ", sla=" .. args.sla)
   local client = GenericObjectPool:connection(
       HomeTimelineServiceClient, "home-timeline-service" .. k8s_suffix, 9090)
   local status, ret = pcall(client.ReadHomeTimeline, client, req_id,

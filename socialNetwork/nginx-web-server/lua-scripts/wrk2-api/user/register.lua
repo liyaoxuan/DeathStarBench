@@ -38,8 +38,16 @@ function _M.RegisterUser()
 
   local socket = require "socket"
   local context = {}
-  context["sched-enable"] = tonumber(args.enable)
-  context["sched-sla"] = tonumber(args.sla)
+  local enable = 0
+  local sla = 10000000
+  if (not _StrIsEmpty(post.enable)) then
+    enable = tonumber(post.enable)
+  end
+  if (not _StrIsEmpty(post.sla)) then
+    sla = tonumber(post.sla)
+  end
+  context["sched-enable"] = enable
+  context["sched-sla"] = sla
   context["sched-time-next"] = 0
   context["sched-time-remaining"] = 0
   context["sched-time-start"] = math.floor(socket.gettime() * 1000)
