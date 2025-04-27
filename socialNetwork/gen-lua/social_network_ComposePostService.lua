@@ -6,21 +6,99 @@
 --
 
 
-local Thrift = require 'Thrift'
-local TType = Thrift.TType
-local TMessageType = Thrift.TMessageType
-local __TObject = Thrift.__TObject
-local TApplicationException = Thrift.TApplicationException
-local __TClient = Thrift.__TClient
-local __TProcessor = Thrift.__TProcessor
-local ttype = Thrift.ttype
-local ttable_size = Thrift.ttable_size
-local social_network_ttypes = require 'social_network_ttypes'
-local ServiceException = social_network_ttypes.ServiceException
+require 'Thrift'
+require 'social_network_ttypes'
+
+ComposePostServiceClient = __TObject.new(__TClient, {
+  __type = 'ComposePostServiceClient'
+})
+
+function ComposePostServiceClient:ComposePost(req_id, username, user_id, text, media_ids, media_types, post_type, carrier, context)
+  self:send_ComposePost(req_id, username, user_id, text, media_ids, media_types, post_type, carrier, context)
+  self:recv_ComposePost(req_id, username, user_id, text, media_ids, media_types, post_type, carrier, context)
+end
+
+function ComposePostServiceClient:send_ComposePost(req_id, username, user_id, text, media_ids, media_types, post_type, carrier, context)
+  self.oprot:writeMessageBegin('ComposePost', TMessageType.CALL, self._seqid)
+  local args = ComposePost_args:new{}
+  args.req_id = req_id
+  args.username = username
+  args.user_id = user_id
+  args.text = text
+  args.media_ids = media_ids
+  args.media_types = media_types
+  args.post_type = post_type
+  args.carrier = carrier
+  args.context = context
+  args:write(self.oprot)
+  self.oprot:writeMessageEnd()
+  self.oprot.trans:flush()
+end
+
+function ComposePostServiceClient:recv_ComposePost(req_id, username, user_id, text, media_ids, media_types, post_type, carrier, context)
+  local fname, mtype, rseqid = self.iprot:readMessageBegin()
+  if mtype == TMessageType.EXCEPTION then
+    local x = TApplicationException:new{}
+    x:read(self.iprot)
+    self.iprot:readMessageEnd()
+    error(x)
+  end
+  local result = ComposePost_result:new{}
+  result:read(self.iprot)
+  self.iprot:readMessageEnd()
+end
+ComposePostServiceIface = __TObject:new{
+  __type = 'ComposePostServiceIface'
+}
+
+
+ComposePostServiceProcessor = __TObject.new(__TProcessor
+, {
+ __type = 'ComposePostServiceProcessor'
+})
+
+function ComposePostServiceProcessor:process(iprot, oprot, server_ctx)
+  local name, mtype, seqid = iprot:readMessageBegin()
+  local func_name = 'process_' .. name
+  if not self[func_name] or ttype(self[func_name]) ~= 'function' then
+    iprot:skip(TType.STRUCT)
+    iprot:readMessageEnd()
+    x = TApplicationException:new{
+      errorCode = TApplicationException.UNKNOWN_METHOD
+    }
+    oprot:writeMessageBegin(name, TMessageType.EXCEPTION, seqid)
+    x:write(oprot)
+    oprot:writeMessageEnd()
+    oprot.trans:flush()
+  else
+    self[func_name](self, seqid, iprot, oprot, server_ctx)
+  end
+end
+
+function ComposePostServiceProcessor:process_ComposePost(seqid, iprot, oprot, server_ctx)
+  local args = ComposePost_args:new{}
+  local reply_type = TMessageType.REPLY
+  args:read(iprot)
+  iprot:readMessageEnd()
+  local result = ComposePost_result:new{}
+  local status, res = pcall(self.handler.ComposePost, self.handler, args.req_id, args.username, args.user_id, args.text, args.media_ids, args.media_types, args.post_type, args.carrier, args.context)
+  if not status then
+    reply_type = TMessageType.EXCEPTION
+    result = TApplicationException:new{message = res}
+  elseif ttype(res) == 'ServiceException' then
+    result.se = res
+  else
+    result.success = res
+  end
+  oprot:writeMessageBegin('ComposePost', reply_type, seqid)
+  result:write(oprot)
+  oprot:writeMessageEnd()
+  oprot.trans:flush()
+end
 
 -- HELPER FUNCTIONS AND STRUCTURES
 
-local ComposePost_args = __TObject:new{
+ComposePost_args = __TObject:new{
   req_id,
   username,
   user_id,
@@ -28,7 +106,8 @@ local ComposePost_args = __TObject:new{
   media_ids,
   media_types,
   post_type,
-  carrier
+  carrier,
+  context
 }
 
 function ComposePost_args:read(iprot)
@@ -64,10 +143,10 @@ function ComposePost_args:read(iprot)
     elseif fid == 5 then
       if ftype == TType.LIST then
         self.media_ids = {}
-        local _etype97, _size94 = iprot:readListBegin()
-        for _i=1,_size94 do
-          local _elem98 = iprot:readI64()
-          table.insert(self.media_ids, _elem98)
+        local _etype161, _size158 = iprot:readListBegin()
+        for _i=1,_size158 do
+          local _elem162 = iprot:readI64()
+          table.insert(self.media_ids, _elem162)
         end
         iprot:readListEnd()
       else
@@ -76,10 +155,10 @@ function ComposePost_args:read(iprot)
     elseif fid == 6 then
       if ftype == TType.LIST then
         self.media_types = {}
-        local _etype102, _size99 = iprot:readListBegin()
-        for _i=1,_size99 do
-          local _elem103 = iprot:readString()
-          table.insert(self.media_types, _elem103)
+        local _etype166, _size163 = iprot:readListBegin()
+        for _i=1,_size163 do
+          local _elem167 = iprot:readString()
+          table.insert(self.media_types, _elem167)
         end
         iprot:readListEnd()
       else
@@ -94,11 +173,24 @@ function ComposePost_args:read(iprot)
     elseif fid == 8 then
       if ftype == TType.MAP then
         self.carrier = {}
-        local _ktype105, _vtype106, _size104 = iprot:readMapBegin()
-        for _i=1,_size104 do
-          local _key108 = iprot:readString()
-          local _val109 = iprot:readString()
-          self.carrier[_key108] = _val109
+        local _ktype169, _vtype170, _size168 = iprot:readMapBegin() 
+        for _i=1,_size168 do
+          local _key172 = iprot:readString()
+          local _val173 = iprot:readString()
+          self.carrier[_key172] = _val173
+        end
+        iprot:readMapEnd()
+      else
+        iprot:skip(ftype)
+      end
+    elseif fid == 9 then
+      if ftype == TType.MAP then
+        self.context = {}
+        local _ktype175, _vtype176, _size174 = iprot:readMapBegin() 
+        for _i=1,_size174 do
+          local _key178 = iprot:readString()
+          local _val179 = iprot:readString()
+          self.context[_key178] = _val179
         end
         iprot:readMapEnd()
       else
@@ -137,8 +229,8 @@ function ComposePost_args:write(oprot)
   if self.media_ids ~= nil then
     oprot:writeFieldBegin('media_ids', TType.LIST, 5)
     oprot:writeListBegin(TType.I64, #self.media_ids)
-    for _,iter110 in ipairs(self.media_ids) do
-      oprot:writeI64(iter110)
+    for _,iter180 in ipairs(self.media_ids) do
+      oprot:writeI64(iter180)
     end
     oprot:writeListEnd()
     oprot:writeFieldEnd()
@@ -146,8 +238,8 @@ function ComposePost_args:write(oprot)
   if self.media_types ~= nil then
     oprot:writeFieldBegin('media_types', TType.LIST, 6)
     oprot:writeListBegin(TType.STRING, #self.media_types)
-    for _,iter111 in ipairs(self.media_types) do
-      oprot:writeString(iter111)
+    for _,iter181 in ipairs(self.media_types) do
+      oprot:writeString(iter181)
     end
     oprot:writeListEnd()
     oprot:writeFieldEnd()
@@ -160,9 +252,19 @@ function ComposePost_args:write(oprot)
   if self.carrier ~= nil then
     oprot:writeFieldBegin('carrier', TType.MAP, 8)
     oprot:writeMapBegin(TType.STRING, TType.STRING, ttable_size(self.carrier))
-    for kiter112,viter113 in pairs(self.carrier) do
-      oprot:writeString(kiter112)
-      oprot:writeString(viter113)
+    for kiter182,viter183 in pairs(self.carrier) do
+      oprot:writeString(kiter182)
+      oprot:writeString(viter183)
+    end
+    oprot:writeMapEnd()
+    oprot:writeFieldEnd()
+  end
+  if self.context ~= nil then
+    oprot:writeFieldBegin('context', TType.MAP, 9)
+    oprot:writeMapBegin(TType.STRING, TType.STRING, ttable_size(self.context))
+    for kiter184,viter185 in pairs(self.context) do
+      oprot:writeString(kiter184)
+      oprot:writeString(viter185)
     end
     oprot:writeMapEnd()
     oprot:writeFieldEnd()
@@ -171,7 +273,7 @@ function ComposePost_args:write(oprot)
   oprot:writeStructEnd()
 end
 
-local ComposePost_result = __TObject:new{
+ComposePost_result = __TObject:new{
   se
 }
 
@@ -206,93 +308,3 @@ function ComposePost_result:write(oprot)
   oprot:writeFieldStop()
   oprot:writeStructEnd()
 end
-
-local ComposePostServiceClient = __TObject.new(__TClient, {
-  __type = 'ComposePostServiceClient'
-})
-
-function ComposePostServiceClient:ComposePost(req_id, username, user_id, text, media_ids, media_types, post_type, carrier)
-  self:send_ComposePost(req_id, username, user_id, text, media_ids, media_types, post_type, carrier)
-  self:recv_ComposePost(req_id, username, user_id, text, media_ids, media_types, post_type, carrier)
-end
-
-function ComposePostServiceClient:send_ComposePost(req_id, username, user_id, text, media_ids, media_types, post_type, carrier)
-  self.oprot:writeMessageBegin('ComposePost', TMessageType.CALL, self._seqid)
-  local args = ComposePost_args:new{}
-  args.req_id = req_id
-  args.username = username
-  args.user_id = user_id
-  args.text = text
-  args.media_ids = media_ids
-  args.media_types = media_types
-  args.post_type = post_type
-  args.carrier = carrier
-  args:write(self.oprot)
-  self.oprot:writeMessageEnd()
-  self.oprot.trans:flush()
-end
-
-function ComposePostServiceClient:recv_ComposePost(req_id, username, user_id, text, media_ids, media_types, post_type, carrier)
-  local fname, mtype, rseqid = self.iprot:readMessageBegin()
-  if mtype == TMessageType.EXCEPTION then
-    local x = TApplicationException:new{}
-    x:read(self.iprot)
-    self.iprot:readMessageEnd()
-    error(x)
-  end
-  local result = ComposePost_result:new{}
-  result:read(self.iprot)
-  self.iprot:readMessageEnd()
-end
-local ComposePostServiceIface = __TObject:new{
-  __type = 'ComposePostServiceIface'
-}
-
-
-local ComposePostServiceProcessor = __TObject.new(__TProcessor
-, {
- __type = 'ComposePostServiceProcessor'
-})
-
-function ComposePostServiceProcessor:process(iprot, oprot, server_ctx)
-  local name, mtype, seqid = iprot:readMessageBegin()
-  local func_name = 'process_' .. name
-  if not self[func_name] or ttype(self[func_name]) ~= 'function' then
-    iprot:skip(TType.STRUCT)
-    iprot:readMessageEnd()
-    x = TApplicationException:new{
-      errorCode = TApplicationException.UNKNOWN_METHOD
-    }
-    oprot:writeMessageBegin(name, TMessageType.EXCEPTION, seqid)
-    x:write(oprot)
-    oprot:writeMessageEnd()
-    oprot.trans:flush()
-  else
-    self[func_name](self, seqid, iprot, oprot, server_ctx)
-  end
-end
-
-function ComposePostServiceProcessor:process_ComposePost(seqid, iprot, oprot, server_ctx)
-  local args = ComposePost_args:new{}
-  local reply_type = TMessageType.REPLY
-  args:read(iprot)
-  iprot:readMessageEnd()
-  local result = ComposePost_result:new{}
-  local status, res = pcall(self.handler.ComposePost, self.handler, args.req_id, args.username, args.user_id, args.text, args.media_ids, args.media_types, args.post_type, args.carrier)
-  if not status then
-    reply_type = TMessageType.EXCEPTION
-    result = TApplicationException:new{message = res}
-  elseif ttype(res) == 'ServiceException' then
-    result.se = res
-  else
-    result.success = res
-  end
-  oprot:writeMessageBegin('ComposePost', reply_type, seqid)
-  result:write(oprot)
-  oprot:writeMessageEnd()
-  oprot.trans:flush()
-end
-
-return {
-  ComposePostServiceClient = ComposePostServiceClient
-}

@@ -13,23 +13,24 @@ UserMentionServiceClient = __TObject.new(__TClient, {
   __type = 'UserMentionServiceClient'
 })
 
-function UserMentionServiceClient:ComposeUserMentions(req_id, usernames, carrier)
-  self:send_ComposeUserMentions(req_id, usernames, carrier)
-  return self:recv_ComposeUserMentions(req_id, usernames, carrier)
+function UserMentionServiceClient:ComposeUserMentions(req_id, usernames, carrier, context)
+  self:send_ComposeUserMentions(req_id, usernames, carrier, context)
+  return self:recv_ComposeUserMentions(req_id, usernames, carrier, context)
 end
 
-function UserMentionServiceClient:send_ComposeUserMentions(req_id, usernames, carrier)
+function UserMentionServiceClient:send_ComposeUserMentions(req_id, usernames, carrier, context)
   self.oprot:writeMessageBegin('ComposeUserMentions', TMessageType.CALL, self._seqid)
   local args = ComposeUserMentions_args:new{}
   args.req_id = req_id
   args.usernames = usernames
   args.carrier = carrier
+  args.context = context
   args:write(self.oprot)
   self.oprot:writeMessageEnd()
   self.oprot.trans:flush()
 end
 
-function UserMentionServiceClient:recv_ComposeUserMentions(req_id, usernames, carrier)
+function UserMentionServiceClient:recv_ComposeUserMentions(req_id, usernames, carrier, context)
   local fname, mtype, rseqid = self.iprot:readMessageBegin()
   if mtype == TMessageType.EXCEPTION then
     local x = TApplicationException:new{}
@@ -81,7 +82,7 @@ function UserMentionServiceProcessor:process_ComposeUserMentions(seqid, iprot, o
   args:read(iprot)
   iprot:readMessageEnd()
   local result = ComposeUserMentions_result:new{}
-  local status, res = pcall(self.handler.ComposeUserMentions, self.handler, args.req_id, args.usernames, args.carrier)
+  local status, res = pcall(self.handler.ComposeUserMentions, self.handler, args.req_id, args.usernames, args.carrier, args.context)
   if not status then
     reply_type = TMessageType.EXCEPTION
     result = TApplicationException:new{message = res}
@@ -101,7 +102,8 @@ end
 ComposeUserMentions_args = __TObject:new{
   req_id,
   usernames,
-  carrier
+  carrier,
+  context
 }
 
 function ComposeUserMentions_args:read(iprot)
@@ -119,10 +121,10 @@ function ComposeUserMentions_args:read(iprot)
     elseif fid == 2 then
       if ftype == TType.LIST then
         self.usernames = {}
-        local _etype263, _size260 = iprot:readListBegin()
-        for _i=1,_size260 do
-          local _elem264 = iprot:readString()
-          table.insert(self.usernames, _elem264)
+        local _etype455, _size452 = iprot:readListBegin()
+        for _i=1,_size452 do
+          local _elem456 = iprot:readString()
+          table.insert(self.usernames, _elem456)
         end
         iprot:readListEnd()
       else
@@ -131,11 +133,24 @@ function ComposeUserMentions_args:read(iprot)
     elseif fid == 3 then
       if ftype == TType.MAP then
         self.carrier = {}
-        local _ktype266, _vtype267, _size265 = iprot:readMapBegin()
-        for _i=1,_size265 do
-          local _key269 = iprot:readString()
-          local _val270 = iprot:readString()
-          self.carrier[_key269] = _val270
+        local _ktype458, _vtype459, _size457 = iprot:readMapBegin() 
+        for _i=1,_size457 do
+          local _key461 = iprot:readString()
+          local _val462 = iprot:readString()
+          self.carrier[_key461] = _val462
+        end
+        iprot:readMapEnd()
+      else
+        iprot:skip(ftype)
+      end
+    elseif fid == 4 then
+      if ftype == TType.MAP then
+        self.context = {}
+        local _ktype464, _vtype465, _size463 = iprot:readMapBegin() 
+        for _i=1,_size463 do
+          local _key467 = iprot:readString()
+          local _val468 = iprot:readString()
+          self.context[_key467] = _val468
         end
         iprot:readMapEnd()
       else
@@ -159,8 +174,8 @@ function ComposeUserMentions_args:write(oprot)
   if self.usernames ~= nil then
     oprot:writeFieldBegin('usernames', TType.LIST, 2)
     oprot:writeListBegin(TType.STRING, #self.usernames)
-    for _,iter271 in ipairs(self.usernames) do
-      oprot:writeString(iter271)
+    for _,iter469 in ipairs(self.usernames) do
+      oprot:writeString(iter469)
     end
     oprot:writeListEnd()
     oprot:writeFieldEnd()
@@ -168,9 +183,19 @@ function ComposeUserMentions_args:write(oprot)
   if self.carrier ~= nil then
     oprot:writeFieldBegin('carrier', TType.MAP, 3)
     oprot:writeMapBegin(TType.STRING, TType.STRING, ttable_size(self.carrier))
-    for kiter272,viter273 in pairs(self.carrier) do
-      oprot:writeString(kiter272)
-      oprot:writeString(viter273)
+    for kiter470,viter471 in pairs(self.carrier) do
+      oprot:writeString(kiter470)
+      oprot:writeString(viter471)
+    end
+    oprot:writeMapEnd()
+    oprot:writeFieldEnd()
+  end
+  if self.context ~= nil then
+    oprot:writeFieldBegin('context', TType.MAP, 4)
+    oprot:writeMapBegin(TType.STRING, TType.STRING, ttable_size(self.context))
+    for kiter472,viter473 in pairs(self.context) do
+      oprot:writeString(kiter472)
+      oprot:writeString(viter473)
     end
     oprot:writeMapEnd()
     oprot:writeFieldEnd()
@@ -193,11 +218,11 @@ function ComposeUserMentions_result:read(iprot)
     elseif fid == 0 then
       if ftype == TType.LIST then
         self.success = {}
-        local _etype277, _size274 = iprot:readListBegin()
-        for _i=1,_size274 do
-          local _elem278 = UserMention:new{}
-          _elem278:read(iprot)
-          table.insert(self.success, _elem278)
+        local _etype477, _size474 = iprot:readListBegin()
+        for _i=1,_size474 do
+          local _elem478 = UserMention:new{}
+          _elem478:read(iprot)
+          table.insert(self.success, _elem478)
         end
         iprot:readListEnd()
       else
@@ -223,8 +248,8 @@ function ComposeUserMentions_result:write(oprot)
   if self.success ~= nil then
     oprot:writeFieldBegin('success', TType.LIST, 0)
     oprot:writeListBegin(TType.STRUCT, #self.success)
-    for _,iter279 in ipairs(self.success) do
-      iter279:write(oprot)
+    for _,iter479 in ipairs(self.success) do
+      iter479:write(oprot)
     end
     oprot:writeListEnd()
     oprot:writeFieldEnd()

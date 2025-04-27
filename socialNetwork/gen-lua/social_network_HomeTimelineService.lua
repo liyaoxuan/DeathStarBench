@@ -6,27 +6,162 @@
 --
 
 
-local Thrift = require 'Thrift'
-local TType = Thrift.TType
-local TMessageType = Thrift.TMessageType
-local __TObject = Thrift.__TObject
-local TApplicationException = Thrift.TApplicationException
-local __TClient = Thrift.__TClient
-local __TProcessor = Thrift.__TProcessor
-local ttype = Thrift.ttype
-local ttable_size = Thrift.ttable_size
-local social_network_ttypes = require 'social_network_ttypes'
-local ServiceException = social_network_ttypes.ServiceException
-local Post = social_network_ttypes.Post
+require 'Thrift'
+require 'social_network_ttypes'
+
+HomeTimelineServiceClient = __TObject.new(__TClient, {
+  __type = 'HomeTimelineServiceClient'
+})
+
+function HomeTimelineServiceClient:ReadHomeTimeline(req_id, user_id, start, stop, carrier, context)
+  self:send_ReadHomeTimeline(req_id, user_id, start, stop, carrier, context)
+  return self:recv_ReadHomeTimeline(req_id, user_id, start, stop, carrier, context)
+end
+
+function HomeTimelineServiceClient:send_ReadHomeTimeline(req_id, user_id, start, stop, carrier, context)
+  self.oprot:writeMessageBegin('ReadHomeTimeline', TMessageType.CALL, self._seqid)
+  local args = ReadHomeTimeline_args:new{}
+  args.req_id = req_id
+  args.user_id = user_id
+  args.start = start
+  args.stop = stop
+  args.carrier = carrier
+  args.context = context
+  args:write(self.oprot)
+  self.oprot:writeMessageEnd()
+  self.oprot.trans:flush()
+end
+
+function HomeTimelineServiceClient:recv_ReadHomeTimeline(req_id, user_id, start, stop, carrier, context)
+  local fname, mtype, rseqid = self.iprot:readMessageBegin()
+  if mtype == TMessageType.EXCEPTION then
+    local x = TApplicationException:new{}
+    x:read(self.iprot)
+    self.iprot:readMessageEnd()
+    error(x)
+  end
+  local result = ReadHomeTimeline_result:new{}
+  result:read(self.iprot)
+  self.iprot:readMessageEnd()
+  if result.success ~= nil then
+    return result.success
+  elseif result.se then
+    error(result.se)
+  end
+  error(TApplicationException:new{errorCode = TApplicationException.MISSING_RESULT})
+end
+
+function HomeTimelineServiceClient:WriteHomeTimeline(req_id, post_id, user_id, timestamp, user_mentions_id, carrier, context)
+  self:send_WriteHomeTimeline(req_id, post_id, user_id, timestamp, user_mentions_id, carrier, context)
+  self:recv_WriteHomeTimeline(req_id, post_id, user_id, timestamp, user_mentions_id, carrier, context)
+end
+
+function HomeTimelineServiceClient:send_WriteHomeTimeline(req_id, post_id, user_id, timestamp, user_mentions_id, carrier, context)
+  self.oprot:writeMessageBegin('WriteHomeTimeline', TMessageType.CALL, self._seqid)
+  local args = WriteHomeTimeline_args:new{}
+  args.req_id = req_id
+  args.post_id = post_id
+  args.user_id = user_id
+  args.timestamp = timestamp
+  args.user_mentions_id = user_mentions_id
+  args.carrier = carrier
+  args.context = context
+  args:write(self.oprot)
+  self.oprot:writeMessageEnd()
+  self.oprot.trans:flush()
+end
+
+function HomeTimelineServiceClient:recv_WriteHomeTimeline(req_id, post_id, user_id, timestamp, user_mentions_id, carrier, context)
+  local fname, mtype, rseqid = self.iprot:readMessageBegin()
+  if mtype == TMessageType.EXCEPTION then
+    local x = TApplicationException:new{}
+    x:read(self.iprot)
+    self.iprot:readMessageEnd()
+    error(x)
+  end
+  local result = WriteHomeTimeline_result:new{}
+  result:read(self.iprot)
+  self.iprot:readMessageEnd()
+end
+HomeTimelineServiceIface = __TObject:new{
+  __type = 'HomeTimelineServiceIface'
+}
+
+
+HomeTimelineServiceProcessor = __TObject.new(__TProcessor
+, {
+ __type = 'HomeTimelineServiceProcessor'
+})
+
+function HomeTimelineServiceProcessor:process(iprot, oprot, server_ctx)
+  local name, mtype, seqid = iprot:readMessageBegin()
+  local func_name = 'process_' .. name
+  if not self[func_name] or ttype(self[func_name]) ~= 'function' then
+    iprot:skip(TType.STRUCT)
+    iprot:readMessageEnd()
+    x = TApplicationException:new{
+      errorCode = TApplicationException.UNKNOWN_METHOD
+    }
+    oprot:writeMessageBegin(name, TMessageType.EXCEPTION, seqid)
+    x:write(oprot)
+    oprot:writeMessageEnd()
+    oprot.trans:flush()
+  else
+    self[func_name](self, seqid, iprot, oprot, server_ctx)
+  end
+end
+
+function HomeTimelineServiceProcessor:process_ReadHomeTimeline(seqid, iprot, oprot, server_ctx)
+  local args = ReadHomeTimeline_args:new{}
+  local reply_type = TMessageType.REPLY
+  args:read(iprot)
+  iprot:readMessageEnd()
+  local result = ReadHomeTimeline_result:new{}
+  local status, res = pcall(self.handler.ReadHomeTimeline, self.handler, args.req_id, args.user_id, args.start, args.stop, args.carrier, args.context)
+  if not status then
+    reply_type = TMessageType.EXCEPTION
+    result = TApplicationException:new{message = res}
+  elseif ttype(res) == 'ServiceException' then
+    result.se = res
+  else
+    result.success = res
+  end
+  oprot:writeMessageBegin('ReadHomeTimeline', reply_type, seqid)
+  result:write(oprot)
+  oprot:writeMessageEnd()
+  oprot.trans:flush()
+end
+
+function HomeTimelineServiceProcessor:process_WriteHomeTimeline(seqid, iprot, oprot, server_ctx)
+  local args = WriteHomeTimeline_args:new{}
+  local reply_type = TMessageType.REPLY
+  args:read(iprot)
+  iprot:readMessageEnd()
+  local result = WriteHomeTimeline_result:new{}
+  local status, res = pcall(self.handler.WriteHomeTimeline, self.handler, args.req_id, args.post_id, args.user_id, args.timestamp, args.user_mentions_id, args.carrier, args.context)
+  if not status then
+    reply_type = TMessageType.EXCEPTION
+    result = TApplicationException:new{message = res}
+  elseif ttype(res) == 'ServiceException' then
+    result.se = res
+  else
+    result.success = res
+  end
+  oprot:writeMessageBegin('WriteHomeTimeline', reply_type, seqid)
+  result:write(oprot)
+  oprot:writeMessageEnd()
+  oprot.trans:flush()
+end
 
 -- HELPER FUNCTIONS AND STRUCTURES
 
-local ReadHomeTimeline_args = __TObject:new{
+ReadHomeTimeline_args = __TObject:new{
   req_id,
   user_id,
   start,
   stop,
-  carrier
+  carrier,
+  context
 }
 
 function ReadHomeTimeline_args:read(iprot)
@@ -62,11 +197,24 @@ function ReadHomeTimeline_args:read(iprot)
     elseif fid == 5 then
       if ftype == TType.MAP then
         self.carrier = {}
-        local _ktype151, _vtype152, _size150 = iprot:readMapBegin()
-        for _i=1,_size150 do
-          local _key154 = iprot:readString()
-          local _val155 = iprot:readString()
-          self.carrier[_key154] = _val155
+        local _ktype247, _vtype248, _size246 = iprot:readMapBegin() 
+        for _i=1,_size246 do
+          local _key250 = iprot:readString()
+          local _val251 = iprot:readString()
+          self.carrier[_key250] = _val251
+        end
+        iprot:readMapEnd()
+      else
+        iprot:skip(ftype)
+      end
+    elseif fid == 6 then
+      if ftype == TType.MAP then
+        self.context = {}
+        local _ktype253, _vtype254, _size252 = iprot:readMapBegin() 
+        for _i=1,_size252 do
+          local _key256 = iprot:readString()
+          local _val257 = iprot:readString()
+          self.context[_key256] = _val257
         end
         iprot:readMapEnd()
       else
@@ -105,9 +253,19 @@ function ReadHomeTimeline_args:write(oprot)
   if self.carrier ~= nil then
     oprot:writeFieldBegin('carrier', TType.MAP, 5)
     oprot:writeMapBegin(TType.STRING, TType.STRING, ttable_size(self.carrier))
-    for kiter156,viter157 in pairs(self.carrier) do
-      oprot:writeString(kiter156)
-      oprot:writeString(viter157)
+    for kiter258,viter259 in pairs(self.carrier) do
+      oprot:writeString(kiter258)
+      oprot:writeString(viter259)
+    end
+    oprot:writeMapEnd()
+    oprot:writeFieldEnd()
+  end
+  if self.context ~= nil then
+    oprot:writeFieldBegin('context', TType.MAP, 6)
+    oprot:writeMapBegin(TType.STRING, TType.STRING, ttable_size(self.context))
+    for kiter260,viter261 in pairs(self.context) do
+      oprot:writeString(kiter260)
+      oprot:writeString(viter261)
     end
     oprot:writeMapEnd()
     oprot:writeFieldEnd()
@@ -116,7 +274,7 @@ function ReadHomeTimeline_args:write(oprot)
   oprot:writeStructEnd()
 end
 
-local ReadHomeTimeline_result = __TObject:new{
+ReadHomeTimeline_result = __TObject:new{
   success,
   se
 }
@@ -130,11 +288,11 @@ function ReadHomeTimeline_result:read(iprot)
     elseif fid == 0 then
       if ftype == TType.LIST then
         self.success = {}
-        local _etype161, _size158 = iprot:readListBegin()
-        for _i=1,_size158 do
-          local _elem162 = Post:new{}
-          _elem162:read(iprot)
-          table.insert(self.success, _elem162)
+        local _etype265, _size262 = iprot:readListBegin()
+        for _i=1,_size262 do
+          local _elem266 = Post:new{}
+          _elem266:read(iprot)
+          table.insert(self.success, _elem266)
         end
         iprot:readListEnd()
       else
@@ -160,8 +318,8 @@ function ReadHomeTimeline_result:write(oprot)
   if self.success ~= nil then
     oprot:writeFieldBegin('success', TType.LIST, 0)
     oprot:writeListBegin(TType.STRUCT, #self.success)
-    for _,iter163 in ipairs(self.success) do
-      iter163:write(oprot)
+    for _,iter267 in ipairs(self.success) do
+      iter267:write(oprot)
     end
     oprot:writeListEnd()
     oprot:writeFieldEnd()
@@ -175,13 +333,14 @@ function ReadHomeTimeline_result:write(oprot)
   oprot:writeStructEnd()
 end
 
-local WriteHomeTimeline_args = __TObject:new{
+WriteHomeTimeline_args = __TObject:new{
   req_id,
   post_id,
   user_id,
   timestamp,
   user_mentions_id,
-  carrier
+  carrier,
+  context
 }
 
 function WriteHomeTimeline_args:read(iprot)
@@ -217,10 +376,10 @@ function WriteHomeTimeline_args:read(iprot)
     elseif fid == 5 then
       if ftype == TType.LIST then
         self.user_mentions_id = {}
-        local _etype167, _size164 = iprot:readListBegin()
-        for _i=1,_size164 do
-          local _elem168 = iprot:readI64()
-          table.insert(self.user_mentions_id, _elem168)
+        local _etype271, _size268 = iprot:readListBegin()
+        for _i=1,_size268 do
+          local _elem272 = iprot:readI64()
+          table.insert(self.user_mentions_id, _elem272)
         end
         iprot:readListEnd()
       else
@@ -229,11 +388,24 @@ function WriteHomeTimeline_args:read(iprot)
     elseif fid == 6 then
       if ftype == TType.MAP then
         self.carrier = {}
-        local _ktype170, _vtype171, _size169 = iprot:readMapBegin()
-        for _i=1,_size169 do
-          local _key173 = iprot:readString()
-          local _val174 = iprot:readString()
-          self.carrier[_key173] = _val174
+        local _ktype274, _vtype275, _size273 = iprot:readMapBegin() 
+        for _i=1,_size273 do
+          local _key277 = iprot:readString()
+          local _val278 = iprot:readString()
+          self.carrier[_key277] = _val278
+        end
+        iprot:readMapEnd()
+      else
+        iprot:skip(ftype)
+      end
+    elseif fid == 7 then
+      if ftype == TType.MAP then
+        self.context = {}
+        local _ktype280, _vtype281, _size279 = iprot:readMapBegin() 
+        for _i=1,_size279 do
+          local _key283 = iprot:readString()
+          local _val284 = iprot:readString()
+          self.context[_key283] = _val284
         end
         iprot:readMapEnd()
       else
@@ -272,8 +444,8 @@ function WriteHomeTimeline_args:write(oprot)
   if self.user_mentions_id ~= nil then
     oprot:writeFieldBegin('user_mentions_id', TType.LIST, 5)
     oprot:writeListBegin(TType.I64, #self.user_mentions_id)
-    for _,iter175 in ipairs(self.user_mentions_id) do
-      oprot:writeI64(iter175)
+    for _,iter285 in ipairs(self.user_mentions_id) do
+      oprot:writeI64(iter285)
     end
     oprot:writeListEnd()
     oprot:writeFieldEnd()
@@ -281,9 +453,19 @@ function WriteHomeTimeline_args:write(oprot)
   if self.carrier ~= nil then
     oprot:writeFieldBegin('carrier', TType.MAP, 6)
     oprot:writeMapBegin(TType.STRING, TType.STRING, ttable_size(self.carrier))
-    for kiter176,viter177 in pairs(self.carrier) do
-      oprot:writeString(kiter176)
-      oprot:writeString(viter177)
+    for kiter286,viter287 in pairs(self.carrier) do
+      oprot:writeString(kiter286)
+      oprot:writeString(viter287)
+    end
+    oprot:writeMapEnd()
+    oprot:writeFieldEnd()
+  end
+  if self.context ~= nil then
+    oprot:writeFieldBegin('context', TType.MAP, 7)
+    oprot:writeMapBegin(TType.STRING, TType.STRING, ttable_size(self.context))
+    for kiter288,viter289 in pairs(self.context) do
+      oprot:writeString(kiter288)
+      oprot:writeString(viter289)
     end
     oprot:writeMapEnd()
     oprot:writeFieldEnd()
@@ -292,7 +474,7 @@ function WriteHomeTimeline_args:write(oprot)
   oprot:writeStructEnd()
 end
 
-local WriteHomeTimeline_result = __TObject:new{
+WriteHomeTimeline_result = __TObject:new{
   se
 }
 
@@ -327,149 +509,3 @@ function WriteHomeTimeline_result:write(oprot)
   oprot:writeFieldStop()
   oprot:writeStructEnd()
 end
-
-local HomeTimelineServiceClient = __TObject.new(__TClient, {
-  __type = 'HomeTimelineServiceClient'
-})
-
-function HomeTimelineServiceClient:ReadHomeTimeline(req_id, user_id, start, stop, carrier)
-  self:send_ReadHomeTimeline(req_id, user_id, start, stop, carrier)
-  return self:recv_ReadHomeTimeline(req_id, user_id, start, stop, carrier)
-end
-
-function HomeTimelineServiceClient:send_ReadHomeTimeline(req_id, user_id, start, stop, carrier)
-  self.oprot:writeMessageBegin('ReadHomeTimeline', TMessageType.CALL, self._seqid)
-  local args = ReadHomeTimeline_args:new{}
-  args.req_id = req_id
-  args.user_id = user_id
-  args.start = start
-  args.stop = stop
-  args.carrier = carrier
-  args:write(self.oprot)
-  self.oprot:writeMessageEnd()
-  self.oprot.trans:flush()
-end
-
-function HomeTimelineServiceClient:recv_ReadHomeTimeline(req_id, user_id, start, stop, carrier)
-  local fname, mtype, rseqid = self.iprot:readMessageBegin()
-  if mtype == TMessageType.EXCEPTION then
-    local x = TApplicationException:new{}
-    x:read(self.iprot)
-    self.iprot:readMessageEnd()
-    error(x)
-  end
-  local result = ReadHomeTimeline_result:new{}
-  result:read(self.iprot)
-  self.iprot:readMessageEnd()
-  if result.success ~= nil then
-    return result.success
-  elseif result.se then
-    error(result.se)
-  end
-  error(TApplicationException:new{errorCode = TApplicationException.MISSING_RESULT})
-end
-
-function HomeTimelineServiceClient:WriteHomeTimeline(req_id, post_id, user_id, timestamp, user_mentions_id, carrier)
-  self:send_WriteHomeTimeline(req_id, post_id, user_id, timestamp, user_mentions_id, carrier)
-  self:recv_WriteHomeTimeline(req_id, post_id, user_id, timestamp, user_mentions_id, carrier)
-end
-
-function HomeTimelineServiceClient:send_WriteHomeTimeline(req_id, post_id, user_id, timestamp, user_mentions_id, carrier)
-  self.oprot:writeMessageBegin('WriteHomeTimeline', TMessageType.CALL, self._seqid)
-  local args = WriteHomeTimeline_args:new{}
-  args.req_id = req_id
-  args.post_id = post_id
-  args.user_id = user_id
-  args.timestamp = timestamp
-  args.user_mentions_id = user_mentions_id
-  args.carrier = carrier
-  args:write(self.oprot)
-  self.oprot:writeMessageEnd()
-  self.oprot.trans:flush()
-end
-
-function HomeTimelineServiceClient:recv_WriteHomeTimeline(req_id, post_id, user_id, timestamp, user_mentions_id, carrier)
-  local fname, mtype, rseqid = self.iprot:readMessageBegin()
-  if mtype == TMessageType.EXCEPTION then
-    local x = TApplicationException:new{}
-    x:read(self.iprot)
-    self.iprot:readMessageEnd()
-    error(x)
-  end
-  local result = WriteHomeTimeline_result:new{}
-  result:read(self.iprot)
-  self.iprot:readMessageEnd()
-end
-local HomeTimelineServiceIface = __TObject:new{
-  __type = 'HomeTimelineServiceIface'
-}
-
-
-local HomeTimelineServiceProcessor = __TObject.new(__TProcessor
-, {
- __type = 'HomeTimelineServiceProcessor'
-})
-
-function HomeTimelineServiceProcessor:process(iprot, oprot, server_ctx)
-  local name, mtype, seqid = iprot:readMessageBegin()
-  local func_name = 'process_' .. name
-  if not self[func_name] or ttype(self[func_name]) ~= 'function' then
-    iprot:skip(TType.STRUCT)
-    iprot:readMessageEnd()
-    x = TApplicationException:new{
-      errorCode = TApplicationException.UNKNOWN_METHOD
-    }
-    oprot:writeMessageBegin(name, TMessageType.EXCEPTION, seqid)
-    x:write(oprot)
-    oprot:writeMessageEnd()
-    oprot.trans:flush()
-  else
-    self[func_name](self, seqid, iprot, oprot, server_ctx)
-  end
-end
-
-function HomeTimelineServiceProcessor:process_ReadHomeTimeline(seqid, iprot, oprot, server_ctx)
-  local args = ReadHomeTimeline_args:new{}
-  local reply_type = TMessageType.REPLY
-  args:read(iprot)
-  iprot:readMessageEnd()
-  local result = ReadHomeTimeline_result:new{}
-  local status, res = pcall(self.handler.ReadHomeTimeline, self.handler, args.req_id, args.user_id, args.start, args.stop, args.carrier)
-  if not status then
-    reply_type = TMessageType.EXCEPTION
-    result = TApplicationException:new{message = res}
-  elseif ttype(res) == 'ServiceException' then
-    result.se = res
-  else
-    result.success = res
-  end
-  oprot:writeMessageBegin('ReadHomeTimeline', reply_type, seqid)
-  result:write(oprot)
-  oprot:writeMessageEnd()
-  oprot.trans:flush()
-end
-
-function HomeTimelineServiceProcessor:process_WriteHomeTimeline(seqid, iprot, oprot, server_ctx)
-  local args = WriteHomeTimeline_args:new{}
-  local reply_type = TMessageType.REPLY
-  args:read(iprot)
-  iprot:readMessageEnd()
-  local result = WriteHomeTimeline_result:new{}
-  local status, res = pcall(self.handler.WriteHomeTimeline, self.handler, args.req_id, args.post_id, args.user_id, args.timestamp, args.user_mentions_id, args.carrier)
-  if not status then
-    reply_type = TMessageType.EXCEPTION
-    result = TApplicationException:new{message = res}
-  elseif ttype(res) == 'ServiceException' then
-    result.se = res
-  else
-    result.success = res
-  end
-  oprot:writeMessageBegin('WriteHomeTimeline', reply_type, seqid)
-  result:write(oprot)
-  oprot:writeMessageEnd()
-  oprot.trans:flush()
-end
-
-return {
-  HomeTimelineServiceClient = HomeTimelineServiceClient
-}

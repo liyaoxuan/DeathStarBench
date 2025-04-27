@@ -13,23 +13,24 @@ UrlShortenServiceClient = __TObject.new(__TClient, {
   __type = 'UrlShortenServiceClient'
 })
 
-function UrlShortenServiceClient:ComposeUrls(req_id, urls, carrier)
-  self:send_ComposeUrls(req_id, urls, carrier)
-  return self:recv_ComposeUrls(req_id, urls, carrier)
+function UrlShortenServiceClient:ComposeUrls(req_id, urls, carrier, context)
+  self:send_ComposeUrls(req_id, urls, carrier, context)
+  return self:recv_ComposeUrls(req_id, urls, carrier, context)
 end
 
-function UrlShortenServiceClient:send_ComposeUrls(req_id, urls, carrier)
+function UrlShortenServiceClient:send_ComposeUrls(req_id, urls, carrier, context)
   self.oprot:writeMessageBegin('ComposeUrls', TMessageType.CALL, self._seqid)
   local args = ComposeUrls_args:new{}
   args.req_id = req_id
   args.urls = urls
   args.carrier = carrier
+  args.context = context
   args:write(self.oprot)
   self.oprot:writeMessageEnd()
   self.oprot.trans:flush()
 end
 
-function UrlShortenServiceClient:recv_ComposeUrls(req_id, urls, carrier)
+function UrlShortenServiceClient:recv_ComposeUrls(req_id, urls, carrier, context)
   local fname, mtype, rseqid = self.iprot:readMessageBegin()
   if mtype == TMessageType.EXCEPTION then
     local x = TApplicationException:new{}
@@ -48,23 +49,24 @@ function UrlShortenServiceClient:recv_ComposeUrls(req_id, urls, carrier)
   error(TApplicationException:new{errorCode = TApplicationException.MISSING_RESULT})
 end
 
-function UrlShortenServiceClient:GetExtendedUrls(req_id, shortened_urls, carrier)
-  self:send_GetExtendedUrls(req_id, shortened_urls, carrier)
-  return self:recv_GetExtendedUrls(req_id, shortened_urls, carrier)
+function UrlShortenServiceClient:GetExtendedUrls(req_id, shortened_urls, carrier, context)
+  self:send_GetExtendedUrls(req_id, shortened_urls, carrier, context)
+  return self:recv_GetExtendedUrls(req_id, shortened_urls, carrier, context)
 end
 
-function UrlShortenServiceClient:send_GetExtendedUrls(req_id, shortened_urls, carrier)
+function UrlShortenServiceClient:send_GetExtendedUrls(req_id, shortened_urls, carrier, context)
   self.oprot:writeMessageBegin('GetExtendedUrls', TMessageType.CALL, self._seqid)
   local args = GetExtendedUrls_args:new{}
   args.req_id = req_id
   args.shortened_urls = shortened_urls
   args.carrier = carrier
+  args.context = context
   args:write(self.oprot)
   self.oprot:writeMessageEnd()
   self.oprot.trans:flush()
 end
 
-function UrlShortenServiceClient:recv_GetExtendedUrls(req_id, shortened_urls, carrier)
+function UrlShortenServiceClient:recv_GetExtendedUrls(req_id, shortened_urls, carrier, context)
   local fname, mtype, rseqid = self.iprot:readMessageBegin()
   if mtype == TMessageType.EXCEPTION then
     local x = TApplicationException:new{}
@@ -116,7 +118,7 @@ function UrlShortenServiceProcessor:process_ComposeUrls(seqid, iprot, oprot, ser
   args:read(iprot)
   iprot:readMessageEnd()
   local result = ComposeUrls_result:new{}
-  local status, res = pcall(self.handler.ComposeUrls, self.handler, args.req_id, args.urls, args.carrier)
+  local status, res = pcall(self.handler.ComposeUrls, self.handler, args.req_id, args.urls, args.carrier, args.context)
   if not status then
     reply_type = TMessageType.EXCEPTION
     result = TApplicationException:new{message = res}
@@ -137,7 +139,7 @@ function UrlShortenServiceProcessor:process_GetExtendedUrls(seqid, iprot, oprot,
   args:read(iprot)
   iprot:readMessageEnd()
   local result = GetExtendedUrls_result:new{}
-  local status, res = pcall(self.handler.GetExtendedUrls, self.handler, args.req_id, args.shortened_urls, args.carrier)
+  local status, res = pcall(self.handler.GetExtendedUrls, self.handler, args.req_id, args.shortened_urls, args.carrier, args.context)
   if not status then
     reply_type = TMessageType.EXCEPTION
     result = TApplicationException:new{message = res}
@@ -157,7 +159,8 @@ end
 ComposeUrls_args = __TObject:new{
   req_id,
   urls,
-  carrier
+  carrier,
+  context
 }
 
 function ComposeUrls_args:read(iprot)
@@ -175,10 +178,10 @@ function ComposeUrls_args:read(iprot)
     elseif fid == 2 then
       if ftype == TType.LIST then
         self.urls = {}
-        local _etype283, _size280 = iprot:readListBegin()
-        for _i=1,_size280 do
-          local _elem284 = iprot:readString()
-          table.insert(self.urls, _elem284)
+        local _etype483, _size480 = iprot:readListBegin()
+        for _i=1,_size480 do
+          local _elem484 = iprot:readString()
+          table.insert(self.urls, _elem484)
         end
         iprot:readListEnd()
       else
@@ -187,11 +190,24 @@ function ComposeUrls_args:read(iprot)
     elseif fid == 3 then
       if ftype == TType.MAP then
         self.carrier = {}
-        local _ktype286, _vtype287, _size285 = iprot:readMapBegin()
-        for _i=1,_size285 do
-          local _key289 = iprot:readString()
-          local _val290 = iprot:readString()
-          self.carrier[_key289] = _val290
+        local _ktype486, _vtype487, _size485 = iprot:readMapBegin() 
+        for _i=1,_size485 do
+          local _key489 = iprot:readString()
+          local _val490 = iprot:readString()
+          self.carrier[_key489] = _val490
+        end
+        iprot:readMapEnd()
+      else
+        iprot:skip(ftype)
+      end
+    elseif fid == 4 then
+      if ftype == TType.MAP then
+        self.context = {}
+        local _ktype492, _vtype493, _size491 = iprot:readMapBegin() 
+        for _i=1,_size491 do
+          local _key495 = iprot:readString()
+          local _val496 = iprot:readString()
+          self.context[_key495] = _val496
         end
         iprot:readMapEnd()
       else
@@ -215,8 +231,8 @@ function ComposeUrls_args:write(oprot)
   if self.urls ~= nil then
     oprot:writeFieldBegin('urls', TType.LIST, 2)
     oprot:writeListBegin(TType.STRING, #self.urls)
-    for _,iter291 in ipairs(self.urls) do
-      oprot:writeString(iter291)
+    for _,iter497 in ipairs(self.urls) do
+      oprot:writeString(iter497)
     end
     oprot:writeListEnd()
     oprot:writeFieldEnd()
@@ -224,9 +240,19 @@ function ComposeUrls_args:write(oprot)
   if self.carrier ~= nil then
     oprot:writeFieldBegin('carrier', TType.MAP, 3)
     oprot:writeMapBegin(TType.STRING, TType.STRING, ttable_size(self.carrier))
-    for kiter292,viter293 in pairs(self.carrier) do
-      oprot:writeString(kiter292)
-      oprot:writeString(viter293)
+    for kiter498,viter499 in pairs(self.carrier) do
+      oprot:writeString(kiter498)
+      oprot:writeString(viter499)
+    end
+    oprot:writeMapEnd()
+    oprot:writeFieldEnd()
+  end
+  if self.context ~= nil then
+    oprot:writeFieldBegin('context', TType.MAP, 4)
+    oprot:writeMapBegin(TType.STRING, TType.STRING, ttable_size(self.context))
+    for kiter500,viter501 in pairs(self.context) do
+      oprot:writeString(kiter500)
+      oprot:writeString(viter501)
     end
     oprot:writeMapEnd()
     oprot:writeFieldEnd()
@@ -249,11 +275,11 @@ function ComposeUrls_result:read(iprot)
     elseif fid == 0 then
       if ftype == TType.LIST then
         self.success = {}
-        local _etype297, _size294 = iprot:readListBegin()
-        for _i=1,_size294 do
-          local _elem298 = Url:new{}
-          _elem298:read(iprot)
-          table.insert(self.success, _elem298)
+        local _etype505, _size502 = iprot:readListBegin()
+        for _i=1,_size502 do
+          local _elem506 = Url:new{}
+          _elem506:read(iprot)
+          table.insert(self.success, _elem506)
         end
         iprot:readListEnd()
       else
@@ -279,8 +305,8 @@ function ComposeUrls_result:write(oprot)
   if self.success ~= nil then
     oprot:writeFieldBegin('success', TType.LIST, 0)
     oprot:writeListBegin(TType.STRUCT, #self.success)
-    for _,iter299 in ipairs(self.success) do
-      iter299:write(oprot)
+    for _,iter507 in ipairs(self.success) do
+      iter507:write(oprot)
     end
     oprot:writeListEnd()
     oprot:writeFieldEnd()
@@ -297,7 +323,8 @@ end
 GetExtendedUrls_args = __TObject:new{
   req_id,
   shortened_urls,
-  carrier
+  carrier,
+  context
 }
 
 function GetExtendedUrls_args:read(iprot)
@@ -315,10 +342,10 @@ function GetExtendedUrls_args:read(iprot)
     elseif fid == 2 then
       if ftype == TType.LIST then
         self.shortened_urls = {}
-        local _etype303, _size300 = iprot:readListBegin()
-        for _i=1,_size300 do
-          local _elem304 = iprot:readString()
-          table.insert(self.shortened_urls, _elem304)
+        local _etype511, _size508 = iprot:readListBegin()
+        for _i=1,_size508 do
+          local _elem512 = iprot:readString()
+          table.insert(self.shortened_urls, _elem512)
         end
         iprot:readListEnd()
       else
@@ -327,11 +354,24 @@ function GetExtendedUrls_args:read(iprot)
     elseif fid == 3 then
       if ftype == TType.MAP then
         self.carrier = {}
-        local _ktype306, _vtype307, _size305 = iprot:readMapBegin()
-        for _i=1,_size305 do
-          local _key309 = iprot:readString()
-          local _val310 = iprot:readString()
-          self.carrier[_key309] = _val310
+        local _ktype514, _vtype515, _size513 = iprot:readMapBegin() 
+        for _i=1,_size513 do
+          local _key517 = iprot:readString()
+          local _val518 = iprot:readString()
+          self.carrier[_key517] = _val518
+        end
+        iprot:readMapEnd()
+      else
+        iprot:skip(ftype)
+      end
+    elseif fid == 4 then
+      if ftype == TType.MAP then
+        self.context = {}
+        local _ktype520, _vtype521, _size519 = iprot:readMapBegin() 
+        for _i=1,_size519 do
+          local _key523 = iprot:readString()
+          local _val524 = iprot:readString()
+          self.context[_key523] = _val524
         end
         iprot:readMapEnd()
       else
@@ -355,8 +395,8 @@ function GetExtendedUrls_args:write(oprot)
   if self.shortened_urls ~= nil then
     oprot:writeFieldBegin('shortened_urls', TType.LIST, 2)
     oprot:writeListBegin(TType.STRING, #self.shortened_urls)
-    for _,iter311 in ipairs(self.shortened_urls) do
-      oprot:writeString(iter311)
+    for _,iter525 in ipairs(self.shortened_urls) do
+      oprot:writeString(iter525)
     end
     oprot:writeListEnd()
     oprot:writeFieldEnd()
@@ -364,9 +404,19 @@ function GetExtendedUrls_args:write(oprot)
   if self.carrier ~= nil then
     oprot:writeFieldBegin('carrier', TType.MAP, 3)
     oprot:writeMapBegin(TType.STRING, TType.STRING, ttable_size(self.carrier))
-    for kiter312,viter313 in pairs(self.carrier) do
-      oprot:writeString(kiter312)
-      oprot:writeString(viter313)
+    for kiter526,viter527 in pairs(self.carrier) do
+      oprot:writeString(kiter526)
+      oprot:writeString(viter527)
+    end
+    oprot:writeMapEnd()
+    oprot:writeFieldEnd()
+  end
+  if self.context ~= nil then
+    oprot:writeFieldBegin('context', TType.MAP, 4)
+    oprot:writeMapBegin(TType.STRING, TType.STRING, ttable_size(self.context))
+    for kiter528,viter529 in pairs(self.context) do
+      oprot:writeString(kiter528)
+      oprot:writeString(viter529)
     end
     oprot:writeMapEnd()
     oprot:writeFieldEnd()
@@ -389,10 +439,10 @@ function GetExtendedUrls_result:read(iprot)
     elseif fid == 0 then
       if ftype == TType.LIST then
         self.success = {}
-        local _etype317, _size314 = iprot:readListBegin()
-        for _i=1,_size314 do
-          local _elem318 = iprot:readString()
-          table.insert(self.success, _elem318)
+        local _etype533, _size530 = iprot:readListBegin()
+        for _i=1,_size530 do
+          local _elem534 = iprot:readString()
+          table.insert(self.success, _elem534)
         end
         iprot:readListEnd()
       else
@@ -418,8 +468,8 @@ function GetExtendedUrls_result:write(oprot)
   if self.success ~= nil then
     oprot:writeFieldBegin('success', TType.LIST, 0)
     oprot:writeListBegin(TType.STRING, #self.success)
-    for _,iter319 in ipairs(self.success) do
-      oprot:writeString(iter319)
+    for _,iter535 in ipairs(self.success) do
+      oprot:writeString(iter535)
     end
     oprot:writeListEnd()
     oprot:writeFieldEnd()

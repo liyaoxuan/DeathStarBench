@@ -13,23 +13,24 @@ UniqueIdServiceClient = __TObject.new(__TClient, {
   __type = 'UniqueIdServiceClient'
 })
 
-function UniqueIdServiceClient:ComposeUniqueId(req_id, post_type, carrier)
-  self:send_ComposeUniqueId(req_id, post_type, carrier)
-  return self:recv_ComposeUniqueId(req_id, post_type, carrier)
+function UniqueIdServiceClient:ComposeUniqueId(req_id, post_type, carrier, context)
+  self:send_ComposeUniqueId(req_id, post_type, carrier, context)
+  return self:recv_ComposeUniqueId(req_id, post_type, carrier, context)
 end
 
-function UniqueIdServiceClient:send_ComposeUniqueId(req_id, post_type, carrier)
+function UniqueIdServiceClient:send_ComposeUniqueId(req_id, post_type, carrier, context)
   self.oprot:writeMessageBegin('ComposeUniqueId', TMessageType.CALL, self._seqid)
   local args = ComposeUniqueId_args:new{}
   args.req_id = req_id
   args.post_type = post_type
   args.carrier = carrier
+  args.context = context
   args:write(self.oprot)
   self.oprot:writeMessageEnd()
   self.oprot.trans:flush()
 end
 
-function UniqueIdServiceClient:recv_ComposeUniqueId(req_id, post_type, carrier)
+function UniqueIdServiceClient:recv_ComposeUniqueId(req_id, post_type, carrier, context)
   local fname, mtype, rseqid = self.iprot:readMessageBegin()
   if mtype == TMessageType.EXCEPTION then
     local x = TApplicationException:new{}
@@ -81,7 +82,7 @@ function UniqueIdServiceProcessor:process_ComposeUniqueId(seqid, iprot, oprot, s
   args:read(iprot)
   iprot:readMessageEnd()
   local result = ComposeUniqueId_result:new{}
-  local status, res = pcall(self.handler.ComposeUniqueId, self.handler, args.req_id, args.post_type, args.carrier)
+  local status, res = pcall(self.handler.ComposeUniqueId, self.handler, args.req_id, args.post_type, args.carrier, args.context)
   if not status then
     reply_type = TMessageType.EXCEPTION
     result = TApplicationException:new{message = res}
@@ -101,7 +102,8 @@ end
 ComposeUniqueId_args = __TObject:new{
   req_id,
   post_type,
-  carrier
+  carrier,
+  context
 }
 
 function ComposeUniqueId_args:read(iprot)
@@ -125,11 +127,24 @@ function ComposeUniqueId_args:read(iprot)
     elseif fid == 3 then
       if ftype == TType.MAP then
         self.carrier = {}
-        local _ktype31, _vtype32, _size30 = iprot:readMapBegin()
+        local _ktype31, _vtype32, _size30 = iprot:readMapBegin() 
         for _i=1,_size30 do
           local _key34 = iprot:readString()
           local _val35 = iprot:readString()
           self.carrier[_key34] = _val35
+        end
+        iprot:readMapEnd()
+      else
+        iprot:skip(ftype)
+      end
+    elseif fid == 4 then
+      if ftype == TType.MAP then
+        self.context = {}
+        local _ktype37, _vtype38, _size36 = iprot:readMapBegin() 
+        for _i=1,_size36 do
+          local _key40 = iprot:readString()
+          local _val41 = iprot:readString()
+          self.context[_key40] = _val41
         end
         iprot:readMapEnd()
       else
@@ -158,9 +173,19 @@ function ComposeUniqueId_args:write(oprot)
   if self.carrier ~= nil then
     oprot:writeFieldBegin('carrier', TType.MAP, 3)
     oprot:writeMapBegin(TType.STRING, TType.STRING, ttable_size(self.carrier))
-    for kiter36,viter37 in pairs(self.carrier) do
-      oprot:writeString(kiter36)
-      oprot:writeString(viter37)
+    for kiter42,viter43 in pairs(self.carrier) do
+      oprot:writeString(kiter42)
+      oprot:writeString(viter43)
+    end
+    oprot:writeMapEnd()
+    oprot:writeFieldEnd()
+  end
+  if self.context ~= nil then
+    oprot:writeFieldBegin('context', TType.MAP, 4)
+    oprot:writeMapBegin(TType.STRING, TType.STRING, ttable_size(self.context))
+    for kiter44,viter45 in pairs(self.context) do
+      oprot:writeString(kiter44)
+      oprot:writeString(viter45)
     end
     oprot:writeMapEnd()
     oprot:writeFieldEnd()

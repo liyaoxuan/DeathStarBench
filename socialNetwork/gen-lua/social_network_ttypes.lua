@@ -6,12 +6,10 @@
 --
 
 
-local Thrift = require 'Thrift'
-local TType = Thrift.TType
-local __TObject = Thrift.__TObject
-local TException = Thrift.TException
+require 'Thrift'
+require 'social_network_constants'
 
-local ErrorCode = {
+ErrorCode = {
   SE_CONNPOOL_TIMEOUT = 0,
   SE_THRIFT_CONN_ERROR = 1,
   SE_UNAUTHORIZED = 2,
@@ -22,14 +20,14 @@ local ErrorCode = {
   SE_RABBITMQ_CONN_ERROR = 7
 }
 
-local PostType = {
+PostType = {
   POST = 0,
   REPOST = 1,
   REPLY = 2,
   DM = 3
 }
 
-local User = __TObject:new{
+User = __TObject:new{
   user_id,
   first_name,
   last_name,
@@ -124,7 +122,7 @@ function User:write(oprot)
   oprot:writeStructEnd()
 end
 
-local ServiceException = TException:new{
+ServiceException = TException:new{
   __type = 'ServiceException',
   errorCode,
   message
@@ -172,7 +170,7 @@ function ServiceException:write(oprot)
   oprot:writeStructEnd()
 end
 
-local Media = __TObject:new{
+Media = __TObject:new{
   media_id,
   media_type
 }
@@ -219,7 +217,7 @@ function Media:write(oprot)
   oprot:writeStructEnd()
 end
 
-local Url = __TObject:new{
+Url = __TObject:new{
   shortened_url,
   expanded_url
 }
@@ -266,7 +264,7 @@ function Url:write(oprot)
   oprot:writeStructEnd()
 end
 
-local UserMention = __TObject:new{
+UserMention = __TObject:new{
   user_id,
   username
 }
@@ -313,7 +311,7 @@ function UserMention:write(oprot)
   oprot:writeStructEnd()
 end
 
-local Creator = __TObject:new{
+Creator = __TObject:new{
   user_id,
   username
 }
@@ -360,7 +358,7 @@ function Creator:write(oprot)
   oprot:writeStructEnd()
 end
 
-local TextServiceReturn = __TObject:new{
+TextServiceReturn = __TObject:new{
   text,
   user_mentions,
   urls
@@ -441,7 +439,7 @@ function TextServiceReturn:write(oprot)
   oprot:writeStructEnd()
 end
 
-local Post = __TObject:new{
+Post = __TObject:new{
   post_id,
   creator,
   req_id,
@@ -605,16 +603,3 @@ function Post:write(oprot)
   oprot:writeFieldStop()
   oprot:writeStructEnd()
 end
-
-return {
-  ErrorCode=ErrorCode,
-  PostType=PostType,
-  User=User,
-  ServiceException=ServiceException,
-  Media=Media,
-  Url=Url,
-  UserMention=UserMention,
-  Creator=Creator,
-  Post=Post,
-  TextServiceReturn=TextServiceReturn
-}

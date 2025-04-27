@@ -13,23 +13,24 @@ PostStorageServiceClient = __TObject.new(__TClient, {
   __type = 'PostStorageServiceClient'
 })
 
-function PostStorageServiceClient:StorePost(req_id, post, carrier)
-  self:send_StorePost(req_id, post, carrier)
-  self:recv_StorePost(req_id, post, carrier)
+function PostStorageServiceClient:StorePost(req_id, post, carrier, context)
+  self:send_StorePost(req_id, post, carrier, context)
+  self:recv_StorePost(req_id, post, carrier, context)
 end
 
-function PostStorageServiceClient:send_StorePost(req_id, post, carrier)
+function PostStorageServiceClient:send_StorePost(req_id, post, carrier, context)
   self.oprot:writeMessageBegin('StorePost', TMessageType.CALL, self._seqid)
   local args = StorePost_args:new{}
   args.req_id = req_id
   args.post = post
   args.carrier = carrier
+  args.context = context
   args:write(self.oprot)
   self.oprot:writeMessageEnd()
   self.oprot.trans:flush()
 end
 
-function PostStorageServiceClient:recv_StorePost(req_id, post, carrier)
+function PostStorageServiceClient:recv_StorePost(req_id, post, carrier, context)
   local fname, mtype, rseqid = self.iprot:readMessageBegin()
   if mtype == TMessageType.EXCEPTION then
     local x = TApplicationException:new{}
@@ -42,23 +43,24 @@ function PostStorageServiceClient:recv_StorePost(req_id, post, carrier)
   self.iprot:readMessageEnd()
 end
 
-function PostStorageServiceClient:ReadPost(req_id, post_id, carrier)
-  self:send_ReadPost(req_id, post_id, carrier)
-  return self:recv_ReadPost(req_id, post_id, carrier)
+function PostStorageServiceClient:ReadPost(req_id, post_id, carrier, context)
+  self:send_ReadPost(req_id, post_id, carrier, context)
+  return self:recv_ReadPost(req_id, post_id, carrier, context)
 end
 
-function PostStorageServiceClient:send_ReadPost(req_id, post_id, carrier)
+function PostStorageServiceClient:send_ReadPost(req_id, post_id, carrier, context)
   self.oprot:writeMessageBegin('ReadPost', TMessageType.CALL, self._seqid)
   local args = ReadPost_args:new{}
   args.req_id = req_id
   args.post_id = post_id
   args.carrier = carrier
+  args.context = context
   args:write(self.oprot)
   self.oprot:writeMessageEnd()
   self.oprot.trans:flush()
 end
 
-function PostStorageServiceClient:recv_ReadPost(req_id, post_id, carrier)
+function PostStorageServiceClient:recv_ReadPost(req_id, post_id, carrier, context)
   local fname, mtype, rseqid = self.iprot:readMessageBegin()
   if mtype == TMessageType.EXCEPTION then
     local x = TApplicationException:new{}
@@ -77,23 +79,24 @@ function PostStorageServiceClient:recv_ReadPost(req_id, post_id, carrier)
   error(TApplicationException:new{errorCode = TApplicationException.MISSING_RESULT})
 end
 
-function PostStorageServiceClient:ReadPosts(req_id, post_ids, carrier)
-  self:send_ReadPosts(req_id, post_ids, carrier)
-  return self:recv_ReadPosts(req_id, post_ids, carrier)
+function PostStorageServiceClient:ReadPosts(req_id, post_ids, carrier, context)
+  self:send_ReadPosts(req_id, post_ids, carrier, context)
+  return self:recv_ReadPosts(req_id, post_ids, carrier, context)
 end
 
-function PostStorageServiceClient:send_ReadPosts(req_id, post_ids, carrier)
+function PostStorageServiceClient:send_ReadPosts(req_id, post_ids, carrier, context)
   self.oprot:writeMessageBegin('ReadPosts', TMessageType.CALL, self._seqid)
   local args = ReadPosts_args:new{}
   args.req_id = req_id
   args.post_ids = post_ids
   args.carrier = carrier
+  args.context = context
   args:write(self.oprot)
   self.oprot:writeMessageEnd()
   self.oprot.trans:flush()
 end
 
-function PostStorageServiceClient:recv_ReadPosts(req_id, post_ids, carrier)
+function PostStorageServiceClient:recv_ReadPosts(req_id, post_ids, carrier, context)
   local fname, mtype, rseqid = self.iprot:readMessageBegin()
   if mtype == TMessageType.EXCEPTION then
     local x = TApplicationException:new{}
@@ -145,7 +148,7 @@ function PostStorageServiceProcessor:process_StorePost(seqid, iprot, oprot, serv
   args:read(iprot)
   iprot:readMessageEnd()
   local result = StorePost_result:new{}
-  local status, res = pcall(self.handler.StorePost, self.handler, args.req_id, args.post, args.carrier)
+  local status, res = pcall(self.handler.StorePost, self.handler, args.req_id, args.post, args.carrier, args.context)
   if not status then
     reply_type = TMessageType.EXCEPTION
     result = TApplicationException:new{message = res}
@@ -166,7 +169,7 @@ function PostStorageServiceProcessor:process_ReadPost(seqid, iprot, oprot, serve
   args:read(iprot)
   iprot:readMessageEnd()
   local result = ReadPost_result:new{}
-  local status, res = pcall(self.handler.ReadPost, self.handler, args.req_id, args.post_id, args.carrier)
+  local status, res = pcall(self.handler.ReadPost, self.handler, args.req_id, args.post_id, args.carrier, args.context)
   if not status then
     reply_type = TMessageType.EXCEPTION
     result = TApplicationException:new{message = res}
@@ -187,7 +190,7 @@ function PostStorageServiceProcessor:process_ReadPosts(seqid, iprot, oprot, serv
   args:read(iprot)
   iprot:readMessageEnd()
   local result = ReadPosts_result:new{}
-  local status, res = pcall(self.handler.ReadPosts, self.handler, args.req_id, args.post_ids, args.carrier)
+  local status, res = pcall(self.handler.ReadPosts, self.handler, args.req_id, args.post_ids, args.carrier, args.context)
   if not status then
     reply_type = TMessageType.EXCEPTION
     result = TApplicationException:new{message = res}
@@ -207,7 +210,8 @@ end
 StorePost_args = __TObject:new{
   req_id,
   post,
-  carrier
+  carrier,
+  context
 }
 
 function StorePost_args:read(iprot)
@@ -232,11 +236,24 @@ function StorePost_args:read(iprot)
     elseif fid == 3 then
       if ftype == TType.MAP then
         self.carrier = {}
-        local _ktype121, _vtype122, _size120 = iprot:readMapBegin()
-        for _i=1,_size120 do
-          local _key124 = iprot:readString()
-          local _val125 = iprot:readString()
-          self.carrier[_key124] = _val125
+        local _ktype187, _vtype188, _size186 = iprot:readMapBegin() 
+        for _i=1,_size186 do
+          local _key190 = iprot:readString()
+          local _val191 = iprot:readString()
+          self.carrier[_key190] = _val191
+        end
+        iprot:readMapEnd()
+      else
+        iprot:skip(ftype)
+      end
+    elseif fid == 4 then
+      if ftype == TType.MAP then
+        self.context = {}
+        local _ktype193, _vtype194, _size192 = iprot:readMapBegin() 
+        for _i=1,_size192 do
+          local _key196 = iprot:readString()
+          local _val197 = iprot:readString()
+          self.context[_key196] = _val197
         end
         iprot:readMapEnd()
       else
@@ -265,9 +282,19 @@ function StorePost_args:write(oprot)
   if self.carrier ~= nil then
     oprot:writeFieldBegin('carrier', TType.MAP, 3)
     oprot:writeMapBegin(TType.STRING, TType.STRING, ttable_size(self.carrier))
-    for kiter126,viter127 in pairs(self.carrier) do
-      oprot:writeString(kiter126)
-      oprot:writeString(viter127)
+    for kiter198,viter199 in pairs(self.carrier) do
+      oprot:writeString(kiter198)
+      oprot:writeString(viter199)
+    end
+    oprot:writeMapEnd()
+    oprot:writeFieldEnd()
+  end
+  if self.context ~= nil then
+    oprot:writeFieldBegin('context', TType.MAP, 4)
+    oprot:writeMapBegin(TType.STRING, TType.STRING, ttable_size(self.context))
+    for kiter200,viter201 in pairs(self.context) do
+      oprot:writeString(kiter200)
+      oprot:writeString(viter201)
     end
     oprot:writeMapEnd()
     oprot:writeFieldEnd()
@@ -315,7 +342,8 @@ end
 ReadPost_args = __TObject:new{
   req_id,
   post_id,
-  carrier
+  carrier,
+  context
 }
 
 function ReadPost_args:read(iprot)
@@ -339,11 +367,24 @@ function ReadPost_args:read(iprot)
     elseif fid == 3 then
       if ftype == TType.MAP then
         self.carrier = {}
-        local _ktype129, _vtype130, _size128 = iprot:readMapBegin()
-        for _i=1,_size128 do
-          local _key132 = iprot:readString()
-          local _val133 = iprot:readString()
-          self.carrier[_key132] = _val133
+        local _ktype203, _vtype204, _size202 = iprot:readMapBegin() 
+        for _i=1,_size202 do
+          local _key206 = iprot:readString()
+          local _val207 = iprot:readString()
+          self.carrier[_key206] = _val207
+        end
+        iprot:readMapEnd()
+      else
+        iprot:skip(ftype)
+      end
+    elseif fid == 4 then
+      if ftype == TType.MAP then
+        self.context = {}
+        local _ktype209, _vtype210, _size208 = iprot:readMapBegin() 
+        for _i=1,_size208 do
+          local _key212 = iprot:readString()
+          local _val213 = iprot:readString()
+          self.context[_key212] = _val213
         end
         iprot:readMapEnd()
       else
@@ -372,9 +413,19 @@ function ReadPost_args:write(oprot)
   if self.carrier ~= nil then
     oprot:writeFieldBegin('carrier', TType.MAP, 3)
     oprot:writeMapBegin(TType.STRING, TType.STRING, ttable_size(self.carrier))
-    for kiter134,viter135 in pairs(self.carrier) do
-      oprot:writeString(kiter134)
-      oprot:writeString(viter135)
+    for kiter214,viter215 in pairs(self.carrier) do
+      oprot:writeString(kiter214)
+      oprot:writeString(viter215)
+    end
+    oprot:writeMapEnd()
+    oprot:writeFieldEnd()
+  end
+  if self.context ~= nil then
+    oprot:writeFieldBegin('context', TType.MAP, 4)
+    oprot:writeMapBegin(TType.STRING, TType.STRING, ttable_size(self.context))
+    for kiter216,viter217 in pairs(self.context) do
+      oprot:writeString(kiter216)
+      oprot:writeString(viter217)
     end
     oprot:writeMapEnd()
     oprot:writeFieldEnd()
@@ -435,7 +486,8 @@ end
 ReadPosts_args = __TObject:new{
   req_id,
   post_ids,
-  carrier
+  carrier,
+  context
 }
 
 function ReadPosts_args:read(iprot)
@@ -453,10 +505,10 @@ function ReadPosts_args:read(iprot)
     elseif fid == 2 then
       if ftype == TType.LIST then
         self.post_ids = {}
-        local _etype139, _size136 = iprot:readListBegin()
-        for _i=1,_size136 do
-          local _elem140 = iprot:readI64()
-          table.insert(self.post_ids, _elem140)
+        local _etype221, _size218 = iprot:readListBegin()
+        for _i=1,_size218 do
+          local _elem222 = iprot:readI64()
+          table.insert(self.post_ids, _elem222)
         end
         iprot:readListEnd()
       else
@@ -465,11 +517,24 @@ function ReadPosts_args:read(iprot)
     elseif fid == 3 then
       if ftype == TType.MAP then
         self.carrier = {}
-        local _ktype142, _vtype143, _size141 = iprot:readMapBegin()
-        for _i=1,_size141 do
-          local _key145 = iprot:readString()
-          local _val146 = iprot:readString()
-          self.carrier[_key145] = _val146
+        local _ktype224, _vtype225, _size223 = iprot:readMapBegin() 
+        for _i=1,_size223 do
+          local _key227 = iprot:readString()
+          local _val228 = iprot:readString()
+          self.carrier[_key227] = _val228
+        end
+        iprot:readMapEnd()
+      else
+        iprot:skip(ftype)
+      end
+    elseif fid == 4 then
+      if ftype == TType.MAP then
+        self.context = {}
+        local _ktype230, _vtype231, _size229 = iprot:readMapBegin() 
+        for _i=1,_size229 do
+          local _key233 = iprot:readString()
+          local _val234 = iprot:readString()
+          self.context[_key233] = _val234
         end
         iprot:readMapEnd()
       else
@@ -493,8 +558,8 @@ function ReadPosts_args:write(oprot)
   if self.post_ids ~= nil then
     oprot:writeFieldBegin('post_ids', TType.LIST, 2)
     oprot:writeListBegin(TType.I64, #self.post_ids)
-    for _,iter147 in ipairs(self.post_ids) do
-      oprot:writeI64(iter147)
+    for _,iter235 in ipairs(self.post_ids) do
+      oprot:writeI64(iter235)
     end
     oprot:writeListEnd()
     oprot:writeFieldEnd()
@@ -502,9 +567,19 @@ function ReadPosts_args:write(oprot)
   if self.carrier ~= nil then
     oprot:writeFieldBegin('carrier', TType.MAP, 3)
     oprot:writeMapBegin(TType.STRING, TType.STRING, ttable_size(self.carrier))
-    for kiter148,viter149 in pairs(self.carrier) do
-      oprot:writeString(kiter148)
-      oprot:writeString(viter149)
+    for kiter236,viter237 in pairs(self.carrier) do
+      oprot:writeString(kiter236)
+      oprot:writeString(viter237)
+    end
+    oprot:writeMapEnd()
+    oprot:writeFieldEnd()
+  end
+  if self.context ~= nil then
+    oprot:writeFieldBegin('context', TType.MAP, 4)
+    oprot:writeMapBegin(TType.STRING, TType.STRING, ttable_size(self.context))
+    for kiter238,viter239 in pairs(self.context) do
+      oprot:writeString(kiter238)
+      oprot:writeString(viter239)
     end
     oprot:writeMapEnd()
     oprot:writeFieldEnd()
@@ -527,11 +602,11 @@ function ReadPosts_result:read(iprot)
     elseif fid == 0 then
       if ftype == TType.LIST then
         self.success = {}
-        local _etype153, _size150 = iprot:readListBegin()
-        for _i=1,_size150 do
-          local _elem154 = Post:new{}
-          _elem154:read(iprot)
-          table.insert(self.success, _elem154)
+        local _etype243, _size240 = iprot:readListBegin()
+        for _i=1,_size240 do
+          local _elem244 = Post:new{}
+          _elem244:read(iprot)
+          table.insert(self.success, _elem244)
         end
         iprot:readListEnd()
       else
@@ -557,8 +632,8 @@ function ReadPosts_result:write(oprot)
   if self.success ~= nil then
     oprot:writeFieldBegin('success', TType.LIST, 0)
     oprot:writeListBegin(TType.STRUCT, #self.success)
-    for _,iter155 in ipairs(self.success) do
-      iter155:write(oprot)
+    for _,iter245 in ipairs(self.success) do
+      iter245:write(oprot)
     end
     oprot:writeListEnd()
     oprot:writeFieldEnd()
