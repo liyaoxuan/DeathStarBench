@@ -94,8 +94,6 @@ function _M.ReadHomeTimeline()
   context["sched-time-remaining"] = 0
   context["sched-time-start"] = math.floor(socket.gettime() * 1000)
 
-  ngx.log(ngx.ERR, dump(carrier))
-  ngx.log(ngx.ERR, dump(context))
 
   local client = GenericObjectPool:connection(
       HomeTimelineServiceClient, "home-timeline-service" .. k8s_suffix, 9090)
