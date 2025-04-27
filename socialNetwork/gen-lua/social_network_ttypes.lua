@@ -605,3 +605,16 @@ function Post:write(oprot)
   oprot:writeFieldStop()
   oprot:writeStructEnd()
 end
+
+return {
+  ErrorCode=ErrorCode,
+  PostType=PostType,
+  User=User,
+  ServiceException=ServiceException,
+  Media=Media,
+  Url=Url,
+  UserMention=UserMention,
+  Creator=Creator,
+  Post=Post,
+  TextServiceReturn=TextServiceReturn
+}

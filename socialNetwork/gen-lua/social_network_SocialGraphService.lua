@@ -6,8 +6,19 @@
 --
 
 
-require 'Thrift'
-require 'social_network_ttypes'
+-- require 'Thrift'
+-- require 'social_network_ttypes'
+local Thrift = require 'Thrift'
+local TType = Thrift.TType
+local TMessageType = Thrift.TMessageType
+local __TObject = Thrift.__TObject
+local TApplicationException = Thrift.TApplicationException
+local __TClient = Thrift.__TClient
+local __TProcessor = Thrift.__TProcessor
+local ttype = Thrift.ttype
+local ttable_size = Thrift.ttable_size
+local social_network_ttypes = require 'social_network_ttypes'
+local ServiceException = social_network_ttypes.ServiceException
 
 SocialGraphServiceClient = __TObject.new(__TClient, {
   __type = 'SocialGraphServiceClient'
@@ -1423,3 +1434,7 @@ function InsertUser_result:write(oprot)
   oprot:writeFieldStop()
   oprot:writeStructEnd()
 end
+
+return {
+  SocialGraphServiceClient = SocialGraphServiceClient
+}

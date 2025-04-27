@@ -6,4 +6,5 @@
 --
 
 
-require 'Thrift'
+-- require 'Thrift'
+local Thrift = require 'Thrift'
