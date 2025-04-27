@@ -103,6 +103,14 @@ int main(int argc, char *argv[]) {
   std::shared_ptr<TServerSocket> server_socket =
       get_server_socket(config_json, "0.0.0.0", port);
 
+  pid_t pid = getpid();
+  struct sched_param param;
+  param.sched_priority = 0;
+  if (sched_setscheduler(pid, 7, &param) == -1) {
+      std::cerr << "Failed to set schedule class to SCHED_EXT" << std::endl;
+      return 1;
+  }
+
   if (redis_cluster_flag || redis_cluster_config_flag) {
     RedisCluster redis_cluster_client_pool =
         init_redis_cluster_client_pool(config_json, "social-graph");
@@ -137,7 +145,7 @@ int main(int argc, char *argv[]) {
     TThreadedServer server(
         std::make_shared<SocialGraphServiceProcessor>(
             std::make_shared<SocialGraphHandler>(
-                mongodb_client_pool, &redis_client_pool, &user_client_pool)),
+                mongodb_client_pool, &redis_client_pool, &user_client_pool, &config_json)),
         server_socket, std::make_shared<TFramedTransportFactory>(),
         std::make_shared<TBinaryProtocolFactory>());
     LOG(info) << "Starting the social-graph-service server ...";

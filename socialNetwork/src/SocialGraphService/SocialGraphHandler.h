@@ -30,7 +30,7 @@ using std::chrono::system_clock;
 class SocialGraphHandler : public SocialGraphServiceIf {
  public:
   SocialGraphHandler(mongoc_client_pool_t *, Redis *,
-                     ClientPool<ThriftClient<UserServiceClient>> *);
+                     ClientPool<ThriftClient<UserServiceClient>> *, json *);
   SocialGraphHandler(mongoc_client_pool_t *, Redis *, Redis *,
       ClientPool<ThriftClient<UserServiceClient>>*);
   SocialGraphHandler(mongoc_client_pool_t *, RedisCluster *,
@@ -38,19 +38,26 @@ class SocialGraphHandler : public SocialGraphServiceIf {
   ~SocialGraphHandler() override = default;
   bool IsRedisReplicationEnabled();
   void GetFollowers(std::vector<int64_t> &, int64_t, int64_t,
+                    const std::map<std::string, std::string> &,
                     const std::map<std::string, std::string> &) override;
   void GetFollowees(std::vector<int64_t> &, int64_t, int64_t,
+                    const std::map<std::string, std::string> &,
                     const std::map<std::string, std::string> &) override;
   void Follow(int64_t, int64_t, int64_t,
+              const std::map<std::string, std::string> &,
               const std::map<std::string, std::string> &) override;
   void Unfollow(int64_t, int64_t, int64_t,
+                const std::map<std::string, std::string> &,
                 const std::map<std::string, std::string> &) override;
   void FollowWithUsername(int64_t, const std::string &, const std::string &,
+                          const std::map<std::string, std::string> &,
                           const std::map<std::string, std::string> &) override;
   void UnfollowWithUsername(
       int64_t, const std::string &, const std::string &,
+      const std::map<std::string, std::string> &,
       const std::map<std::string, std::string> &) override;
   void InsertUser(int64_t, int64_t,
+                  const std::map<std::string, std::string> &,
                   const std::map<std::string, std::string> &) override;
 
  private:
@@ -60,17 +67,19 @@ class SocialGraphHandler : public SocialGraphServiceIf {
   Redis *_redis_primary_client_pool;
   RedisCluster *_redis_cluster_client_pool;
   ClientPool<ThriftClient<UserServiceClient>> *_user_service_client_pool;
+  json * _config_json;
 };
 
 SocialGraphHandler::SocialGraphHandler(
     mongoc_client_pool_t *mongodb_client_pool, Redis *redis_client_pool,
-    ClientPool<ThriftClient<UserServiceClient>> *user_service_client_pool) {
+    ClientPool<ThriftClient<UserServiceClient>> *user_service_client_pool, json *config_json) {
   _mongodb_client_pool = mongodb_client_pool;
   _redis_client_pool = redis_client_pool;
   _redis_replica_client_pool = nullptr;
   _redis_primary_client_pool = nullptr;
   _redis_cluster_client_pool = nullptr;
   _user_service_client_pool = user_service_client_pool;
+  _config_json = config_json;
 }
 
 SocialGraphHandler::SocialGraphHandler(
@@ -82,6 +91,7 @@ SocialGraphHandler::SocialGraphHandler(
     _redis_primary_client_pool = redis_primary_client_pool;
     _redis_cluster_client_pool = nullptr;
     _user_service_client_pool = user_service_client_pool;
+    _config_json = nullptr;
 }
 
 SocialGraphHandler::SocialGraphHandler(
@@ -94,6 +104,7 @@ SocialGraphHandler::SocialGraphHandler(
   _redis_primary_client_pool = nullptr;
   _redis_cluster_client_pool = redis_cluster_client_pool;
   _user_service_client_pool = user_service_client_pool;
+  _config_json = nullptr;
 }
 
 bool SocialGraphHandler::IsRedisReplicationEnabled() {
@@ -102,7 +113,8 @@ bool SocialGraphHandler::IsRedisReplicationEnabled() {
 
 void SocialGraphHandler::Follow(
     int64_t req_id, int64_t user_id, int64_t followee_id,
-    const std::map<std::string, std::string> &carrier) {
+    const std::map<std::string, std::string> &carrier,
+    const std::map<std::string, std::string> &context) {
   // Initialize a span
   TextMapReader reader(carrier);
   std::map<std::string, std::string> writer_text_map;
@@ -302,7 +314,8 @@ void SocialGraphHandler::Follow(
 
 void SocialGraphHandler::Unfollow(
     int64_t req_id, int64_t user_id, int64_t followee_id,
-    const std::map<std::string, std::string> &carrier) {
+    const std::map<std::string, std::string> &carrier,
+    const std::map<std::string, std::string> &context) {
   // Initialize a span
   TextMapReader reader(carrier);
   std::map<std::string, std::string> writer_text_map;
@@ -484,7 +497,8 @@ void SocialGraphHandler::Unfollow(
 
 void SocialGraphHandler::GetFollowers(
     std::vector<int64_t> &_return, const int64_t req_id, const int64_t user_id,
-    const std::map<std::string, std::string> &carrier) {
+    const std::map<std::string, std::string> &carrier,
+    const std::map<std::string, std::string> &context) {
   // Initialize a span
   TextMapReader reader(carrier);
   std::map<std::string, std::string> writer_text_map;
@@ -622,7 +636,8 @@ void SocialGraphHandler::GetFollowers(
 
 void SocialGraphHandler::GetFollowees(
     std::vector<int64_t> &_return, const int64_t req_id, const int64_t user_id,
-    const std::map<std::string, std::string> &carrier) {
+    const std::map<std::string, std::string> &carrier,
+    const std::map<std::string, std::string> &context) {
   // Initialize a span
   TextMapReader reader(carrier);
   std::map<std::string, std::string> writer_text_map;
@@ -767,7 +782,8 @@ void SocialGraphHandler::GetFollowees(
 
 void SocialGraphHandler::InsertUser(
     int64_t req_id, int64_t user_id,
-    const std::map<std::string, std::string> &carrier) {
+    const std::map<std::string, std::string> &carrier,
+    const std::map<std::string, std::string> &context) {
   // Initialize a span
   TextMapReader reader(carrier);
   std::map<std::string, std::string> writer_text_map;
@@ -824,7 +840,8 @@ void SocialGraphHandler::InsertUser(
 void SocialGraphHandler::FollowWithUsername(
     int64_t req_id, const std::string &user_name,
     const std::string &followee_name,
-    const std::map<std::string, std::string> &carrier) {
+    const std::map<std::string, std::string> &carrier,
+    const std::map<std::string, std::string> &context) {
   // Initialize a span
   TextMapReader reader(carrier);
   std::map<std::string, std::string> writer_text_map;
@@ -835,6 +852,11 @@ void SocialGraphHandler::FollowWithUsername(
       {opentracing::ChildOf(parent_span->get())});
   opentracing::Tracer::Global()->Inject(span->context(), writer);
 
+  auto new_context = context;
+  std::string sched_time_next = "0";
+  std::string sched_time_remaining = "0";
+  new_context["sched-time-next"] = sched_time_next;
+  new_context["sched-time-remaining"] = sched_time_remaining;
   std::future<int64_t> user_id_future = std::async(std::launch::async, [&]() {
     auto user_client_wrapper = _user_service_client_pool->Pop();
     if (!user_client_wrapper) {
@@ -846,7 +868,7 @@ void SocialGraphHandler::FollowWithUsername(
     auto user_client = user_client_wrapper->GetClient();
     int64_t _return;
     try {
-      _return = user_client->GetUserId(req_id, user_name, writer_text_map);
+      _return = user_client->GetUserId(req_id, user_name, writer_text_map, new_context);
     } catch (...) {
       _user_service_client_pool->Remove(user_client_wrapper);
       LOG(error) << "Failed to get user_id from user-service";
@@ -869,7 +891,7 @@ void SocialGraphHandler::FollowWithUsername(
         int64_t _return;
         try {
           _return =
-              user_client->GetUserId(req_id, followee_name, writer_text_map);
+              user_client->GetUserId(req_id, followee_name, writer_text_map, new_context);
         } catch (...) {
           _user_service_client_pool->Remove(user_client_wrapper);
           LOG(error) << "Failed to get user_id from user-service";
@@ -890,7 +912,7 @@ void SocialGraphHandler::FollowWithUsername(
   }
 
   if (user_id >= 0 && followee_id >= 0) {
-    Follow(req_id, user_id, followee_id, writer_text_map);
+    Follow(req_id, user_id, followee_id, writer_text_map, new_context);
   }
   span->Finish();
 }
@@ -898,7 +920,8 @@ void SocialGraphHandler::FollowWithUsername(
 void SocialGraphHandler::UnfollowWithUsername(
     int64_t req_id, const std::string &user_name,
     const std::string &followee_name,
-    const std::map<std::string, std::string> &carrier) {
+    const std::map<std::string, std::string> &carrier,
+    const std::map<std::string, std::string> &context) {
   // Initialize a span
   TextMapReader reader(carrier);
   std::map<std::string, std::string> writer_text_map;
@@ -909,6 +932,11 @@ void SocialGraphHandler::UnfollowWithUsername(
       {opentracing::ChildOf(parent_span->get())});
   opentracing::Tracer::Global()->Inject(span->context(), writer);
 
+  auto new_context = context;
+  std::string sched_time_next = "0";
+  std::string sched_time_remaining = "0";
+  new_context["sched-time-next"] = sched_time_next;
+  new_context["sched-time-remaining"] = sched_time_remaining;
   std::future<int64_t> user_id_future = std::async(std::launch::async, [&]() {
     auto user_client_wrapper = _user_service_client_pool->Pop();
     if (!user_client_wrapper) {
@@ -920,7 +948,7 @@ void SocialGraphHandler::UnfollowWithUsername(
     auto user_client = user_client_wrapper->GetClient();
     int64_t _return;
     try {
-      _return = user_client->GetUserId(req_id, user_name, writer_text_map);
+      _return = user_client->GetUserId(req_id, user_name, writer_text_map, new_context);
     } catch (...) {
       _user_service_client_pool->Remove(user_client_wrapper);
       LOG(error) << "Failed to get user_id from user-service";
@@ -943,7 +971,7 @@ void SocialGraphHandler::UnfollowWithUsername(
         int64_t _return;
         try {
           _return =
-              user_client->GetUserId(req_id, followee_name, writer_text_map);
+              user_client->GetUserId(req_id, followee_name, writer_text_map, new_context);
         } catch (...) {
           _user_service_client_pool->Remove(user_client_wrapper);
           LOG(error) << "Failed to get user_id from user-service";
@@ -964,7 +992,7 @@ void SocialGraphHandler::UnfollowWithUsername(
 
   if (user_id >= 0 && followee_id >= 0) {
     try {
-      Unfollow(req_id, user_id, followee_id, writer_text_map);
+      Unfollow(req_id, user_id, followee_id, writer_text_map, new_context);
     } catch (...) {
       throw;
     }

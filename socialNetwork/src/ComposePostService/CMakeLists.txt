@@ -28,6 +28,7 @@ target_link_libraries(
     OpenSSL::SSL
     /usr/local/lib/libjaegertracing.so
     /usr/local/lib/libSimpleAmqpClient.so
+    -lrt
 
 )
 

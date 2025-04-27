@@ -4,15 +4,18 @@ nodeName: cpu-16
 ports:
   - port: 9090
     targetPort: 9090
+
 hostPID: true
 
 container:
   command: ComposePostService
-  image: yxlee/socialnetwork-profile #deathstarbench/social-network-microservices
   name: compose-post-service
   ports:
   - containerPort: 9090
-  imageVersion: debug
+  securityContext: CAP_SYS_PTRACE
+  image: socialnetwork #socialnetwork-profile
+  imageVersion: ext #latest #jammy
+  dockerRegistry: local.registry #docker.io #localhost
 
 configMaps:
   - name: jaeger-config.yml

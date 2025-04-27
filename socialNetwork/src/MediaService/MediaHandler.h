@@ -22,6 +22,7 @@ class MediaHandler : public MediaServiceIf {
   void ComposeMedia(std::vector<Media> &_return, int64_t,
                     const std::vector<std::string> &,
                     const std::vector<int64_t> &,
+                    const std::map<std::string, std::string> &,
                     const std::map<std::string, std::string> &) override;
 
  private:
@@ -31,7 +32,8 @@ void MediaHandler::ComposeMedia(
     std::vector<Media> &_return, int64_t req_id,
     const std::vector<std::string> &media_types,
     const std::vector<int64_t> &media_ids,
-    const std::map<std::string, std::string> &carrier) {
+    const std::map<std::string, std::string> &carrier,
+    const std::map<std::string, std::string> &context) {
   // Initialize a span
   TextMapReader reader(carrier);
   std::map<std::string, std::string> writer_text_map;

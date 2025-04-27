@@ -5,6 +5,7 @@
  *  @generated
  */
 #include "SocialGraphService.h"
+#include "resched.h"
 
 namespace social_network {
 
@@ -54,21 +55,44 @@ uint32_t SocialGraphService_GetFollowers_args::read(::apache::thrift::protocol::
         if (ftype == ::apache::thrift::protocol::T_MAP) {
           {
             this->carrier.clear();
-            uint32_t _size255;
-            ::apache::thrift::protocol::TType _ktype256;
-            ::apache::thrift::protocol::TType _vtype257;
-            xfer += iprot->readMapBegin(_ktype256, _vtype257, _size255);
-            uint32_t _i259;
-            for (_i259 = 0; _i259 < _size255; ++_i259)
+            uint32_t _size399;
+            ::apache::thrift::protocol::TType _ktype400;
+            ::apache::thrift::protocol::TType _vtype401;
+            xfer += iprot->readMapBegin(_ktype400, _vtype401, _size399);
+            uint32_t _i403;
+            for (_i403 = 0; _i403 < _size399; ++_i403)
             {
-              std::string _key260;
-              xfer += iprot->readString(_key260);
-              std::string& _val261 = this->carrier[_key260];
-              xfer += iprot->readString(_val261);
+              std::string _key404;
+              xfer += iprot->readString(_key404);
+              std::string& _val405 = this->carrier[_key404];
+              xfer += iprot->readString(_val405);
             }
             xfer += iprot->readMapEnd();
           }
           this->__isset.carrier = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 4:
+        if (ftype == ::apache::thrift::protocol::T_MAP) {
+          {
+            this->context.clear();
+            uint32_t _size406;
+            ::apache::thrift::protocol::TType _ktype407;
+            ::apache::thrift::protocol::TType _vtype408;
+            xfer += iprot->readMapBegin(_ktype407, _vtype408, _size406);
+            uint32_t _i410;
+            for (_i410 = 0; _i410 < _size406; ++_i410)
+            {
+              std::string _key411;
+              xfer += iprot->readString(_key411);
+              std::string& _val412 = this->context[_key411];
+              xfer += iprot->readString(_val412);
+            }
+            xfer += iprot->readMapEnd();
+          }
+          this->__isset.context = true;
         } else {
           xfer += iprot->skip(ftype);
         }
@@ -101,11 +125,24 @@ uint32_t SocialGraphService_GetFollowers_args::write(::apache::thrift::protocol:
   xfer += oprot->writeFieldBegin("carrier", ::apache::thrift::protocol::T_MAP, 3);
   {
     xfer += oprot->writeMapBegin(::apache::thrift::protocol::T_STRING, ::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->carrier.size()));
-    std::map<std::string, std::string> ::const_iterator _iter262;
-    for (_iter262 = this->carrier.begin(); _iter262 != this->carrier.end(); ++_iter262)
+    std::map<std::string, std::string> ::const_iterator _iter413;
+    for (_iter413 = this->carrier.begin(); _iter413 != this->carrier.end(); ++_iter413)
     {
-      xfer += oprot->writeString(_iter262->first);
-      xfer += oprot->writeString(_iter262->second);
+      xfer += oprot->writeString(_iter413->first);
+      xfer += oprot->writeString(_iter413->second);
+    }
+    xfer += oprot->writeMapEnd();
+  }
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("context", ::apache::thrift::protocol::T_MAP, 4);
+  {
+    xfer += oprot->writeMapBegin(::apache::thrift::protocol::T_STRING, ::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->context.size()));
+    std::map<std::string, std::string> ::const_iterator _iter414;
+    for (_iter414 = this->context.begin(); _iter414 != this->context.end(); ++_iter414)
+    {
+      xfer += oprot->writeString(_iter414->first);
+      xfer += oprot->writeString(_iter414->second);
     }
     xfer += oprot->writeMapEnd();
   }
@@ -137,11 +174,24 @@ uint32_t SocialGraphService_GetFollowers_pargs::write(::apache::thrift::protocol
   xfer += oprot->writeFieldBegin("carrier", ::apache::thrift::protocol::T_MAP, 3);
   {
     xfer += oprot->writeMapBegin(::apache::thrift::protocol::T_STRING, ::apache::thrift::protocol::T_STRING, static_cast<uint32_t>((*(this->carrier)).size()));
-    std::map<std::string, std::string> ::const_iterator _iter263;
-    for (_iter263 = (*(this->carrier)).begin(); _iter263 != (*(this->carrier)).end(); ++_iter263)
+    std::map<std::string, std::string> ::const_iterator _iter415;
+    for (_iter415 = (*(this->carrier)).begin(); _iter415 != (*(this->carrier)).end(); ++_iter415)
     {
-      xfer += oprot->writeString(_iter263->first);
-      xfer += oprot->writeString(_iter263->second);
+      xfer += oprot->writeString(_iter415->first);
+      xfer += oprot->writeString(_iter415->second);
+    }
+    xfer += oprot->writeMapEnd();
+  }
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("context", ::apache::thrift::protocol::T_MAP, 4);
+  {
+    xfer += oprot->writeMapBegin(::apache::thrift::protocol::T_STRING, ::apache::thrift::protocol::T_STRING, static_cast<uint32_t>((*(this->context)).size()));
+    std::map<std::string, std::string> ::const_iterator _iter416;
+    for (_iter416 = (*(this->context)).begin(); _iter416 != (*(this->context)).end(); ++_iter416)
+    {
+      xfer += oprot->writeString(_iter416->first);
+      xfer += oprot->writeString(_iter416->second);
     }
     xfer += oprot->writeMapEnd();
   }
@@ -182,14 +232,14 @@ uint32_t SocialGraphService_GetFollowers_result::read(::apache::thrift::protocol
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->success.clear();
-            uint32_t _size264;
-            ::apache::thrift::protocol::TType _etype267;
-            xfer += iprot->readListBegin(_etype267, _size264);
-            this->success.resize(_size264);
-            uint32_t _i268;
-            for (_i268 = 0; _i268 < _size264; ++_i268)
+            uint32_t _size417;
+            ::apache::thrift::protocol::TType _etype420;
+            xfer += iprot->readListBegin(_etype420, _size417);
+            this->success.resize(_size417);
+            uint32_t _i421;
+            for (_i421 = 0; _i421 < _size417; ++_i421)
             {
-              xfer += iprot->readI64(this->success[_i268]);
+              xfer += iprot->readI64(this->success[_i421]);
             }
             xfer += iprot->readListEnd();
           }
@@ -228,10 +278,10 @@ uint32_t SocialGraphService_GetFollowers_result::write(::apache::thrift::protoco
     xfer += oprot->writeFieldBegin("success", ::apache::thrift::protocol::T_LIST, 0);
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_I64, static_cast<uint32_t>(this->success.size()));
-      std::vector<int64_t> ::const_iterator _iter269;
-      for (_iter269 = this->success.begin(); _iter269 != this->success.end(); ++_iter269)
+      std::vector<int64_t> ::const_iterator _iter422;
+      for (_iter422 = this->success.begin(); _iter422 != this->success.end(); ++_iter422)
       {
-        xfer += oprot->writeI64((*_iter269));
+        xfer += oprot->writeI64((*_iter422));
       }
       xfer += oprot->writeListEnd();
     }
@@ -276,14 +326,14 @@ uint32_t SocialGraphService_GetFollowers_presult::read(::apache::thrift::protoco
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             (*(this->success)).clear();
-            uint32_t _size270;
-            ::apache::thrift::protocol::TType _etype273;
-            xfer += iprot->readListBegin(_etype273, _size270);
-            (*(this->success)).resize(_size270);
-            uint32_t _i274;
-            for (_i274 = 0; _i274 < _size270; ++_i274)
+            uint32_t _size423;
+            ::apache::thrift::protocol::TType _etype426;
+            xfer += iprot->readListBegin(_etype426, _size423);
+            (*(this->success)).resize(_size423);
+            uint32_t _i427;
+            for (_i427 = 0; _i427 < _size423; ++_i427)
             {
-              xfer += iprot->readI64((*(this->success))[_i274]);
+              xfer += iprot->readI64((*(this->success))[_i427]);
             }
             xfer += iprot->readListEnd();
           }
@@ -358,21 +408,44 @@ uint32_t SocialGraphService_GetFollowees_args::read(::apache::thrift::protocol::
         if (ftype == ::apache::thrift::protocol::T_MAP) {
           {
             this->carrier.clear();
-            uint32_t _size275;
-            ::apache::thrift::protocol::TType _ktype276;
-            ::apache::thrift::protocol::TType _vtype277;
-            xfer += iprot->readMapBegin(_ktype276, _vtype277, _size275);
-            uint32_t _i279;
-            for (_i279 = 0; _i279 < _size275; ++_i279)
+            uint32_t _size428;
+            ::apache::thrift::protocol::TType _ktype429;
+            ::apache::thrift::protocol::TType _vtype430;
+            xfer += iprot->readMapBegin(_ktype429, _vtype430, _size428);
+            uint32_t _i432;
+            for (_i432 = 0; _i432 < _size428; ++_i432)
             {
-              std::string _key280;
-              xfer += iprot->readString(_key280);
-              std::string& _val281 = this->carrier[_key280];
-              xfer += iprot->readString(_val281);
+              std::string _key433;
+              xfer += iprot->readString(_key433);
+              std::string& _val434 = this->carrier[_key433];
+              xfer += iprot->readString(_val434);
             }
             xfer += iprot->readMapEnd();
           }
           this->__isset.carrier = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 4:
+        if (ftype == ::apache::thrift::protocol::T_MAP) {
+          {
+            this->context.clear();
+            uint32_t _size435;
+            ::apache::thrift::protocol::TType _ktype436;
+            ::apache::thrift::protocol::TType _vtype437;
+            xfer += iprot->readMapBegin(_ktype436, _vtype437, _size435);
+            uint32_t _i439;
+            for (_i439 = 0; _i439 < _size435; ++_i439)
+            {
+              std::string _key440;
+              xfer += iprot->readString(_key440);
+              std::string& _val441 = this->context[_key440];
+              xfer += iprot->readString(_val441);
+            }
+            xfer += iprot->readMapEnd();
+          }
+          this->__isset.context = true;
         } else {
           xfer += iprot->skip(ftype);
         }
@@ -405,11 +478,24 @@ uint32_t SocialGraphService_GetFollowees_args::write(::apache::thrift::protocol:
   xfer += oprot->writeFieldBegin("carrier", ::apache::thrift::protocol::T_MAP, 3);
   {
     xfer += oprot->writeMapBegin(::apache::thrift::protocol::T_STRING, ::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->carrier.size()));
-    std::map<std::string, std::string> ::const_iterator _iter282;
-    for (_iter282 = this->carrier.begin(); _iter282 != this->carrier.end(); ++_iter282)
+    std::map<std::string, std::string> ::const_iterator _iter442;
+    for (_iter442 = this->carrier.begin(); _iter442 != this->carrier.end(); ++_iter442)
     {
-      xfer += oprot->writeString(_iter282->first);
-      xfer += oprot->writeString(_iter282->second);
+      xfer += oprot->writeString(_iter442->first);
+      xfer += oprot->writeString(_iter442->second);
+    }
+    xfer += oprot->writeMapEnd();
+  }
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("context", ::apache::thrift::protocol::T_MAP, 4);
+  {
+    xfer += oprot->writeMapBegin(::apache::thrift::protocol::T_STRING, ::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->context.size()));
+    std::map<std::string, std::string> ::const_iterator _iter443;
+    for (_iter443 = this->context.begin(); _iter443 != this->context.end(); ++_iter443)
+    {
+      xfer += oprot->writeString(_iter443->first);
+      xfer += oprot->writeString(_iter443->second);
     }
     xfer += oprot->writeMapEnd();
   }
@@ -441,11 +527,24 @@ uint32_t SocialGraphService_GetFollowees_pargs::write(::apache::thrift::protocol
   xfer += oprot->writeFieldBegin("carrier", ::apache::thrift::protocol::T_MAP, 3);
   {
     xfer += oprot->writeMapBegin(::apache::thrift::protocol::T_STRING, ::apache::thrift::protocol::T_STRING, static_cast<uint32_t>((*(this->carrier)).size()));
-    std::map<std::string, std::string> ::const_iterator _iter283;
-    for (_iter283 = (*(this->carrier)).begin(); _iter283 != (*(this->carrier)).end(); ++_iter283)
+    std::map<std::string, std::string> ::const_iterator _iter444;
+    for (_iter444 = (*(this->carrier)).begin(); _iter444 != (*(this->carrier)).end(); ++_iter444)
     {
-      xfer += oprot->writeString(_iter283->first);
-      xfer += oprot->writeString(_iter283->second);
+      xfer += oprot->writeString(_iter444->first);
+      xfer += oprot->writeString(_iter444->second);
+    }
+    xfer += oprot->writeMapEnd();
+  }
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("context", ::apache::thrift::protocol::T_MAP, 4);
+  {
+    xfer += oprot->writeMapBegin(::apache::thrift::protocol::T_STRING, ::apache::thrift::protocol::T_STRING, static_cast<uint32_t>((*(this->context)).size()));
+    std::map<std::string, std::string> ::const_iterator _iter445;
+    for (_iter445 = (*(this->context)).begin(); _iter445 != (*(this->context)).end(); ++_iter445)
+    {
+      xfer += oprot->writeString(_iter445->first);
+      xfer += oprot->writeString(_iter445->second);
     }
     xfer += oprot->writeMapEnd();
   }
@@ -486,14 +585,14 @@ uint32_t SocialGraphService_GetFollowees_result::read(::apache::thrift::protocol
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->success.clear();
-            uint32_t _size284;
-            ::apache::thrift::protocol::TType _etype287;
-            xfer += iprot->readListBegin(_etype287, _size284);
-            this->success.resize(_size284);
-            uint32_t _i288;
-            for (_i288 = 0; _i288 < _size284; ++_i288)
+            uint32_t _size446;
+            ::apache::thrift::protocol::TType _etype449;
+            xfer += iprot->readListBegin(_etype449, _size446);
+            this->success.resize(_size446);
+            uint32_t _i450;
+            for (_i450 = 0; _i450 < _size446; ++_i450)
             {
-              xfer += iprot->readI64(this->success[_i288]);
+              xfer += iprot->readI64(this->success[_i450]);
             }
             xfer += iprot->readListEnd();
           }
@@ -532,10 +631,10 @@ uint32_t SocialGraphService_GetFollowees_result::write(::apache::thrift::protoco
     xfer += oprot->writeFieldBegin("success", ::apache::thrift::protocol::T_LIST, 0);
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_I64, static_cast<uint32_t>(this->success.size()));
-      std::vector<int64_t> ::const_iterator _iter289;
-      for (_iter289 = this->success.begin(); _iter289 != this->success.end(); ++_iter289)
+      std::vector<int64_t> ::const_iterator _iter451;
+      for (_iter451 = this->success.begin(); _iter451 != this->success.end(); ++_iter451)
       {
-        xfer += oprot->writeI64((*_iter289));
+        xfer += oprot->writeI64((*_iter451));
       }
       xfer += oprot->writeListEnd();
     }
@@ -580,14 +679,14 @@ uint32_t SocialGraphService_GetFollowees_presult::read(::apache::thrift::protoco
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             (*(this->success)).clear();
-            uint32_t _size290;
-            ::apache::thrift::protocol::TType _etype293;
-            xfer += iprot->readListBegin(_etype293, _size290);
-            (*(this->success)).resize(_size290);
-            uint32_t _i294;
-            for (_i294 = 0; _i294 < _size290; ++_i294)
+            uint32_t _size452;
+            ::apache::thrift::protocol::TType _etype455;
+            xfer += iprot->readListBegin(_etype455, _size452);
+            (*(this->success)).resize(_size452);
+            uint32_t _i456;
+            for (_i456 = 0; _i456 < _size452; ++_i456)
             {
-              xfer += iprot->readI64((*(this->success))[_i294]);
+              xfer += iprot->readI64((*(this->success))[_i456]);
             }
             xfer += iprot->readListEnd();
           }
@@ -670,21 +769,44 @@ uint32_t SocialGraphService_Follow_args::read(::apache::thrift::protocol::TProto
         if (ftype == ::apache::thrift::protocol::T_MAP) {
           {
             this->carrier.clear();
-            uint32_t _size295;
-            ::apache::thrift::protocol::TType _ktype296;
-            ::apache::thrift::protocol::TType _vtype297;
-            xfer += iprot->readMapBegin(_ktype296, _vtype297, _size295);
-            uint32_t _i299;
-            for (_i299 = 0; _i299 < _size295; ++_i299)
+            uint32_t _size457;
+            ::apache::thrift::protocol::TType _ktype458;
+            ::apache::thrift::protocol::TType _vtype459;
+            xfer += iprot->readMapBegin(_ktype458, _vtype459, _size457);
+            uint32_t _i461;
+            for (_i461 = 0; _i461 < _size457; ++_i461)
             {
-              std::string _key300;
-              xfer += iprot->readString(_key300);
-              std::string& _val301 = this->carrier[_key300];
-              xfer += iprot->readString(_val301);
+              std::string _key462;
+              xfer += iprot->readString(_key462);
+              std::string& _val463 = this->carrier[_key462];
+              xfer += iprot->readString(_val463);
             }
             xfer += iprot->readMapEnd();
           }
           this->__isset.carrier = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 5:
+        if (ftype == ::apache::thrift::protocol::T_MAP) {
+          {
+            this->context.clear();
+            uint32_t _size464;
+            ::apache::thrift::protocol::TType _ktype465;
+            ::apache::thrift::protocol::TType _vtype466;
+            xfer += iprot->readMapBegin(_ktype465, _vtype466, _size464);
+            uint32_t _i468;
+            for (_i468 = 0; _i468 < _size464; ++_i468)
+            {
+              std::string _key469;
+              xfer += iprot->readString(_key469);
+              std::string& _val470 = this->context[_key469];
+              xfer += iprot->readString(_val470);
+            }
+            xfer += iprot->readMapEnd();
+          }
+          this->__isset.context = true;
         } else {
           xfer += iprot->skip(ftype);
         }
@@ -721,11 +843,24 @@ uint32_t SocialGraphService_Follow_args::write(::apache::thrift::protocol::TProt
   xfer += oprot->writeFieldBegin("carrier", ::apache::thrift::protocol::T_MAP, 4);
   {
     xfer += oprot->writeMapBegin(::apache::thrift::protocol::T_STRING, ::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->carrier.size()));
-    std::map<std::string, std::string> ::const_iterator _iter302;
-    for (_iter302 = this->carrier.begin(); _iter302 != this->carrier.end(); ++_iter302)
+    std::map<std::string, std::string> ::const_iterator _iter471;
+    for (_iter471 = this->carrier.begin(); _iter471 != this->carrier.end(); ++_iter471)
     {
-      xfer += oprot->writeString(_iter302->first);
-      xfer += oprot->writeString(_iter302->second);
+      xfer += oprot->writeString(_iter471->first);
+      xfer += oprot->writeString(_iter471->second);
+    }
+    xfer += oprot->writeMapEnd();
+  }
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("context", ::apache::thrift::protocol::T_MAP, 5);
+  {
+    xfer += oprot->writeMapBegin(::apache::thrift::protocol::T_STRING, ::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->context.size()));
+    std::map<std::string, std::string> ::const_iterator _iter472;
+    for (_iter472 = this->context.begin(); _iter472 != this->context.end(); ++_iter472)
+    {
+      xfer += oprot->writeString(_iter472->first);
+      xfer += oprot->writeString(_iter472->second);
     }
     xfer += oprot->writeMapEnd();
   }
@@ -761,11 +896,24 @@ uint32_t SocialGraphService_Follow_pargs::write(::apache::thrift::protocol::TPro
   xfer += oprot->writeFieldBegin("carrier", ::apache::thrift::protocol::T_MAP, 4);
   {
     xfer += oprot->writeMapBegin(::apache::thrift::protocol::T_STRING, ::apache::thrift::protocol::T_STRING, static_cast<uint32_t>((*(this->carrier)).size()));
-    std::map<std::string, std::string> ::const_iterator _iter303;
-    for (_iter303 = (*(this->carrier)).begin(); _iter303 != (*(this->carrier)).end(); ++_iter303)
+    std::map<std::string, std::string> ::const_iterator _iter473;
+    for (_iter473 = (*(this->carrier)).begin(); _iter473 != (*(this->carrier)).end(); ++_iter473)
     {
-      xfer += oprot->writeString(_iter303->first);
-      xfer += oprot->writeString(_iter303->second);
+      xfer += oprot->writeString(_iter473->first);
+      xfer += oprot->writeString(_iter473->second);
+    }
+    xfer += oprot->writeMapEnd();
+  }
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("context", ::apache::thrift::protocol::T_MAP, 5);
+  {
+    xfer += oprot->writeMapBegin(::apache::thrift::protocol::T_STRING, ::apache::thrift::protocol::T_STRING, static_cast<uint32_t>((*(this->context)).size()));
+    std::map<std::string, std::string> ::const_iterator _iter474;
+    for (_iter474 = (*(this->context)).begin(); _iter474 != (*(this->context)).end(); ++_iter474)
+    {
+      xfer += oprot->writeString(_iter474->first);
+      xfer += oprot->writeString(_iter474->second);
     }
     xfer += oprot->writeMapEnd();
   }
@@ -938,21 +1086,44 @@ uint32_t SocialGraphService_Unfollow_args::read(::apache::thrift::protocol::TPro
         if (ftype == ::apache::thrift::protocol::T_MAP) {
           {
             this->carrier.clear();
-            uint32_t _size304;
-            ::apache::thrift::protocol::TType _ktype305;
-            ::apache::thrift::protocol::TType _vtype306;
-            xfer += iprot->readMapBegin(_ktype305, _vtype306, _size304);
-            uint32_t _i308;
-            for (_i308 = 0; _i308 < _size304; ++_i308)
+            uint32_t _size475;
+            ::apache::thrift::protocol::TType _ktype476;
+            ::apache::thrift::protocol::TType _vtype477;
+            xfer += iprot->readMapBegin(_ktype476, _vtype477, _size475);
+            uint32_t _i479;
+            for (_i479 = 0; _i479 < _size475; ++_i479)
             {
-              std::string _key309;
-              xfer += iprot->readString(_key309);
-              std::string& _val310 = this->carrier[_key309];
-              xfer += iprot->readString(_val310);
+              std::string _key480;
+              xfer += iprot->readString(_key480);
+              std::string& _val481 = this->carrier[_key480];
+              xfer += iprot->readString(_val481);
             }
             xfer += iprot->readMapEnd();
           }
           this->__isset.carrier = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 5:
+        if (ftype == ::apache::thrift::protocol::T_MAP) {
+          {
+            this->context.clear();
+            uint32_t _size482;
+            ::apache::thrift::protocol::TType _ktype483;
+            ::apache::thrift::protocol::TType _vtype484;
+            xfer += iprot->readMapBegin(_ktype483, _vtype484, _size482);
+            uint32_t _i486;
+            for (_i486 = 0; _i486 < _size482; ++_i486)
+            {
+              std::string _key487;
+              xfer += iprot->readString(_key487);
+              std::string& _val488 = this->context[_key487];
+              xfer += iprot->readString(_val488);
+            }
+            xfer += iprot->readMapEnd();
+          }
+          this->__isset.context = true;
         } else {
           xfer += iprot->skip(ftype);
         }
@@ -989,11 +1160,24 @@ uint32_t SocialGraphService_Unfollow_args::write(::apache::thrift::protocol::TPr
   xfer += oprot->writeFieldBegin("carrier", ::apache::thrift::protocol::T_MAP, 4);
   {
     xfer += oprot->writeMapBegin(::apache::thrift::protocol::T_STRING, ::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->carrier.size()));
-    std::map<std::string, std::string> ::const_iterator _iter311;
-    for (_iter311 = this->carrier.begin(); _iter311 != this->carrier.end(); ++_iter311)
+    std::map<std::string, std::string> ::const_iterator _iter489;
+    for (_iter489 = this->carrier.begin(); _iter489 != this->carrier.end(); ++_iter489)
     {
-      xfer += oprot->writeString(_iter311->first);
-      xfer += oprot->writeString(_iter311->second);
+      xfer += oprot->writeString(_iter489->first);
+      xfer += oprot->writeString(_iter489->second);
+    }
+    xfer += oprot->writeMapEnd();
+  }
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("context", ::apache::thrift::protocol::T_MAP, 5);
+  {
+    xfer += oprot->writeMapBegin(::apache::thrift::protocol::T_STRING, ::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->context.size()));
+    std::map<std::string, std::string> ::const_iterator _iter490;
+    for (_iter490 = this->context.begin(); _iter490 != this->context.end(); ++_iter490)
+    {
+      xfer += oprot->writeString(_iter490->first);
+      xfer += oprot->writeString(_iter490->second);
     }
     xfer += oprot->writeMapEnd();
   }
@@ -1029,11 +1213,24 @@ uint32_t SocialGraphService_Unfollow_pargs::write(::apache::thrift::protocol::TP
   xfer += oprot->writeFieldBegin("carrier", ::apache::thrift::protocol::T_MAP, 4);
   {
     xfer += oprot->writeMapBegin(::apache::thrift::protocol::T_STRING, ::apache::thrift::protocol::T_STRING, static_cast<uint32_t>((*(this->carrier)).size()));
-    std::map<std::string, std::string> ::const_iterator _iter312;
-    for (_iter312 = (*(this->carrier)).begin(); _iter312 != (*(this->carrier)).end(); ++_iter312)
+    std::map<std::string, std::string> ::const_iterator _iter491;
+    for (_iter491 = (*(this->carrier)).begin(); _iter491 != (*(this->carrier)).end(); ++_iter491)
     {
-      xfer += oprot->writeString(_iter312->first);
-      xfer += oprot->writeString(_iter312->second);
+      xfer += oprot->writeString(_iter491->first);
+      xfer += oprot->writeString(_iter491->second);
+    }
+    xfer += oprot->writeMapEnd();
+  }
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("context", ::apache::thrift::protocol::T_MAP, 5);
+  {
+    xfer += oprot->writeMapBegin(::apache::thrift::protocol::T_STRING, ::apache::thrift::protocol::T_STRING, static_cast<uint32_t>((*(this->context)).size()));
+    std::map<std::string, std::string> ::const_iterator _iter492;
+    for (_iter492 = (*(this->context)).begin(); _iter492 != (*(this->context)).end(); ++_iter492)
+    {
+      xfer += oprot->writeString(_iter492->first);
+      xfer += oprot->writeString(_iter492->second);
     }
     xfer += oprot->writeMapEnd();
   }
@@ -1206,21 +1403,44 @@ uint32_t SocialGraphService_FollowWithUsername_args::read(::apache::thrift::prot
         if (ftype == ::apache::thrift::protocol::T_MAP) {
           {
             this->carrier.clear();
-            uint32_t _size313;
-            ::apache::thrift::protocol::TType _ktype314;
-            ::apache::thrift::protocol::TType _vtype315;
-            xfer += iprot->readMapBegin(_ktype314, _vtype315, _size313);
-            uint32_t _i317;
-            for (_i317 = 0; _i317 < _size313; ++_i317)
+            uint32_t _size493;
+            ::apache::thrift::protocol::TType _ktype494;
+            ::apache::thrift::protocol::TType _vtype495;
+            xfer += iprot->readMapBegin(_ktype494, _vtype495, _size493);
+            uint32_t _i497;
+            for (_i497 = 0; _i497 < _size493; ++_i497)
             {
-              std::string _key318;
-              xfer += iprot->readString(_key318);
-              std::string& _val319 = this->carrier[_key318];
-              xfer += iprot->readString(_val319);
+              std::string _key498;
+              xfer += iprot->readString(_key498);
+              std::string& _val499 = this->carrier[_key498];
+              xfer += iprot->readString(_val499);
             }
             xfer += iprot->readMapEnd();
           }
           this->__isset.carrier = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 5:
+        if (ftype == ::apache::thrift::protocol::T_MAP) {
+          {
+            this->context.clear();
+            uint32_t _size500;
+            ::apache::thrift::protocol::TType _ktype501;
+            ::apache::thrift::protocol::TType _vtype502;
+            xfer += iprot->readMapBegin(_ktype501, _vtype502, _size500);
+            uint32_t _i504;
+            for (_i504 = 0; _i504 < _size500; ++_i504)
+            {
+              std::string _key505;
+              xfer += iprot->readString(_key505);
+              std::string& _val506 = this->context[_key505];
+              xfer += iprot->readString(_val506);
+            }
+            xfer += iprot->readMapEnd();
+          }
+          this->__isset.context = true;
         } else {
           xfer += iprot->skip(ftype);
         }
@@ -1257,11 +1477,24 @@ uint32_t SocialGraphService_FollowWithUsername_args::write(::apache::thrift::pro
   xfer += oprot->writeFieldBegin("carrier", ::apache::thrift::protocol::T_MAP, 4);
   {
     xfer += oprot->writeMapBegin(::apache::thrift::protocol::T_STRING, ::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->carrier.size()));
-    std::map<std::string, std::string> ::const_iterator _iter320;
-    for (_iter320 = this->carrier.begin(); _iter320 != this->carrier.end(); ++_iter320)
+    std::map<std::string, std::string> ::const_iterator _iter507;
+    for (_iter507 = this->carrier.begin(); _iter507 != this->carrier.end(); ++_iter507)
     {
-      xfer += oprot->writeString(_iter320->first);
-      xfer += oprot->writeString(_iter320->second);
+      xfer += oprot->writeString(_iter507->first);
+      xfer += oprot->writeString(_iter507->second);
+    }
+    xfer += oprot->writeMapEnd();
+  }
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("context", ::apache::thrift::protocol::T_MAP, 5);
+  {
+    xfer += oprot->writeMapBegin(::apache::thrift::protocol::T_STRING, ::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->context.size()));
+    std::map<std::string, std::string> ::const_iterator _iter508;
+    for (_iter508 = this->context.begin(); _iter508 != this->context.end(); ++_iter508)
+    {
+      xfer += oprot->writeString(_iter508->first);
+      xfer += oprot->writeString(_iter508->second);
     }
     xfer += oprot->writeMapEnd();
   }
@@ -1297,11 +1530,24 @@ uint32_t SocialGraphService_FollowWithUsername_pargs::write(::apache::thrift::pr
   xfer += oprot->writeFieldBegin("carrier", ::apache::thrift::protocol::T_MAP, 4);
   {
     xfer += oprot->writeMapBegin(::apache::thrift::protocol::T_STRING, ::apache::thrift::protocol::T_STRING, static_cast<uint32_t>((*(this->carrier)).size()));
-    std::map<std::string, std::string> ::const_iterator _iter321;
-    for (_iter321 = (*(this->carrier)).begin(); _iter321 != (*(this->carrier)).end(); ++_iter321)
+    std::map<std::string, std::string> ::const_iterator _iter509;
+    for (_iter509 = (*(this->carrier)).begin(); _iter509 != (*(this->carrier)).end(); ++_iter509)
     {
-      xfer += oprot->writeString(_iter321->first);
-      xfer += oprot->writeString(_iter321->second);
+      xfer += oprot->writeString(_iter509->first);
+      xfer += oprot->writeString(_iter509->second);
+    }
+    xfer += oprot->writeMapEnd();
+  }
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("context", ::apache::thrift::protocol::T_MAP, 5);
+  {
+    xfer += oprot->writeMapBegin(::apache::thrift::protocol::T_STRING, ::apache::thrift::protocol::T_STRING, static_cast<uint32_t>((*(this->context)).size()));
+    std::map<std::string, std::string> ::const_iterator _iter510;
+    for (_iter510 = (*(this->context)).begin(); _iter510 != (*(this->context)).end(); ++_iter510)
+    {
+      xfer += oprot->writeString(_iter510->first);
+      xfer += oprot->writeString(_iter510->second);
     }
     xfer += oprot->writeMapEnd();
   }
@@ -1474,21 +1720,44 @@ uint32_t SocialGraphService_UnfollowWithUsername_args::read(::apache::thrift::pr
         if (ftype == ::apache::thrift::protocol::T_MAP) {
           {
             this->carrier.clear();
-            uint32_t _size322;
-            ::apache::thrift::protocol::TType _ktype323;
-            ::apache::thrift::protocol::TType _vtype324;
-            xfer += iprot->readMapBegin(_ktype323, _vtype324, _size322);
-            uint32_t _i326;
-            for (_i326 = 0; _i326 < _size322; ++_i326)
+            uint32_t _size511;
+            ::apache::thrift::protocol::TType _ktype512;
+            ::apache::thrift::protocol::TType _vtype513;
+            xfer += iprot->readMapBegin(_ktype512, _vtype513, _size511);
+            uint32_t _i515;
+            for (_i515 = 0; _i515 < _size511; ++_i515)
             {
-              std::string _key327;
-              xfer += iprot->readString(_key327);
-              std::string& _val328 = this->carrier[_key327];
-              xfer += iprot->readString(_val328);
+              std::string _key516;
+              xfer += iprot->readString(_key516);
+              std::string& _val517 = this->carrier[_key516];
+              xfer += iprot->readString(_val517);
             }
             xfer += iprot->readMapEnd();
           }
           this->__isset.carrier = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 5:
+        if (ftype == ::apache::thrift::protocol::T_MAP) {
+          {
+            this->context.clear();
+            uint32_t _size518;
+            ::apache::thrift::protocol::TType _ktype519;
+            ::apache::thrift::protocol::TType _vtype520;
+            xfer += iprot->readMapBegin(_ktype519, _vtype520, _size518);
+            uint32_t _i522;
+            for (_i522 = 0; _i522 < _size518; ++_i522)
+            {
+              std::string _key523;
+              xfer += iprot->readString(_key523);
+              std::string& _val524 = this->context[_key523];
+              xfer += iprot->readString(_val524);
+            }
+            xfer += iprot->readMapEnd();
+          }
+          this->__isset.context = true;
         } else {
           xfer += iprot->skip(ftype);
         }
@@ -1525,11 +1794,24 @@ uint32_t SocialGraphService_UnfollowWithUsername_args::write(::apache::thrift::p
   xfer += oprot->writeFieldBegin("carrier", ::apache::thrift::protocol::T_MAP, 4);
   {
     xfer += oprot->writeMapBegin(::apache::thrift::protocol::T_STRING, ::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->carrier.size()));
-    std::map<std::string, std::string> ::const_iterator _iter329;
-    for (_iter329 = this->carrier.begin(); _iter329 != this->carrier.end(); ++_iter329)
+    std::map<std::string, std::string> ::const_iterator _iter525;
+    for (_iter525 = this->carrier.begin(); _iter525 != this->carrier.end(); ++_iter525)
     {
-      xfer += oprot->writeString(_iter329->first);
-      xfer += oprot->writeString(_iter329->second);
+      xfer += oprot->writeString(_iter525->first);
+      xfer += oprot->writeString(_iter525->second);
+    }
+    xfer += oprot->writeMapEnd();
+  }
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("context", ::apache::thrift::protocol::T_MAP, 5);
+  {
+    xfer += oprot->writeMapBegin(::apache::thrift::protocol::T_STRING, ::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->context.size()));
+    std::map<std::string, std::string> ::const_iterator _iter526;
+    for (_iter526 = this->context.begin(); _iter526 != this->context.end(); ++_iter526)
+    {
+      xfer += oprot->writeString(_iter526->first);
+      xfer += oprot->writeString(_iter526->second);
     }
     xfer += oprot->writeMapEnd();
   }
@@ -1565,11 +1847,24 @@ uint32_t SocialGraphService_UnfollowWithUsername_pargs::write(::apache::thrift::
   xfer += oprot->writeFieldBegin("carrier", ::apache::thrift::protocol::T_MAP, 4);
   {
     xfer += oprot->writeMapBegin(::apache::thrift::protocol::T_STRING, ::apache::thrift::protocol::T_STRING, static_cast<uint32_t>((*(this->carrier)).size()));
-    std::map<std::string, std::string> ::const_iterator _iter330;
-    for (_iter330 = (*(this->carrier)).begin(); _iter330 != (*(this->carrier)).end(); ++_iter330)
+    std::map<std::string, std::string> ::const_iterator _iter527;
+    for (_iter527 = (*(this->carrier)).begin(); _iter527 != (*(this->carrier)).end(); ++_iter527)
     {
-      xfer += oprot->writeString(_iter330->first);
-      xfer += oprot->writeString(_iter330->second);
+      xfer += oprot->writeString(_iter527->first);
+      xfer += oprot->writeString(_iter527->second);
+    }
+    xfer += oprot->writeMapEnd();
+  }
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("context", ::apache::thrift::protocol::T_MAP, 5);
+  {
+    xfer += oprot->writeMapBegin(::apache::thrift::protocol::T_STRING, ::apache::thrift::protocol::T_STRING, static_cast<uint32_t>((*(this->context)).size()));
+    std::map<std::string, std::string> ::const_iterator _iter528;
+    for (_iter528 = (*(this->context)).begin(); _iter528 != (*(this->context)).end(); ++_iter528)
+    {
+      xfer += oprot->writeString(_iter528->first);
+      xfer += oprot->writeString(_iter528->second);
     }
     xfer += oprot->writeMapEnd();
   }
@@ -1734,21 +2029,44 @@ uint32_t SocialGraphService_InsertUser_args::read(::apache::thrift::protocol::TP
         if (ftype == ::apache::thrift::protocol::T_MAP) {
           {
             this->carrier.clear();
-            uint32_t _size331;
-            ::apache::thrift::protocol::TType _ktype332;
-            ::apache::thrift::protocol::TType _vtype333;
-            xfer += iprot->readMapBegin(_ktype332, _vtype333, _size331);
-            uint32_t _i335;
-            for (_i335 = 0; _i335 < _size331; ++_i335)
+            uint32_t _size529;
+            ::apache::thrift::protocol::TType _ktype530;
+            ::apache::thrift::protocol::TType _vtype531;
+            xfer += iprot->readMapBegin(_ktype530, _vtype531, _size529);
+            uint32_t _i533;
+            for (_i533 = 0; _i533 < _size529; ++_i533)
             {
-              std::string _key336;
-              xfer += iprot->readString(_key336);
-              std::string& _val337 = this->carrier[_key336];
-              xfer += iprot->readString(_val337);
+              std::string _key534;
+              xfer += iprot->readString(_key534);
+              std::string& _val535 = this->carrier[_key534];
+              xfer += iprot->readString(_val535);
             }
             xfer += iprot->readMapEnd();
           }
           this->__isset.carrier = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 4:
+        if (ftype == ::apache::thrift::protocol::T_MAP) {
+          {
+            this->context.clear();
+            uint32_t _size536;
+            ::apache::thrift::protocol::TType _ktype537;
+            ::apache::thrift::protocol::TType _vtype538;
+            xfer += iprot->readMapBegin(_ktype537, _vtype538, _size536);
+            uint32_t _i540;
+            for (_i540 = 0; _i540 < _size536; ++_i540)
+            {
+              std::string _key541;
+              xfer += iprot->readString(_key541);
+              std::string& _val542 = this->context[_key541];
+              xfer += iprot->readString(_val542);
+            }
+            xfer += iprot->readMapEnd();
+          }
+          this->__isset.context = true;
         } else {
           xfer += iprot->skip(ftype);
         }
@@ -1781,11 +2099,24 @@ uint32_t SocialGraphService_InsertUser_args::write(::apache::thrift::protocol::T
   xfer += oprot->writeFieldBegin("carrier", ::apache::thrift::protocol::T_MAP, 3);
   {
     xfer += oprot->writeMapBegin(::apache::thrift::protocol::T_STRING, ::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->carrier.size()));
-    std::map<std::string, std::string> ::const_iterator _iter338;
-    for (_iter338 = this->carrier.begin(); _iter338 != this->carrier.end(); ++_iter338)
+    std::map<std::string, std::string> ::const_iterator _iter543;
+    for (_iter543 = this->carrier.begin(); _iter543 != this->carrier.end(); ++_iter543)
     {
-      xfer += oprot->writeString(_iter338->first);
-      xfer += oprot->writeString(_iter338->second);
+      xfer += oprot->writeString(_iter543->first);
+      xfer += oprot->writeString(_iter543->second);
+    }
+    xfer += oprot->writeMapEnd();
+  }
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("context", ::apache::thrift::protocol::T_MAP, 4);
+  {
+    xfer += oprot->writeMapBegin(::apache::thrift::protocol::T_STRING, ::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->context.size()));
+    std::map<std::string, std::string> ::const_iterator _iter544;
+    for (_iter544 = this->context.begin(); _iter544 != this->context.end(); ++_iter544)
+    {
+      xfer += oprot->writeString(_iter544->first);
+      xfer += oprot->writeString(_iter544->second);
     }
     xfer += oprot->writeMapEnd();
   }
@@ -1817,11 +2148,24 @@ uint32_t SocialGraphService_InsertUser_pargs::write(::apache::thrift::protocol::
   xfer += oprot->writeFieldBegin("carrier", ::apache::thrift::protocol::T_MAP, 3);
   {
     xfer += oprot->writeMapBegin(::apache::thrift::protocol::T_STRING, ::apache::thrift::protocol::T_STRING, static_cast<uint32_t>((*(this->carrier)).size()));
-    std::map<std::string, std::string> ::const_iterator _iter339;
-    for (_iter339 = (*(this->carrier)).begin(); _iter339 != (*(this->carrier)).end(); ++_iter339)
+    std::map<std::string, std::string> ::const_iterator _iter545;
+    for (_iter545 = (*(this->carrier)).begin(); _iter545 != (*(this->carrier)).end(); ++_iter545)
     {
-      xfer += oprot->writeString(_iter339->first);
-      xfer += oprot->writeString(_iter339->second);
+      xfer += oprot->writeString(_iter545->first);
+      xfer += oprot->writeString(_iter545->second);
+    }
+    xfer += oprot->writeMapEnd();
+  }
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("context", ::apache::thrift::protocol::T_MAP, 4);
+  {
+    xfer += oprot->writeMapBegin(::apache::thrift::protocol::T_STRING, ::apache::thrift::protocol::T_STRING, static_cast<uint32_t>((*(this->context)).size()));
+    std::map<std::string, std::string> ::const_iterator _iter546;
+    for (_iter546 = (*(this->context)).begin(); _iter546 != (*(this->context)).end(); ++_iter546)
+    {
+      xfer += oprot->writeString(_iter546->first);
+      xfer += oprot->writeString(_iter546->second);
     }
     xfer += oprot->writeMapEnd();
   }
@@ -1940,13 +2284,13 @@ uint32_t SocialGraphService_InsertUser_presult::read(::apache::thrift::protocol:
   return xfer;
 }
 
-void SocialGraphServiceClient::GetFollowers(std::vector<int64_t> & _return, const int64_t req_id, const int64_t user_id, const std::map<std::string, std::string> & carrier)
+void SocialGraphServiceClient::GetFollowers(std::vector<int64_t> & _return, const int64_t req_id, const int64_t user_id, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context)
 {
-  send_GetFollowers(req_id, user_id, carrier);
+  send_GetFollowers(req_id, user_id, carrier, context);
   recv_GetFollowers(_return);
 }
 
-void SocialGraphServiceClient::send_GetFollowers(const int64_t req_id, const int64_t user_id, const std::map<std::string, std::string> & carrier)
+void SocialGraphServiceClient::send_GetFollowers(const int64_t req_id, const int64_t user_id, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context)
 {
   int32_t cseqid = 0;
   oprot_->writeMessageBegin("GetFollowers", ::apache::thrift::protocol::T_CALL, cseqid);
@@ -1955,6 +2299,7 @@ void SocialGraphServiceClient::send_GetFollowers(const int64_t req_id, const int
   args.req_id = &req_id;
   args.user_id = &user_id;
   args.carrier = &carrier;
+  args.context = &context;
   args.write(oprot_);
 
   oprot_->writeMessageEnd();
@@ -2003,13 +2348,13 @@ void SocialGraphServiceClient::recv_GetFollowers(std::vector<int64_t> & _return)
   throw ::apache::thrift::TApplicationException(::apache::thrift::TApplicationException::MISSING_RESULT, "GetFollowers failed: unknown result");
 }
 
-void SocialGraphServiceClient::GetFollowees(std::vector<int64_t> & _return, const int64_t req_id, const int64_t user_id, const std::map<std::string, std::string> & carrier)
+void SocialGraphServiceClient::GetFollowees(std::vector<int64_t> & _return, const int64_t req_id, const int64_t user_id, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context)
 {
-  send_GetFollowees(req_id, user_id, carrier);
+  send_GetFollowees(req_id, user_id, carrier, context);
   recv_GetFollowees(_return);
 }
 
-void SocialGraphServiceClient::send_GetFollowees(const int64_t req_id, const int64_t user_id, const std::map<std::string, std::string> & carrier)
+void SocialGraphServiceClient::send_GetFollowees(const int64_t req_id, const int64_t user_id, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context)
 {
   int32_t cseqid = 0;
   oprot_->writeMessageBegin("GetFollowees", ::apache::thrift::protocol::T_CALL, cseqid);
@@ -2018,6 +2363,7 @@ void SocialGraphServiceClient::send_GetFollowees(const int64_t req_id, const int
   args.req_id = &req_id;
   args.user_id = &user_id;
   args.carrier = &carrier;
+  args.context = &context;
   args.write(oprot_);
 
   oprot_->writeMessageEnd();
@@ -2066,13 +2412,13 @@ void SocialGraphServiceClient::recv_GetFollowees(std::vector<int64_t> & _return)
   throw ::apache::thrift::TApplicationException(::apache::thrift::TApplicationException::MISSING_RESULT, "GetFollowees failed: unknown result");
 }
 
-void SocialGraphServiceClient::Follow(const int64_t req_id, const int64_t user_id, const int64_t followee_id, const std::map<std::string, std::string> & carrier)
+void SocialGraphServiceClient::Follow(const int64_t req_id, const int64_t user_id, const int64_t followee_id, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context)
 {
-  send_Follow(req_id, user_id, followee_id, carrier);
+  send_Follow(req_id, user_id, followee_id, carrier, context);
   recv_Follow();
 }
 
-void SocialGraphServiceClient::send_Follow(const int64_t req_id, const int64_t user_id, const int64_t followee_id, const std::map<std::string, std::string> & carrier)
+void SocialGraphServiceClient::send_Follow(const int64_t req_id, const int64_t user_id, const int64_t followee_id, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context)
 {
   int32_t cseqid = 0;
   oprot_->writeMessageBegin("Follow", ::apache::thrift::protocol::T_CALL, cseqid);
@@ -2082,6 +2428,7 @@ void SocialGraphServiceClient::send_Follow(const int64_t req_id, const int64_t u
   args.user_id = &user_id;
   args.followee_id = &followee_id;
   args.carrier = &carrier;
+  args.context = &context;
   args.write(oprot_);
 
   oprot_->writeMessageEnd();
@@ -2125,13 +2472,13 @@ void SocialGraphServiceClient::recv_Follow()
   return;
 }
 
-void SocialGraphServiceClient::Unfollow(const int64_t req_id, const int64_t user_id, const int64_t followee_id, const std::map<std::string, std::string> & carrier)
+void SocialGraphServiceClient::Unfollow(const int64_t req_id, const int64_t user_id, const int64_t followee_id, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context)
 {
-  send_Unfollow(req_id, user_id, followee_id, carrier);
+  send_Unfollow(req_id, user_id, followee_id, carrier, context);
   recv_Unfollow();
 }
 
-void SocialGraphServiceClient::send_Unfollow(const int64_t req_id, const int64_t user_id, const int64_t followee_id, const std::map<std::string, std::string> & carrier)
+void SocialGraphServiceClient::send_Unfollow(const int64_t req_id, const int64_t user_id, const int64_t followee_id, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context)
 {
   int32_t cseqid = 0;
   oprot_->writeMessageBegin("Unfollow", ::apache::thrift::protocol::T_CALL, cseqid);
@@ -2141,6 +2488,7 @@ void SocialGraphServiceClient::send_Unfollow(const int64_t req_id, const int64_t
   args.user_id = &user_id;
   args.followee_id = &followee_id;
   args.carrier = &carrier;
+  args.context = &context;
   args.write(oprot_);
 
   oprot_->writeMessageEnd();
@@ -2184,13 +2532,13 @@ void SocialGraphServiceClient::recv_Unfollow()
   return;
 }
 
-void SocialGraphServiceClient::FollowWithUsername(const int64_t req_id, const std::string& user_usernmae, const std::string& followee_username, const std::map<std::string, std::string> & carrier)
+void SocialGraphServiceClient::FollowWithUsername(const int64_t req_id, const std::string& user_usernmae, const std::string& followee_username, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context)
 {
-  send_FollowWithUsername(req_id, user_usernmae, followee_username, carrier);
+  send_FollowWithUsername(req_id, user_usernmae, followee_username, carrier, context);
   recv_FollowWithUsername();
 }
 
-void SocialGraphServiceClient::send_FollowWithUsername(const int64_t req_id, const std::string& user_usernmae, const std::string& followee_username, const std::map<std::string, std::string> & carrier)
+void SocialGraphServiceClient::send_FollowWithUsername(const int64_t req_id, const std::string& user_usernmae, const std::string& followee_username, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context)
 {
   int32_t cseqid = 0;
   oprot_->writeMessageBegin("FollowWithUsername", ::apache::thrift::protocol::T_CALL, cseqid);
@@ -2200,6 +2548,7 @@ void SocialGraphServiceClient::send_FollowWithUsername(const int64_t req_id, con
   args.user_usernmae = &user_usernmae;
   args.followee_username = &followee_username;
   args.carrier = &carrier;
+  args.context = &context;
   args.write(oprot_);
 
   oprot_->writeMessageEnd();
@@ -2243,13 +2592,13 @@ void SocialGraphServiceClient::recv_FollowWithUsername()
   return;
 }
 
-void SocialGraphServiceClient::UnfollowWithUsername(const int64_t req_id, const std::string& user_usernmae, const std::string& followee_username, const std::map<std::string, std::string> & carrier)
+void SocialGraphServiceClient::UnfollowWithUsername(const int64_t req_id, const std::string& user_usernmae, const std::string& followee_username, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context)
 {
-  send_UnfollowWithUsername(req_id, user_usernmae, followee_username, carrier);
+  send_UnfollowWithUsername(req_id, user_usernmae, followee_username, carrier, context);
   recv_UnfollowWithUsername();
 }
 
-void SocialGraphServiceClient::send_UnfollowWithUsername(const int64_t req_id, const std::string& user_usernmae, const std::string& followee_username, const std::map<std::string, std::string> & carrier)
+void SocialGraphServiceClient::send_UnfollowWithUsername(const int64_t req_id, const std::string& user_usernmae, const std::string& followee_username, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context)
 {
   int32_t cseqid = 0;
   oprot_->writeMessageBegin("UnfollowWithUsername", ::apache::thrift::protocol::T_CALL, cseqid);
@@ -2259,6 +2608,7 @@ void SocialGraphServiceClient::send_UnfollowWithUsername(const int64_t req_id, c
   args.user_usernmae = &user_usernmae;
   args.followee_username = &followee_username;
   args.carrier = &carrier;
+  args.context = &context;
   args.write(oprot_);
 
   oprot_->writeMessageEnd();
@@ -2302,13 +2652,13 @@ void SocialGraphServiceClient::recv_UnfollowWithUsername()
   return;
 }
 
-void SocialGraphServiceClient::InsertUser(const int64_t req_id, const int64_t user_id, const std::map<std::string, std::string> & carrier)
+void SocialGraphServiceClient::InsertUser(const int64_t req_id, const int64_t user_id, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context)
 {
-  send_InsertUser(req_id, user_id, carrier);
+  send_InsertUser(req_id, user_id, carrier, context);
   recv_InsertUser();
 }
 
-void SocialGraphServiceClient::send_InsertUser(const int64_t req_id, const int64_t user_id, const std::map<std::string, std::string> & carrier)
+void SocialGraphServiceClient::send_InsertUser(const int64_t req_id, const int64_t user_id, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context)
 {
   int32_t cseqid = 0;
   oprot_->writeMessageBegin("InsertUser", ::apache::thrift::protocol::T_CALL, cseqid);
@@ -2317,6 +2667,7 @@ void SocialGraphServiceClient::send_InsertUser(const int64_t req_id, const int64
   args.req_id = &req_id;
   args.user_id = &user_id;
   args.carrier = &carrier;
+  args.context = &context;
   args.write(oprot_);
 
   oprot_->writeMessageEnd();
@@ -2400,9 +2751,10 @@ void SocialGraphServiceProcessor::process_GetFollowers(int32_t seqid, ::apache::
     this->eventHandler_->postRead(ctx, "SocialGraphService.GetFollowers", bytes);
   }
 
+  reschedule(args.context);
   SocialGraphService_GetFollowers_result result;
   try {
-    iface_->GetFollowers(result.success, args.req_id, args.user_id, args.carrier);
+    iface_->GetFollowers(result.success, args.req_id, args.user_id, args.carrier, args.context);
     result.__isset.success = true;
   } catch (ServiceException &se) {
     result.se = se;
@@ -2457,9 +2809,10 @@ void SocialGraphServiceProcessor::process_GetFollowees(int32_t seqid, ::apache::
     this->eventHandler_->postRead(ctx, "SocialGraphService.GetFollowees", bytes);
   }
 
+  reschedule(args.context);
   SocialGraphService_GetFollowees_result result;
   try {
-    iface_->GetFollowees(result.success, args.req_id, args.user_id, args.carrier);
+    iface_->GetFollowees(result.success, args.req_id, args.user_id, args.carrier, args.context);
     result.__isset.success = true;
   } catch (ServiceException &se) {
     result.se = se;
@@ -2514,9 +2867,10 @@ void SocialGraphServiceProcessor::process_Follow(int32_t seqid, ::apache::thrift
     this->eventHandler_->postRead(ctx, "SocialGraphService.Follow", bytes);
   }
 
+  reschedule(args.context);
   SocialGraphService_Follow_result result;
   try {
-    iface_->Follow(args.req_id, args.user_id, args.followee_id, args.carrier);
+    iface_->Follow(args.req_id, args.user_id, args.followee_id, args.carrier, args.context);
   } catch (ServiceException &se) {
     result.se = se;
     result.__isset.se = true;
@@ -2570,9 +2924,10 @@ void SocialGraphServiceProcessor::process_Unfollow(int32_t seqid, ::apache::thri
     this->eventHandler_->postRead(ctx, "SocialGraphService.Unfollow", bytes);
   }
 
+  reschedule(args.context);
   SocialGraphService_Unfollow_result result;
   try {
-    iface_->Unfollow(args.req_id, args.user_id, args.followee_id, args.carrier);
+    iface_->Unfollow(args.req_id, args.user_id, args.followee_id, args.carrier, args.context);
   } catch (ServiceException &se) {
     result.se = se;
     result.__isset.se = true;
@@ -2626,9 +2981,10 @@ void SocialGraphServiceProcessor::process_FollowWithUsername(int32_t seqid, ::ap
     this->eventHandler_->postRead(ctx, "SocialGraphService.FollowWithUsername", bytes);
   }
 
+  reschedule(args.context);
   SocialGraphService_FollowWithUsername_result result;
   try {
-    iface_->FollowWithUsername(args.req_id, args.user_usernmae, args.followee_username, args.carrier);
+    iface_->FollowWithUsername(args.req_id, args.user_usernmae, args.followee_username, args.carrier, args.context);
   } catch (ServiceException &se) {
     result.se = se;
     result.__isset.se = true;
@@ -2682,9 +3038,10 @@ void SocialGraphServiceProcessor::process_UnfollowWithUsername(int32_t seqid, ::
     this->eventHandler_->postRead(ctx, "SocialGraphService.UnfollowWithUsername", bytes);
   }
 
+  reschedule(args.context);
   SocialGraphService_UnfollowWithUsername_result result;
   try {
-    iface_->UnfollowWithUsername(args.req_id, args.user_usernmae, args.followee_username, args.carrier);
+    iface_->UnfollowWithUsername(args.req_id, args.user_usernmae, args.followee_username, args.carrier, args.context);
   } catch (ServiceException &se) {
     result.se = se;
     result.__isset.se = true;
@@ -2738,9 +3095,10 @@ void SocialGraphServiceProcessor::process_InsertUser(int32_t seqid, ::apache::th
     this->eventHandler_->postRead(ctx, "SocialGraphService.InsertUser", bytes);
   }
 
+  reschedule(args.context);
   SocialGraphService_InsertUser_result result;
   try {
-    iface_->InsertUser(args.req_id, args.user_id, args.carrier);
+    iface_->InsertUser(args.req_id, args.user_id, args.carrier, args.context);
   } catch (ServiceException &se) {
     result.se = se;
     result.__isset.se = true;
@@ -2780,13 +3138,13 @@ void SocialGraphServiceProcessor::process_InsertUser(int32_t seqid, ::apache::th
   return processor;
 }
 
-void SocialGraphServiceConcurrentClient::GetFollowers(std::vector<int64_t> & _return, const int64_t req_id, const int64_t user_id, const std::map<std::string, std::string> & carrier)
+void SocialGraphServiceConcurrentClient::GetFollowers(std::vector<int64_t> & _return, const int64_t req_id, const int64_t user_id, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context)
 {
-  int32_t seqid = send_GetFollowers(req_id, user_id, carrier);
+  int32_t seqid = send_GetFollowers(req_id, user_id, carrier, context);
   recv_GetFollowers(_return, seqid);
 }
 
-int32_t SocialGraphServiceConcurrentClient::send_GetFollowers(const int64_t req_id, const int64_t user_id, const std::map<std::string, std::string> & carrier)
+int32_t SocialGraphServiceConcurrentClient::send_GetFollowers(const int64_t req_id, const int64_t user_id, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context)
 {
   int32_t cseqid = this->sync_.generateSeqId();
   ::apache::thrift::async::TConcurrentSendSentry sentry(&this->sync_);
@@ -2796,6 +3154,7 @@ int32_t SocialGraphServiceConcurrentClient::send_GetFollowers(const int64_t req_
   args.req_id = &req_id;
   args.user_id = &user_id;
   args.carrier = &carrier;
+  args.context = &context;
   args.write(oprot_);
 
   oprot_->writeMessageEnd();
@@ -2870,13 +3229,13 @@ void SocialGraphServiceConcurrentClient::recv_GetFollowers(std::vector<int64_t> 
   } // end while(true)
 }
 
-void SocialGraphServiceConcurrentClient::GetFollowees(std::vector<int64_t> & _return, const int64_t req_id, const int64_t user_id, const std::map<std::string, std::string> & carrier)
+void SocialGraphServiceConcurrentClient::GetFollowees(std::vector<int64_t> & _return, const int64_t req_id, const int64_t user_id, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context)
 {
-  int32_t seqid = send_GetFollowees(req_id, user_id, carrier);
+  int32_t seqid = send_GetFollowees(req_id, user_id, carrier, context);
   recv_GetFollowees(_return, seqid);
 }
 
-int32_t SocialGraphServiceConcurrentClient::send_GetFollowees(const int64_t req_id, const int64_t user_id, const std::map<std::string, std::string> & carrier)
+int32_t SocialGraphServiceConcurrentClient::send_GetFollowees(const int64_t req_id, const int64_t user_id, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context)
 {
   int32_t cseqid = this->sync_.generateSeqId();
   ::apache::thrift::async::TConcurrentSendSentry sentry(&this->sync_);
@@ -2886,6 +3245,7 @@ int32_t SocialGraphServiceConcurrentClient::send_GetFollowees(const int64_t req_
   args.req_id = &req_id;
   args.user_id = &user_id;
   args.carrier = &carrier;
+  args.context = &context;
   args.write(oprot_);
 
   oprot_->writeMessageEnd();
@@ -2960,13 +3320,13 @@ void SocialGraphServiceConcurrentClient::recv_GetFollowees(std::vector<int64_t> 
   } // end while(true)
 }
 
-void SocialGraphServiceConcurrentClient::Follow(const int64_t req_id, const int64_t user_id, const int64_t followee_id, const std::map<std::string, std::string> & carrier)
+void SocialGraphServiceConcurrentClient::Follow(const int64_t req_id, const int64_t user_id, const int64_t followee_id, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context)
 {
-  int32_t seqid = send_Follow(req_id, user_id, followee_id, carrier);
+  int32_t seqid = send_Follow(req_id, user_id, followee_id, carrier, context);
   recv_Follow(seqid);
 }
 
-int32_t SocialGraphServiceConcurrentClient::send_Follow(const int64_t req_id, const int64_t user_id, const int64_t followee_id, const std::map<std::string, std::string> & carrier)
+int32_t SocialGraphServiceConcurrentClient::send_Follow(const int64_t req_id, const int64_t user_id, const int64_t followee_id, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context)
 {
   int32_t cseqid = this->sync_.generateSeqId();
   ::apache::thrift::async::TConcurrentSendSentry sentry(&this->sync_);
@@ -2977,6 +3337,7 @@ int32_t SocialGraphServiceConcurrentClient::send_Follow(const int64_t req_id, co
   args.user_id = &user_id;
   args.followee_id = &followee_id;
   args.carrier = &carrier;
+  args.context = &context;
   args.write(oprot_);
 
   oprot_->writeMessageEnd();
@@ -3045,13 +3406,13 @@ void SocialGraphServiceConcurrentClient::recv_Follow(const int32_t seqid)
   } // end while(true)
 }
 
-void SocialGraphServiceConcurrentClient::Unfollow(const int64_t req_id, const int64_t user_id, const int64_t followee_id, const std::map<std::string, std::string> & carrier)
+void SocialGraphServiceConcurrentClient::Unfollow(const int64_t req_id, const int64_t user_id, const int64_t followee_id, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context)
 {
-  int32_t seqid = send_Unfollow(req_id, user_id, followee_id, carrier);
+  int32_t seqid = send_Unfollow(req_id, user_id, followee_id, carrier, context);
   recv_Unfollow(seqid);
 }
 
-int32_t SocialGraphServiceConcurrentClient::send_Unfollow(const int64_t req_id, const int64_t user_id, const int64_t followee_id, const std::map<std::string, std::string> & carrier)
+int32_t SocialGraphServiceConcurrentClient::send_Unfollow(const int64_t req_id, const int64_t user_id, const int64_t followee_id, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context)
 {
   int32_t cseqid = this->sync_.generateSeqId();
   ::apache::thrift::async::TConcurrentSendSentry sentry(&this->sync_);
@@ -3062,6 +3423,7 @@ int32_t SocialGraphServiceConcurrentClient::send_Unfollow(const int64_t req_id, 
   args.user_id = &user_id;
   args.followee_id = &followee_id;
   args.carrier = &carrier;
+  args.context = &context;
   args.write(oprot_);
 
   oprot_->writeMessageEnd();
@@ -3130,13 +3492,13 @@ void SocialGraphServiceConcurrentClient::recv_Unfollow(const int32_t seqid)
   } // end while(true)
 }
 
-void SocialGraphServiceConcurrentClient::FollowWithUsername(const int64_t req_id, const std::string& user_usernmae, const std::string& followee_username, const std::map<std::string, std::string> & carrier)
+void SocialGraphServiceConcurrentClient::FollowWithUsername(const int64_t req_id, const std::string& user_usernmae, const std::string& followee_username, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context)
 {
-  int32_t seqid = send_FollowWithUsername(req_id, user_usernmae, followee_username, carrier);
+  int32_t seqid = send_FollowWithUsername(req_id, user_usernmae, followee_username, carrier, context);
   recv_FollowWithUsername(seqid);
 }
 
-int32_t SocialGraphServiceConcurrentClient::send_FollowWithUsername(const int64_t req_id, const std::string& user_usernmae, const std::string& followee_username, const std::map<std::string, std::string> & carrier)
+int32_t SocialGraphServiceConcurrentClient::send_FollowWithUsername(const int64_t req_id, const std::string& user_usernmae, const std::string& followee_username, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context)
 {
   int32_t cseqid = this->sync_.generateSeqId();
   ::apache::thrift::async::TConcurrentSendSentry sentry(&this->sync_);
@@ -3147,6 +3509,7 @@ int32_t SocialGraphServiceConcurrentClient::send_FollowWithUsername(const int64_
   args.user_usernmae = &user_usernmae;
   args.followee_username = &followee_username;
   args.carrier = &carrier;
+  args.context = &context;
   args.write(oprot_);
 
   oprot_->writeMessageEnd();
@@ -3215,13 +3578,13 @@ void SocialGraphServiceConcurrentClient::recv_FollowWithUsername(const int32_t s
   } // end while(true)
 }
 
-void SocialGraphServiceConcurrentClient::UnfollowWithUsername(const int64_t req_id, const std::string& user_usernmae, const std::string& followee_username, const std::map<std::string, std::string> & carrier)
+void SocialGraphServiceConcurrentClient::UnfollowWithUsername(const int64_t req_id, const std::string& user_usernmae, const std::string& followee_username, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context)
 {
-  int32_t seqid = send_UnfollowWithUsername(req_id, user_usernmae, followee_username, carrier);
+  int32_t seqid = send_UnfollowWithUsername(req_id, user_usernmae, followee_username, carrier, context);
   recv_UnfollowWithUsername(seqid);
 }
 
-int32_t SocialGraphServiceConcurrentClient::send_UnfollowWithUsername(const int64_t req_id, const std::string& user_usernmae, const std::string& followee_username, const std::map<std::string, std::string> & carrier)
+int32_t SocialGraphServiceConcurrentClient::send_UnfollowWithUsername(const int64_t req_id, const std::string& user_usernmae, const std::string& followee_username, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context)
 {
   int32_t cseqid = this->sync_.generateSeqId();
   ::apache::thrift::async::TConcurrentSendSentry sentry(&this->sync_);
@@ -3232,6 +3595,7 @@ int32_t SocialGraphServiceConcurrentClient::send_UnfollowWithUsername(const int6
   args.user_usernmae = &user_usernmae;
   args.followee_username = &followee_username;
   args.carrier = &carrier;
+  args.context = &context;
   args.write(oprot_);
 
   oprot_->writeMessageEnd();
@@ -3300,13 +3664,13 @@ void SocialGraphServiceConcurrentClient::recv_UnfollowWithUsername(const int32_t
   } // end while(true)
 }
 
-void SocialGraphServiceConcurrentClient::InsertUser(const int64_t req_id, const int64_t user_id, const std::map<std::string, std::string> & carrier)
+void SocialGraphServiceConcurrentClient::InsertUser(const int64_t req_id, const int64_t user_id, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context)
 {
-  int32_t seqid = send_InsertUser(req_id, user_id, carrier);
+  int32_t seqid = send_InsertUser(req_id, user_id, carrier, context);
   recv_InsertUser(seqid);
 }
 
-int32_t SocialGraphServiceConcurrentClient::send_InsertUser(const int64_t req_id, const int64_t user_id, const std::map<std::string, std::string> & carrier)
+int32_t SocialGraphServiceConcurrentClient::send_InsertUser(const int64_t req_id, const int64_t user_id, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context)
 {
   int32_t cseqid = this->sync_.generateSeqId();
   ::apache::thrift::async::TConcurrentSendSentry sentry(&this->sync_);
@@ -3316,6 +3680,7 @@ int32_t SocialGraphServiceConcurrentClient::send_InsertUser(const int64_t req_id
   args.req_id = &req_id;
   args.user_id = &user_id;
   args.carrier = &carrier;
+  args.context = &context;
   args.write(oprot_);
 
   oprot_->writeMessageEnd();

@@ -9,8 +9,9 @@ ports:
     nodePort: 32080
 
 container:
-  image: yg397/openresty-thrift
-  imageVersion: xenial
+  image: openresty-thrift #yg397/openresty-thrift
+  imageVersion: latest #xenial
+  dockerRegistry: local.registry
   name: nginx-thrift
   ports:
   - containerPort: 8080

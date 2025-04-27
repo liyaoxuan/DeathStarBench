@@ -24,14 +24,17 @@ class PostStorageHandler : public PostStorageServiceIf {
   ~PostStorageHandler() override = default;
 
   void StorePost(int64_t req_id, const Post &post,
-                 const std::map<std::string, std::string> &carrier) override;
+                 const std::map<std::string, std::string> &carrier,
+                 const std::map<std::string, std::string> &context) override;
 
   void ReadPost(Post &_return, int64_t req_id, int64_t post_id,
-                const std::map<std::string, std::string> &carrier) override;
+                const std::map<std::string, std::string> &carrier,
+                 const std::map<std::string, std::string> &context) override;
 
   void ReadPosts(std::vector<Post> &_return, int64_t req_id,
                  const std::vector<int64_t> &post_ids,
-                 const std::map<std::string, std::string> &carrier) override;
+                 const std::map<std::string, std::string> &carrier,
+                 const std::map<std::string, std::string> &context) override;
 
  private:
   memcached_pool_st *_memcached_client_pool;
@@ -47,7 +50,8 @@ PostStorageHandler::PostStorageHandler(
 
 void PostStorageHandler::StorePost(
     int64_t req_id, const social_network::Post &post,
-    const std::map<std::string, std::string> &carrier) {
+    const std::map<std::string, std::string> &carrier,
+    const std::map<std::string, std::string> &context) {
   // Initialize a span
   TextMapReader reader(carrier);
   std::map<std::string, std::string> writer_text_map;
@@ -163,7 +167,8 @@ void PostStorageHandler::StorePost(
 
 void PostStorageHandler::ReadPost(
     Post &_return, int64_t req_id, int64_t post_id,
-    const std::map<std::string, std::string> &carrier) {
+    const std::map<std::string, std::string> &carrier,
+    const std::map<std::string, std::string> &context) {
   // Initialize a span
   TextMapReader reader(carrier);
   std::map<std::string, std::string> writer_text_map;
@@ -353,7 +358,8 @@ void PostStorageHandler::ReadPost(
 void PostStorageHandler::ReadPosts(
     std::vector<Post> &_return, int64_t req_id,
     const std::vector<int64_t> &post_ids,
-    const std::map<std::string, std::string> &carrier) {
+    const std::map<std::string, std::string> &carrier,
+    const std::map<std::string, std::string> &context) {
   // Initialize a span
   TextMapReader reader(carrier);
   std::map<std::string, std::string> writer_text_map;

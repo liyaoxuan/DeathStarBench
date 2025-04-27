@@ -141,7 +141,8 @@ int main(int argc, char *argv[]) {
     TThreadedServer server(std::make_shared<UserTimelineServiceProcessor>(
                                std::make_shared<UserTimelineHandler>(
                                    &redis_client_pool, mongodb_client_pool,
-                                   &post_storage_client_pool)),
+                                   &post_storage_client_pool,
+                                   &config_json)),
                            server_socket,
                            std::make_shared<TFramedTransportFactory>(),
                            std::make_shared<TBinaryProtocolFactory>());

@@ -22,6 +22,7 @@ class UserMentionHandler : public UserMentionServiceIf {
 
   void ComposeUserMentions(std::vector<UserMention> &_return, int64_t,
                            const std::vector<std::string> &,
+                           const std::map<std::string, std::string> &,
                            const std::map<std::string, std::string> &) override;
 
  private:
@@ -39,7 +40,8 @@ UserMentionHandler::UserMentionHandler(
 void UserMentionHandler::ComposeUserMentions(
     std::vector<UserMention> &_return, int64_t req_id,
     const std::vector<std::string> &usernames,
-    const std::map<std::string, std::string> &carrier) {
+    const std::map<std::string, std::string> &carrier,
+    const std::map<std::string, std::string> &context) {
   // Initialize a span
   TextMapReader reader(carrier);
   std::map<std::string, std::string> writer_text_map;

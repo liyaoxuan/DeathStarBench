@@ -1,18 +1,20 @@
 name: media-service
 nodeName: cpu-16
-hostPID: true
 
 ports:
   - port: 9090
     targetPort: 9090
 
+hostPID: true
+
 container:
   command: MediaService
-  image: yxlee/socialnetwork-profile #deathstarbench/social-network-microservices
   name: media-service
   ports: 
   - containerPort: 9090
-  imageVersion: debug
+  dockerRegistry: local.registry #docker.io #localhost
+  image: socialnetwork #deathstarbench/social-network-microservices
+  imageVersion: ext #latest #jammy
 
 configMaps:
   - name: jaeger-config.yml

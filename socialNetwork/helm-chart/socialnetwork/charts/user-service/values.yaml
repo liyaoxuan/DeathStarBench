@@ -1,18 +1,20 @@
 name: user-service
 nodeName: cpu-16
-hostPID: true
 
 ports:
   - port: 9090
     targetPort: 9090
 
+hostPID: true
+
 container:
   command: UserService
-  image: yxlee/socialnetwork-profile #deathstarbench/social-network-microservices
+  image: socialnetwork #deathstarbench/social-network-microservices
+  imageVersion: ext #latest #debug
+  dockerRegistry: local.registry #docker.io #localhost
   name: user-service
   ports: 
   - containerPort: 9090
-  imageVersion: debug
 
 configMaps:
   - name: jaeger-config.yml

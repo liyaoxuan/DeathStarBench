@@ -5,6 +5,7 @@
  *  @generated
  */
 #include "TextService.h"
+#include "resched.h"
 
 namespace social_network {
 
@@ -54,21 +55,44 @@ uint32_t TextService_ComposeText_args::read(::apache::thrift::protocol::TProtoco
         if (ftype == ::apache::thrift::protocol::T_MAP) {
           {
             this->carrier.clear();
-            uint32_t _size58;
-            ::apache::thrift::protocol::TType _ktype59;
-            ::apache::thrift::protocol::TType _vtype60;
-            xfer += iprot->readMapBegin(_ktype59, _vtype60, _size58);
-            uint32_t _i62;
-            for (_i62 = 0; _i62 < _size58; ++_i62)
+            uint32_t _size67;
+            ::apache::thrift::protocol::TType _ktype68;
+            ::apache::thrift::protocol::TType _vtype69;
+            xfer += iprot->readMapBegin(_ktype68, _vtype69, _size67);
+            uint32_t _i71;
+            for (_i71 = 0; _i71 < _size67; ++_i71)
             {
-              std::string _key63;
-              xfer += iprot->readString(_key63);
-              std::string& _val64 = this->carrier[_key63];
-              xfer += iprot->readString(_val64);
+              std::string _key72;
+              xfer += iprot->readString(_key72);
+              std::string& _val73 = this->carrier[_key72];
+              xfer += iprot->readString(_val73);
             }
             xfer += iprot->readMapEnd();
           }
           this->__isset.carrier = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 4:
+        if (ftype == ::apache::thrift::protocol::T_MAP) {
+          {
+            this->context.clear();
+            uint32_t _size74;
+            ::apache::thrift::protocol::TType _ktype75;
+            ::apache::thrift::protocol::TType _vtype76;
+            xfer += iprot->readMapBegin(_ktype75, _vtype76, _size74);
+            uint32_t _i78;
+            for (_i78 = 0; _i78 < _size74; ++_i78)
+            {
+              std::string _key79;
+              xfer += iprot->readString(_key79);
+              std::string& _val80 = this->context[_key79];
+              xfer += iprot->readString(_val80);
+            }
+            xfer += iprot->readMapEnd();
+          }
+          this->__isset.context = true;
         } else {
           xfer += iprot->skip(ftype);
         }
@@ -101,11 +125,24 @@ uint32_t TextService_ComposeText_args::write(::apache::thrift::protocol::TProtoc
   xfer += oprot->writeFieldBegin("carrier", ::apache::thrift::protocol::T_MAP, 3);
   {
     xfer += oprot->writeMapBegin(::apache::thrift::protocol::T_STRING, ::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->carrier.size()));
-    std::map<std::string, std::string> ::const_iterator _iter65;
-    for (_iter65 = this->carrier.begin(); _iter65 != this->carrier.end(); ++_iter65)
+    std::map<std::string, std::string> ::const_iterator _iter81;
+    for (_iter81 = this->carrier.begin(); _iter81 != this->carrier.end(); ++_iter81)
     {
-      xfer += oprot->writeString(_iter65->first);
-      xfer += oprot->writeString(_iter65->second);
+      xfer += oprot->writeString(_iter81->first);
+      xfer += oprot->writeString(_iter81->second);
+    }
+    xfer += oprot->writeMapEnd();
+  }
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("context", ::apache::thrift::protocol::T_MAP, 4);
+  {
+    xfer += oprot->writeMapBegin(::apache::thrift::protocol::T_STRING, ::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->context.size()));
+    std::map<std::string, std::string> ::const_iterator _iter82;
+    for (_iter82 = this->context.begin(); _iter82 != this->context.end(); ++_iter82)
+    {
+      xfer += oprot->writeString(_iter82->first);
+      xfer += oprot->writeString(_iter82->second);
     }
     xfer += oprot->writeMapEnd();
   }
@@ -137,11 +174,24 @@ uint32_t TextService_ComposeText_pargs::write(::apache::thrift::protocol::TProto
   xfer += oprot->writeFieldBegin("carrier", ::apache::thrift::protocol::T_MAP, 3);
   {
     xfer += oprot->writeMapBegin(::apache::thrift::protocol::T_STRING, ::apache::thrift::protocol::T_STRING, static_cast<uint32_t>((*(this->carrier)).size()));
-    std::map<std::string, std::string> ::const_iterator _iter66;
-    for (_iter66 = (*(this->carrier)).begin(); _iter66 != (*(this->carrier)).end(); ++_iter66)
+    std::map<std::string, std::string> ::const_iterator _iter83;
+    for (_iter83 = (*(this->carrier)).begin(); _iter83 != (*(this->carrier)).end(); ++_iter83)
     {
-      xfer += oprot->writeString(_iter66->first);
-      xfer += oprot->writeString(_iter66->second);
+      xfer += oprot->writeString(_iter83->first);
+      xfer += oprot->writeString(_iter83->second);
+    }
+    xfer += oprot->writeMapEnd();
+  }
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("context", ::apache::thrift::protocol::T_MAP, 4);
+  {
+    xfer += oprot->writeMapBegin(::apache::thrift::protocol::T_STRING, ::apache::thrift::protocol::T_STRING, static_cast<uint32_t>((*(this->context)).size()));
+    std::map<std::string, std::string> ::const_iterator _iter84;
+    for (_iter84 = (*(this->context)).begin(); _iter84 != (*(this->context)).end(); ++_iter84)
+    {
+      xfer += oprot->writeString(_iter84->first);
+      xfer += oprot->writeString(_iter84->second);
     }
     xfer += oprot->writeMapEnd();
   }
@@ -280,13 +330,13 @@ uint32_t TextService_ComposeText_presult::read(::apache::thrift::protocol::TProt
   return xfer;
 }
 
-void TextServiceClient::ComposeText(TextServiceReturn& _return, const int64_t req_id, const std::string& text, const std::map<std::string, std::string> & carrier)
+void TextServiceClient::ComposeText(TextServiceReturn& _return, const int64_t req_id, const std::string& text, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context)
 {
-  send_ComposeText(req_id, text, carrier);
+  send_ComposeText(req_id, text, carrier, context);
   recv_ComposeText(_return);
 }
 
-void TextServiceClient::send_ComposeText(const int64_t req_id, const std::string& text, const std::map<std::string, std::string> & carrier)
+void TextServiceClient::send_ComposeText(const int64_t req_id, const std::string& text, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context)
 {
   int32_t cseqid = 0;
   oprot_->writeMessageBegin("ComposeText", ::apache::thrift::protocol::T_CALL, cseqid);
@@ -295,6 +345,7 @@ void TextServiceClient::send_ComposeText(const int64_t req_id, const std::string
   args.req_id = &req_id;
   args.text = &text;
   args.carrier = &carrier;
+  args.context = &context;
   args.write(oprot_);
 
   oprot_->writeMessageEnd();
@@ -383,9 +434,10 @@ void TextServiceProcessor::process_ComposeText(int32_t seqid, ::apache::thrift::
     this->eventHandler_->postRead(ctx, "TextService.ComposeText", bytes);
   }
 
+  reschedule(args.context);
   TextService_ComposeText_result result;
   try {
-    iface_->ComposeText(result.success, args.req_id, args.text, args.carrier);
+    iface_->ComposeText(result.success, args.req_id, args.text, args.carrier, args.context);
     result.__isset.success = true;
   } catch (ServiceException &se) {
     result.se = se;
@@ -426,13 +478,13 @@ void TextServiceProcessor::process_ComposeText(int32_t seqid, ::apache::thrift::
   return processor;
 }
 
-void TextServiceConcurrentClient::ComposeText(TextServiceReturn& _return, const int64_t req_id, const std::string& text, const std::map<std::string, std::string> & carrier)
+void TextServiceConcurrentClient::ComposeText(TextServiceReturn& _return, const int64_t req_id, const std::string& text, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context)
 {
-  int32_t seqid = send_ComposeText(req_id, text, carrier);
+  int32_t seqid = send_ComposeText(req_id, text, carrier, context);
   recv_ComposeText(_return, seqid);
 }
 
-int32_t TextServiceConcurrentClient::send_ComposeText(const int64_t req_id, const std::string& text, const std::map<std::string, std::string> & carrier)
+int32_t TextServiceConcurrentClient::send_ComposeText(const int64_t req_id, const std::string& text, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context)
 {
   int32_t cseqid = this->sync_.generateSeqId();
   ::apache::thrift::async::TConcurrentSendSentry sentry(&this->sync_);
@@ -442,6 +494,7 @@ int32_t TextServiceConcurrentClient::send_ComposeText(const int64_t req_id, cons
   args.req_id = &req_id;
   args.text = &text;
   args.carrier = &carrier;
+  args.context = &context;
   args.write(oprot_);
 
   oprot_->writeMessageEnd();

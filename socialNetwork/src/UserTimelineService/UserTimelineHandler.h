@@ -23,7 +23,7 @@ namespace social_network {
 class UserTimelineHandler : public UserTimelineServiceIf {
  public:
   UserTimelineHandler(Redis *, mongoc_client_pool_t *,
-                      ClientPool<ThriftClient<PostStorageServiceClient>> *);
+                      ClientPool<ThriftClient<PostStorageServiceClient>> *, json *);
 
   UserTimelineHandler(Redis *, Redis *, mongoc_client_pool_t *,
       ClientPool<ThriftClient<PostStorageServiceClient>> *);
@@ -36,9 +36,11 @@ class UserTimelineHandler : public UserTimelineServiceIf {
 
   void WriteUserTimeline(
       int64_t req_id, int64_t post_id, int64_t user_id, int64_t timestamp,
-      const std::map<std::string, std::string> &carrier) override;
+      const std::map<std::string, std::string> &carrier,
+      const std::map<std::string, std::string> &context) override;
 
   void ReadUserTimeline(std::vector<Post> &, int64_t, int64_t, int, int,
+                        const std::map<std::string, std::string> &,
                         const std::map<std::string, std::string> &) override;
 
  private:
@@ -48,17 +50,19 @@ class UserTimelineHandler : public UserTimelineServiceIf {
   RedisCluster *_redis_cluster_client_pool;
   mongoc_client_pool_t *_mongodb_client_pool;
   ClientPool<ThriftClient<PostStorageServiceClient>> *_post_client_pool;
+  json *_config_json;
 };
 
 UserTimelineHandler::UserTimelineHandler(
     Redis *redis_pool, mongoc_client_pool_t *mongodb_pool,
-    ClientPool<ThriftClient<PostStorageServiceClient>> *post_client_pool) {
+    ClientPool<ThriftClient<PostStorageServiceClient>> *post_client_pool, json *config_json) {
   _redis_client_pool = redis_pool;
   _redis_replica_pool = nullptr;
   _redis_primary_pool = nullptr;
   _redis_cluster_client_pool = nullptr;
   _mongodb_client_pool = mongodb_pool;
   _post_client_pool = post_client_pool;
+  _config_json = config_json;
 }
 
 UserTimelineHandler::UserTimelineHandler(
@@ -70,6 +74,7 @@ UserTimelineHandler::UserTimelineHandler(
     _redis_cluster_client_pool = nullptr;
     _mongodb_client_pool = mongodb_pool;
     _post_client_pool = post_client_pool;
+    _config_json = nullptr;
 }
 
 UserTimelineHandler::UserTimelineHandler(
@@ -81,6 +86,7 @@ UserTimelineHandler::UserTimelineHandler(
   _redis_client_pool = nullptr;
   _mongodb_client_pool = mongodb_pool;
   _post_client_pool = post_client_pool;
+  _config_json = nullptr;
 }
 
 bool UserTimelineHandler::IsRedisReplicationEnabled() {
@@ -89,7 +95,8 @@ bool UserTimelineHandler::IsRedisReplicationEnabled() {
 
 void UserTimelineHandler::WriteUserTimeline(
     int64_t req_id, int64_t post_id, int64_t user_id, int64_t timestamp,
-    const std::map<std::string, std::string> &carrier) {
+    const std::map<std::string, std::string> &carrier,
+    const std::map<std::string, std::string> &context) {
   // Initialize a span
   TextMapReader reader(carrier);
   std::map<std::string, std::string> writer_text_map;
@@ -185,7 +192,8 @@ void UserTimelineHandler::WriteUserTimeline(
 
 void UserTimelineHandler::ReadUserTimeline(
     std::vector<Post> &_return, int64_t req_id, int64_t user_id, int start,
-    int stop, const std::map<std::string, std::string> &carrier) {
+    int stop, const std::map<std::string, std::string> &carrier,
+    const std::map<std::string, std::string> &context) {
   // Initialize a span
   TextMapReader reader(carrier);
   std::map<std::string, std::string> writer_text_map;
@@ -199,6 +207,11 @@ void UserTimelineHandler::ReadUserTimeline(
     return;
   }
 
+  auto new_context = context;
+  std::string sched_time_next = "0";
+  std::string sched_time_remaining = "0";
+  new_context["sched-time-next"] = sched_time_next;
+  new_context["sched-time-remaining"] = sched_time_remaining;
   auto redis_span = opentracing::Tracer::Global()->StartSpan(
       "read_user_timeline_redis_find_client",
       {opentracing::ChildOf(&span->context())});
@@ -313,7 +326,7 @@ void UserTimelineHandler::ReadUserTimeline(
         auto post_client = post_client_wrapper->GetClient();
         try {
           post_client->ReadPosts(_return_posts, req_id, post_ids,
-                                 writer_text_map);
+                                 writer_text_map, new_context);
         } catch (...) {
           _post_client_pool->Remove(post_client_wrapper);
           LOG(error) << "Failed to read posts from post-storage-service";

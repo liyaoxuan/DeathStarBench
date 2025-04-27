@@ -5,9 +5,13 @@ ports:
   - port: 9090
     targetPort: 9090
 
+hostPID: true
+
 container:
   command: SocialGraphService
-  image: deathstarbench/social-network-microservices
+  image: socialnetwork #deathstarbench/social-network-microservices
+  imageVersion: ext #latest #jammy
+  dockerRegistry: local.registry #docker.io #localhost
   name: social-graph-service
   ports: 
   - containerPort: 9090

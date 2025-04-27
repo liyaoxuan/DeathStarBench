@@ -75,20 +75,26 @@ class UserHandler : public UserServiceIf {
   ~UserHandler() override = default;
   void RegisterUser(int64_t, const std::string &, const std::string &,
                     const std::string &, const std::string &,
+                    const std::map<std::string, std::string> &,
                     const std::map<std::string, std::string> &) override;
   void RegisterUserWithId(int64_t, const std::string &, const std::string &,
                           const std::string &, const std::string &, int64_t,
+                          const std::map<std::string, std::string> &,
                           const std::map<std::string, std::string> &) override;
 
   void ComposeCreatorWithUserId(
       Creator &, int64_t, int64_t, const std::string &,
+      const std::map<std::string, std::string> &,
       const std::map<std::string, std::string> &) override;
   void ComposeCreatorWithUsername(
       Creator &, int64_t, const std::string &,
+      const std::map<std::string, std::string> &,
       const std::map<std::string, std::string> &) override;
   void Login(std::string &, int64_t, const std::string &, const std::string &,
+             const std::map<std::string, std::string> &,
              const std::map<std::string, std::string> &) override;
   int64_t GetUserId(int64_t, const std::string &,
+                    const std::map<std::string, std::string> &,
                     const std::map<std::string, std::string> &) override;
 
  private:
@@ -118,7 +124,8 @@ void UserHandler::RegisterUserWithId(
     const int64_t req_id, const std::string &first_name,
     const std::string &last_name, const std::string &username,
     const std::string &password, const int64_t user_id,
-    const std::map<std::string, std::string> &carrier) {
+    const std::map<std::string, std::string> &carrier,
+    const std::map<std::string, std::string> &context) {
   // Initialize a span
   TextMapReader reader(carrier);
   std::map<std::string, std::string> writer_text_map;
@@ -129,6 +136,11 @@ void UserHandler::RegisterUserWithId(
       {opentracing::ChildOf(parent_span->get())});
   opentracing::Tracer::Global()->Inject(span->context(), writer);
 
+  auto new_context = context;
+  std::string sched_time_next = "0";
+  std::string sched_time_remaining = "0";
+  new_context["sched-time-next"] = sched_time_next;
+  new_context["sched-time-remaining"] = sched_time_remaining;
   // Store user info into mongodb
   mongoc_client_t *mongodb_client =
       mongoc_client_pool_pop(_mongodb_client_pool);
@@ -217,7 +229,7 @@ void UserHandler::RegisterUserWithId(
     }
     auto social_graph_client = social_graph_client_wrapper->GetClient();
     try {
-      social_graph_client->InsertUser(req_id, user_id, writer_text_map);
+      social_graph_client->InsertUser(req_id, user_id, writer_text_map, new_context);
     } catch (...) {
       _social_graph_client_pool->Remove(social_graph_client_wrapper);
       LOG(error) << "Failed to insert user to social-graph-client";
@@ -233,7 +245,8 @@ void UserHandler::RegisterUser(
     const int64_t req_id, const std::string &first_name,
     const std::string &last_name, const std::string &username,
     const std::string &password,
-    const std::map<std::string, std::string> &carrier) {
+    const std::map<std::string, std::string> &carrier,
+    const std::map<std::string, std::string> &context) {
   // Initialize a span
   TextMapReader reader(carrier);
   std::map<std::string, std::string> writer_text_map;
@@ -243,6 +256,11 @@ void UserHandler::RegisterUser(
       "register_user_server", {opentracing::ChildOf(parent_span->get())});
   opentracing::Tracer::Global()->Inject(span->context(), writer);
 
+  auto new_context = context;
+  std::string sched_time_next = "0";
+  std::string sched_time_remaining = "0";
+  new_context["sched-time-next"] = sched_time_next;
+  new_context["sched-time-remaining"] = sched_time_remaining;
   // Compose user_id
   _thread_lock->lock();
   int64_t timestamp =
@@ -364,7 +382,7 @@ void UserHandler::RegisterUser(
     }
     auto social_graph_client = social_graph_client_wrapper->GetClient();
     try {
-      social_graph_client->InsertUser(req_id, user_id, writer_text_map);
+      social_graph_client->InsertUser(req_id, user_id, writer_text_map, new_context);
     } catch (...) {
       _social_graph_client_pool->Remove(social_graph_client_wrapper);
       LOG(error) << "Failed to insert user to social-graph-service";
@@ -379,7 +397,8 @@ void UserHandler::RegisterUser(
 
 void UserHandler::ComposeCreatorWithUsername(
     Creator &_return, const int64_t req_id, const std::string &username,
-    const std::map<std::string, std::string> &carrier) {
+    const std::map<std::string, std::string> &carrier,
+    const std::map<std::string, std::string> &context) {
   TextMapReader reader(carrier);
   std::map<std::string, std::string> writer_text_map;
   TextMapWriter writer(writer_text_map);
@@ -538,7 +557,8 @@ void UserHandler::ComposeCreatorWithUsername(
 void UserHandler::ComposeCreatorWithUserId(
     Creator &_return, int64_t req_id, int64_t user_id,
     const std::string &username,
-    const std::map<std::string, std::string> &carrier) {
+    const std::map<std::string, std::string> &carrier,
+    const std::map<std::string, std::string> &context) {
   TextMapReader reader(carrier);
   std::map<std::string, std::string> writer_text_map;
   TextMapWriter writer(writer_text_map);
@@ -559,7 +579,8 @@ void UserHandler::ComposeCreatorWithUserId(
 void UserHandler::Login(std::string &_return, int64_t req_id,
                         const std::string &username,
                         const std::string &password,
-                        const std::map<std::string, std::string> &carrier) {
+                        const std::map<std::string, std::string> &carrier,
+                        const std::map<std::string, std::string> &context) {
   TextMapReader reader(carrier);
   std::map<std::string, std::string> writer_text_map;
   TextMapWriter writer(writer_text_map);
@@ -748,7 +769,8 @@ void UserHandler::Login(std::string &_return, int64_t req_id,
 }
 int64_t UserHandler::GetUserId(
     int64_t req_id, const std::string &username,
-    const std::map<std::string, std::string> &carrier) {
+    const std::map<std::string, std::string> &carrier,
+    const std::map<std::string, std::string> &context) {
   TextMapReader reader(carrier);
   std::map<std::string, std::string> writer_text_map;
   TextMapWriter writer(writer_text_map);

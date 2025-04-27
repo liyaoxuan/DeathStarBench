@@ -45,6 +45,7 @@ class UniqueIdHandler : public UniqueIdServiceIf {
   UniqueIdHandler(std::mutex *, const std::string &);
 
   int64_t ComposeUniqueId(int64_t, PostType::type,
+                          const std::map<std::string, std::string> &,
                           const std::map<std::string, std::string> &) override;
 
  private:
@@ -60,7 +61,8 @@ UniqueIdHandler::UniqueIdHandler(std::mutex *thread_lock,
 
 int64_t UniqueIdHandler::ComposeUniqueId(
     int64_t req_id, PostType::type post_type,
-    const std::map<std::string, std::string> &carrier) {
+    const std::map<std::string, std::string> &carrier,
+    const std::map<std::string, std::string> &context) {
   // Initialize a span
   TextMapReader reader(carrier);
   std::map<std::string, std::string> writer_text_map;

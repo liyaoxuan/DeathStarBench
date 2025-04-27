@@ -1,15 +1,17 @@
 global: 
   replicas: 1
-  imagePullPolicy: "IfNotPresent"
+  imagePullPolicy: "Always"
   restartPolicy: Always
   serviceType: ClusterIP
   dockerRegistry: docker.io
   defaultImageVersion: latest
   resources: |
-    requests:
-      cpu: "1000m"
     limits:
-      cpu: "32000m"
+      memory: "1Gi"
+      cpu: "1"
+    requests:
+      memory: "1Gi"
+      cpu: "1"
   redis:
     cluster:
       enabled: false

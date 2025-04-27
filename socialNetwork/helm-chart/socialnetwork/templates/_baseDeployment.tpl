@@ -62,6 +62,14 @@ spec:
           mountPath: {{ $configMap.mountPath }}
           subPath: {{ $configMap.name }}
         {{- end }}
+        - name: shm
+          mountPath: /dev/shm
+        {{- end }}
+        {{- if .securityContext }}
+        securityContext:
+          capabilities:
+            add:
+              - {{ .securityContext }}
         {{- end }}
       {{- end -}}
       {{- if $.Values.configMaps }}
@@ -69,6 +77,10 @@ spec:
       - name: {{ $.Values.name }}-config
         configMap:
           name: {{ $.Values.name }}
+      - name: shm
+        hostPath:
+          path: /dev/shm
+          type: Directory
       {{- end }}
       {{- if hasKey .Values "topologySpreadConstraints" }}
       topologySpreadConstraints:

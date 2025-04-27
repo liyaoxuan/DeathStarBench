@@ -15,14 +15,14 @@ namespace social_network {
 
 #ifdef _MSC_VER
   #pragma warning( push )
-  #pragma warning (disable : 4250 ) //inheriting methods via dominance
+  #pragma warning (disable : 4250 ) //inheriting methods via dominance 
 #endif
 
 class HomeTimelineServiceIf {
  public:
   virtual ~HomeTimelineServiceIf() {}
-  virtual void ReadHomeTimeline(std::vector<Post> & _return, const int64_t req_id, const int64_t user_id, const int32_t start, const int32_t stop, const std::map<std::string, std::string> & carrier) = 0;
-  virtual void WriteHomeTimeline(const int64_t req_id, const int64_t post_id, const int64_t user_id, const int64_t timestamp, const std::vector<int64_t> & user_mentions_id, const std::map<std::string, std::string> & carrier) = 0;
+  virtual void ReadHomeTimeline(std::vector<Post> & _return, const int64_t req_id, const int64_t user_id, const int32_t start, const int32_t stop, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context) = 0;
+  virtual void WriteHomeTimeline(const int64_t req_id, const int64_t post_id, const int64_t user_id, const int64_t timestamp, const std::vector<int64_t> & user_mentions_id, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context) = 0;
 };
 
 class HomeTimelineServiceIfFactory {
@@ -52,21 +52,22 @@ class HomeTimelineServiceIfSingletonFactory : virtual public HomeTimelineService
 class HomeTimelineServiceNull : virtual public HomeTimelineServiceIf {
  public:
   virtual ~HomeTimelineServiceNull() {}
-  void ReadHomeTimeline(std::vector<Post> & /* _return */, const int64_t /* req_id */, const int64_t /* user_id */, const int32_t /* start */, const int32_t /* stop */, const std::map<std::string, std::string> & /* carrier */) {
+  void ReadHomeTimeline(std::vector<Post> & /* _return */, const int64_t /* req_id */, const int64_t /* user_id */, const int32_t /* start */, const int32_t /* stop */, const std::map<std::string, std::string> & /* carrier */, const std::map<std::string, std::string> & /* context */) {
     return;
   }
-  void WriteHomeTimeline(const int64_t /* req_id */, const int64_t /* post_id */, const int64_t /* user_id */, const int64_t /* timestamp */, const std::vector<int64_t> & /* user_mentions_id */, const std::map<std::string, std::string> & /* carrier */) {
+  void WriteHomeTimeline(const int64_t /* req_id */, const int64_t /* post_id */, const int64_t /* user_id */, const int64_t /* timestamp */, const std::vector<int64_t> & /* user_mentions_id */, const std::map<std::string, std::string> & /* carrier */, const std::map<std::string, std::string> & /* context */) {
     return;
   }
 };
 
 typedef struct _HomeTimelineService_ReadHomeTimeline_args__isset {
-  _HomeTimelineService_ReadHomeTimeline_args__isset() : req_id(false), user_id(false), start(false), stop(false), carrier(false) {}
+  _HomeTimelineService_ReadHomeTimeline_args__isset() : req_id(false), user_id(false), start(false), stop(false), carrier(false), context(false) {}
   bool req_id :1;
   bool user_id :1;
   bool start :1;
   bool stop :1;
   bool carrier :1;
+  bool context :1;
 } _HomeTimelineService_ReadHomeTimeline_args__isset;
 
 class HomeTimelineService_ReadHomeTimeline_args {
@@ -83,6 +84,7 @@ class HomeTimelineService_ReadHomeTimeline_args {
   int32_t start;
   int32_t stop;
   std::map<std::string, std::string>  carrier;
+  std::map<std::string, std::string>  context;
 
   _HomeTimelineService_ReadHomeTimeline_args__isset __isset;
 
@@ -96,6 +98,8 @@ class HomeTimelineService_ReadHomeTimeline_args {
 
   void __set_carrier(const std::map<std::string, std::string> & val);
 
+  void __set_context(const std::map<std::string, std::string> & val);
+
   bool operator == (const HomeTimelineService_ReadHomeTimeline_args & rhs) const
   {
     if (!(req_id == rhs.req_id))
@@ -107,6 +111,8 @@ class HomeTimelineService_ReadHomeTimeline_args {
     if (!(stop == rhs.stop))
       return false;
     if (!(carrier == rhs.carrier))
+      return false;
+    if (!(context == rhs.context))
       return false;
     return true;
   }
@@ -132,6 +138,7 @@ class HomeTimelineService_ReadHomeTimeline_pargs {
   const int32_t* start;
   const int32_t* stop;
   const std::map<std::string, std::string> * carrier;
+  const std::map<std::string, std::string> * context;
 
   uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
 
@@ -201,13 +208,14 @@ class HomeTimelineService_ReadHomeTimeline_presult {
 };
 
 typedef struct _HomeTimelineService_WriteHomeTimeline_args__isset {
-  _HomeTimelineService_WriteHomeTimeline_args__isset() : req_id(false), post_id(false), user_id(false), timestamp(false), user_mentions_id(false), carrier(false) {}
+  _HomeTimelineService_WriteHomeTimeline_args__isset() : req_id(false), post_id(false), user_id(false), timestamp(false), user_mentions_id(false), carrier(false), context(false) {}
   bool req_id :1;
   bool post_id :1;
   bool user_id :1;
   bool timestamp :1;
   bool user_mentions_id :1;
   bool carrier :1;
+  bool context :1;
 } _HomeTimelineService_WriteHomeTimeline_args__isset;
 
 class HomeTimelineService_WriteHomeTimeline_args {
@@ -225,6 +233,7 @@ class HomeTimelineService_WriteHomeTimeline_args {
   int64_t timestamp;
   std::vector<int64_t>  user_mentions_id;
   std::map<std::string, std::string>  carrier;
+  std::map<std::string, std::string>  context;
 
   _HomeTimelineService_WriteHomeTimeline_args__isset __isset;
 
@@ -240,6 +249,8 @@ class HomeTimelineService_WriteHomeTimeline_args {
 
   void __set_carrier(const std::map<std::string, std::string> & val);
 
+  void __set_context(const std::map<std::string, std::string> & val);
+
   bool operator == (const HomeTimelineService_WriteHomeTimeline_args & rhs) const
   {
     if (!(req_id == rhs.req_id))
@@ -253,6 +264,8 @@ class HomeTimelineService_WriteHomeTimeline_args {
     if (!(user_mentions_id == rhs.user_mentions_id))
       return false;
     if (!(carrier == rhs.carrier))
+      return false;
+    if (!(context == rhs.context))
       return false;
     return true;
   }
@@ -279,6 +292,7 @@ class HomeTimelineService_WriteHomeTimeline_pargs {
   const int64_t* timestamp;
   const std::vector<int64_t> * user_mentions_id;
   const std::map<std::string, std::string> * carrier;
+  const std::map<std::string, std::string> * context;
 
   uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
 
@@ -364,11 +378,11 @@ class HomeTimelineServiceClient : virtual public HomeTimelineServiceIf {
   apache::thrift::stdcxx::shared_ptr< ::apache::thrift::protocol::TProtocol> getOutputProtocol() {
     return poprot_;
   }
-  void ReadHomeTimeline(std::vector<Post> & _return, const int64_t req_id, const int64_t user_id, const int32_t start, const int32_t stop, const std::map<std::string, std::string> & carrier);
-  void send_ReadHomeTimeline(const int64_t req_id, const int64_t user_id, const int32_t start, const int32_t stop, const std::map<std::string, std::string> & carrier);
+  void ReadHomeTimeline(std::vector<Post> & _return, const int64_t req_id, const int64_t user_id, const int32_t start, const int32_t stop, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context);
+  void send_ReadHomeTimeline(const int64_t req_id, const int64_t user_id, const int32_t start, const int32_t stop, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context);
   void recv_ReadHomeTimeline(std::vector<Post> & _return);
-  void WriteHomeTimeline(const int64_t req_id, const int64_t post_id, const int64_t user_id, const int64_t timestamp, const std::vector<int64_t> & user_mentions_id, const std::map<std::string, std::string> & carrier);
-  void send_WriteHomeTimeline(const int64_t req_id, const int64_t post_id, const int64_t user_id, const int64_t timestamp, const std::vector<int64_t> & user_mentions_id, const std::map<std::string, std::string> & carrier);
+  void WriteHomeTimeline(const int64_t req_id, const int64_t post_id, const int64_t user_id, const int64_t timestamp, const std::vector<int64_t> & user_mentions_id, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context);
+  void send_WriteHomeTimeline(const int64_t req_id, const int64_t post_id, const int64_t user_id, const int64_t timestamp, const std::vector<int64_t> & user_mentions_id, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context);
   void recv_WriteHomeTimeline();
  protected:
   apache::thrift::stdcxx::shared_ptr< ::apache::thrift::protocol::TProtocol> piprot_;
@@ -420,23 +434,23 @@ class HomeTimelineServiceMultiface : virtual public HomeTimelineServiceIf {
     ifaces_.push_back(iface);
   }
  public:
-  void ReadHomeTimeline(std::vector<Post> & _return, const int64_t req_id, const int64_t user_id, const int32_t start, const int32_t stop, const std::map<std::string, std::string> & carrier) {
+  void ReadHomeTimeline(std::vector<Post> & _return, const int64_t req_id, const int64_t user_id, const int32_t start, const int32_t stop, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context) {
     size_t sz = ifaces_.size();
     size_t i = 0;
     for (; i < (sz - 1); ++i) {
-      ifaces_[i]->ReadHomeTimeline(_return, req_id, user_id, start, stop, carrier);
+      ifaces_[i]->ReadHomeTimeline(_return, req_id, user_id, start, stop, carrier, context);
     }
-    ifaces_[i]->ReadHomeTimeline(_return, req_id, user_id, start, stop, carrier);
+    ifaces_[i]->ReadHomeTimeline(_return, req_id, user_id, start, stop, carrier, context);
     return;
   }
 
-  void WriteHomeTimeline(const int64_t req_id, const int64_t post_id, const int64_t user_id, const int64_t timestamp, const std::vector<int64_t> & user_mentions_id, const std::map<std::string, std::string> & carrier) {
+  void WriteHomeTimeline(const int64_t req_id, const int64_t post_id, const int64_t user_id, const int64_t timestamp, const std::vector<int64_t> & user_mentions_id, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context) {
     size_t sz = ifaces_.size();
     size_t i = 0;
     for (; i < (sz - 1); ++i) {
-      ifaces_[i]->WriteHomeTimeline(req_id, post_id, user_id, timestamp, user_mentions_id, carrier);
+      ifaces_[i]->WriteHomeTimeline(req_id, post_id, user_id, timestamp, user_mentions_id, carrier, context);
     }
-    ifaces_[i]->WriteHomeTimeline(req_id, post_id, user_id, timestamp, user_mentions_id, carrier);
+    ifaces_[i]->WriteHomeTimeline(req_id, post_id, user_id, timestamp, user_mentions_id, carrier, context);
   }
 
 };
@@ -469,11 +483,11 @@ class HomeTimelineServiceConcurrentClient : virtual public HomeTimelineServiceIf
   apache::thrift::stdcxx::shared_ptr< ::apache::thrift::protocol::TProtocol> getOutputProtocol() {
     return poprot_;
   }
-  void ReadHomeTimeline(std::vector<Post> & _return, const int64_t req_id, const int64_t user_id, const int32_t start, const int32_t stop, const std::map<std::string, std::string> & carrier);
-  int32_t send_ReadHomeTimeline(const int64_t req_id, const int64_t user_id, const int32_t start, const int32_t stop, const std::map<std::string, std::string> & carrier);
+  void ReadHomeTimeline(std::vector<Post> & _return, const int64_t req_id, const int64_t user_id, const int32_t start, const int32_t stop, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context);
+  int32_t send_ReadHomeTimeline(const int64_t req_id, const int64_t user_id, const int32_t start, const int32_t stop, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context);
   void recv_ReadHomeTimeline(std::vector<Post> & _return, const int32_t seqid);
-  void WriteHomeTimeline(const int64_t req_id, const int64_t post_id, const int64_t user_id, const int64_t timestamp, const std::vector<int64_t> & user_mentions_id, const std::map<std::string, std::string> & carrier);
-  int32_t send_WriteHomeTimeline(const int64_t req_id, const int64_t post_id, const int64_t user_id, const int64_t timestamp, const std::vector<int64_t> & user_mentions_id, const std::map<std::string, std::string> & carrier);
+  void WriteHomeTimeline(const int64_t req_id, const int64_t post_id, const int64_t user_id, const int64_t timestamp, const std::vector<int64_t> & user_mentions_id, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context);
+  int32_t send_WriteHomeTimeline(const int64_t req_id, const int64_t post_id, const int64_t user_id, const int64_t timestamp, const std::vector<int64_t> & user_mentions_id, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context);
   void recv_WriteHomeTimeline(const int32_t seqid);
  protected:
   apache::thrift::stdcxx::shared_ptr< ::apache::thrift::protocol::TProtocol> piprot_;

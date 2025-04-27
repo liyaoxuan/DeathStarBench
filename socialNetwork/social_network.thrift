@@ -77,6 +77,7 @@ service UniqueIdService {
       1: i64 req_id,
       2: PostType post_type,
       3: map<string, string> carrier
+      4: map<string, string> context
   ) throws (1: ServiceException se)
 }
 
@@ -85,6 +86,7 @@ service TextService {
       1: i64 req_id,
       2: string text,
       3: map<string, string> carrier
+      4: map<string, string> context
   ) throws (1: ServiceException se)
 }
 
@@ -96,6 +98,7 @@ service UserService {
       4: string username,
       5: string password,
       6: map<string, string> carrier
+      7: map<string, string> context
   ) throws (1: ServiceException se)
 
   void RegisterUserWithId (
@@ -106,6 +109,7 @@ service UserService {
       5: string password,
       6: i64 user_id,
       7: map<string, string> carrier
+      8: map<string, string> context
   ) throws (1: ServiceException se)
 
   string Login(
@@ -113,6 +117,7 @@ service UserService {
       2: string username,
       3: string password,
       4: map<string, string> carrier
+      5: map<string, string> context
   ) throws (1: ServiceException se)
 
   Creator ComposeCreatorWithUserId(
@@ -120,18 +125,21 @@ service UserService {
       2: i64 user_id,
       3: string username,
       4: map<string, string> carrier
+      5: map<string, string> context
   ) throws (1: ServiceException se)
 
   Creator ComposeCreatorWithUsername(
       1: i64 req_id,
       2: string username,
       3: map<string, string> carrier
+      4: map<string, string> context
   ) throws (1: ServiceException se)
 
   i64 GetUserId(
       1: i64 req_id,
       2: string username,
       3: map<string, string> carrier
+      4: map<string, string> context
   ) throws (1: ServiceException se)
 }
 
@@ -145,6 +153,7 @@ service ComposePostService {
     6: list<string> media_types,
     7: PostType post_type,
     8: map<string, string> carrier
+    9: map<string, string> context
   ) throws (1: ServiceException se)
 }
 
@@ -153,18 +162,21 @@ service PostStorageService {
     1: i64 req_id,
     2: Post post,
     3: map<string, string> carrier
+    4: map<string, string> context
   ) throws (1: ServiceException se)
 
   Post ReadPost(
     1: i64 req_id,
     2: i64 post_id,
     3: map<string, string> carrier
+    4: map<string, string> context
   ) throws (1: ServiceException se)
 
   list<Post> ReadPosts(
     1: i64 req_id,
     2: list<i64> post_ids,
     3: map<string, string> carrier
+    4: map<string, string> context
   ) throws (1: ServiceException se)
 }
 
@@ -175,6 +187,7 @@ service HomeTimelineService {
     3: i32 start,
     4: i32 stop,
     5: map<string, string> carrier
+    6: map<string, string> context
   ) throws (1: ServiceException se)
 
   void WriteHomeTimeline(
@@ -184,6 +197,7 @@ service HomeTimelineService {
     4: i64 timestamp,
     5: list<i64> user_mentions_id,
     6: map<string, string> carrier
+    7: map<string, string> context
   ) throws (1: ServiceException se)
 }
 
@@ -194,6 +208,7 @@ service UserTimelineService {
     3: i64 user_id,
     4: i64 timestamp,
     5: map<string, string> carrier
+    6: map<string, string> context
   ) throws (1: ServiceException se)
 
   list<Post> ReadUserTimeline(
@@ -202,6 +217,7 @@ service UserTimelineService {
     3: i32 start,
     4: i32 stop,
     5: map<string, string> carrier
+    6: map<string, string> context
   ) throws (1: ServiceException se)
 }
 
@@ -210,12 +226,14 @@ service SocialGraphService{
       1: i64 req_id,
       2: i64 user_id,
       3: map<string, string> carrier
+      4: map<string, string> context
   ) throws (1: ServiceException se)
 
   list<i64> GetFollowees(
       1: i64 req_id,
       2: i64 user_id,
       3: map<string, string> carrier
+      4: map<string, string> context
   ) throws (1: ServiceException se)
 
   void Follow(
@@ -223,6 +241,7 @@ service SocialGraphService{
       2: i64 user_id,
       3: i64 followee_id,
       4: map<string, string> carrier
+      5: map<string, string> context
   ) throws (1: ServiceException se)
 
   void Unfollow(
@@ -230,6 +249,7 @@ service SocialGraphService{
       2: i64 user_id,
       3: i64 followee_id,
       4: map<string, string> carrier
+      5: map<string, string> context
   ) throws (1: ServiceException se)
 
   void FollowWithUsername(
@@ -237,6 +257,7 @@ service SocialGraphService{
       2: string user_usernmae,
       3: string followee_username,
       4: map<string, string> carrier
+      5: map<string, string> context
   ) throws (1: ServiceException se)
 
   void UnfollowWithUsername(
@@ -244,12 +265,14 @@ service SocialGraphService{
       2: string user_usernmae,
       3: string followee_username,
       4: map<string, string> carrier
+      5: map<string, string> context
   ) throws (1: ServiceException se)
 
   void InsertUser(
       1: i64 req_id,
       2: i64 user_id,
       3: map<string, string> carrier
+      4: map<string, string> context
   ) throws (1: ServiceException se)
 }
 
@@ -258,6 +281,7 @@ service UserMentionService {
       1: i64 req_id,
       2: list<string> usernames,
       3: map<string, string> carrier
+      4: map<string, string> context
   ) throws (1: ServiceException se)
 }
 
@@ -266,12 +290,14 @@ service UrlShortenService {
       1: i64 req_id,
       2: list<string> urls,
       3: map<string, string> carrier
+      4: map<string, string> context
   ) throws (1: ServiceException se)
 
   list<string> GetExtendedUrls(
       1: i64 req_id,
       2: list<string> shortened_urls,
       3: map<string, string> carrier
+      4: map<string, string> context
   ) throws (1: ServiceException se)
 }
 
@@ -281,5 +307,6 @@ service MediaService {
       2: list<string> media_types,
       3: list<i64> media_ids,
       4: map<string, string> carrier
+      5: map<string, string> context
   ) throws (1: ServiceException se)
 }

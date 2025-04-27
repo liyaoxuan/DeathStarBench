@@ -15,13 +15,13 @@ namespace social_network {
 
 #ifdef _MSC_VER
   #pragma warning( push )
-  #pragma warning (disable : 4250 ) //inheriting methods via dominance
+  #pragma warning (disable : 4250 ) //inheriting methods via dominance 
 #endif
 
 class MediaServiceIf {
  public:
   virtual ~MediaServiceIf() {}
-  virtual void ComposeMedia(std::vector<Media> & _return, const int64_t req_id, const std::vector<std::string> & media_types, const std::vector<int64_t> & media_ids, const std::map<std::string, std::string> & carrier) = 0;
+  virtual void ComposeMedia(std::vector<Media> & _return, const int64_t req_id, const std::vector<std::string> & media_types, const std::vector<int64_t> & media_ids, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context) = 0;
 };
 
 class MediaServiceIfFactory {
@@ -51,17 +51,18 @@ class MediaServiceIfSingletonFactory : virtual public MediaServiceIfFactory {
 class MediaServiceNull : virtual public MediaServiceIf {
  public:
   virtual ~MediaServiceNull() {}
-  void ComposeMedia(std::vector<Media> & /* _return */, const int64_t /* req_id */, const std::vector<std::string> & /* media_types */, const std::vector<int64_t> & /* media_ids */, const std::map<std::string, std::string> & /* carrier */) {
+  void ComposeMedia(std::vector<Media> & /* _return */, const int64_t /* req_id */, const std::vector<std::string> & /* media_types */, const std::vector<int64_t> & /* media_ids */, const std::map<std::string, std::string> & /* carrier */, const std::map<std::string, std::string> & /* context */) {
     return;
   }
 };
 
 typedef struct _MediaService_ComposeMedia_args__isset {
-  _MediaService_ComposeMedia_args__isset() : req_id(false), media_types(false), media_ids(false), carrier(false) {}
+  _MediaService_ComposeMedia_args__isset() : req_id(false), media_types(false), media_ids(false), carrier(false), context(false) {}
   bool req_id :1;
   bool media_types :1;
   bool media_ids :1;
   bool carrier :1;
+  bool context :1;
 } _MediaService_ComposeMedia_args__isset;
 
 class MediaService_ComposeMedia_args {
@@ -77,6 +78,7 @@ class MediaService_ComposeMedia_args {
   std::vector<std::string>  media_types;
   std::vector<int64_t>  media_ids;
   std::map<std::string, std::string>  carrier;
+  std::map<std::string, std::string>  context;
 
   _MediaService_ComposeMedia_args__isset __isset;
 
@@ -88,6 +90,8 @@ class MediaService_ComposeMedia_args {
 
   void __set_carrier(const std::map<std::string, std::string> & val);
 
+  void __set_context(const std::map<std::string, std::string> & val);
+
   bool operator == (const MediaService_ComposeMedia_args & rhs) const
   {
     if (!(req_id == rhs.req_id))
@@ -97,6 +101,8 @@ class MediaService_ComposeMedia_args {
     if (!(media_ids == rhs.media_ids))
       return false;
     if (!(carrier == rhs.carrier))
+      return false;
+    if (!(context == rhs.context))
       return false;
     return true;
   }
@@ -121,6 +127,7 @@ class MediaService_ComposeMedia_pargs {
   const std::vector<std::string> * media_types;
   const std::vector<int64_t> * media_ids;
   const std::map<std::string, std::string> * carrier;
+  const std::map<std::string, std::string> * context;
 
   uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
 
@@ -214,8 +221,8 @@ class MediaServiceClient : virtual public MediaServiceIf {
   apache::thrift::stdcxx::shared_ptr< ::apache::thrift::protocol::TProtocol> getOutputProtocol() {
     return poprot_;
   }
-  void ComposeMedia(std::vector<Media> & _return, const int64_t req_id, const std::vector<std::string> & media_types, const std::vector<int64_t> & media_ids, const std::map<std::string, std::string> & carrier);
-  void send_ComposeMedia(const int64_t req_id, const std::vector<std::string> & media_types, const std::vector<int64_t> & media_ids, const std::map<std::string, std::string> & carrier);
+  void ComposeMedia(std::vector<Media> & _return, const int64_t req_id, const std::vector<std::string> & media_types, const std::vector<int64_t> & media_ids, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context);
+  void send_ComposeMedia(const int64_t req_id, const std::vector<std::string> & media_types, const std::vector<int64_t> & media_ids, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context);
   void recv_ComposeMedia(std::vector<Media> & _return);
  protected:
   apache::thrift::stdcxx::shared_ptr< ::apache::thrift::protocol::TProtocol> piprot_;
@@ -265,13 +272,13 @@ class MediaServiceMultiface : virtual public MediaServiceIf {
     ifaces_.push_back(iface);
   }
  public:
-  void ComposeMedia(std::vector<Media> & _return, const int64_t req_id, const std::vector<std::string> & media_types, const std::vector<int64_t> & media_ids, const std::map<std::string, std::string> & carrier) {
+  void ComposeMedia(std::vector<Media> & _return, const int64_t req_id, const std::vector<std::string> & media_types, const std::vector<int64_t> & media_ids, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context) {
     size_t sz = ifaces_.size();
     size_t i = 0;
     for (; i < (sz - 1); ++i) {
-      ifaces_[i]->ComposeMedia(_return, req_id, media_types, media_ids, carrier);
+      ifaces_[i]->ComposeMedia(_return, req_id, media_types, media_ids, carrier, context);
     }
-    ifaces_[i]->ComposeMedia(_return, req_id, media_types, media_ids, carrier);
+    ifaces_[i]->ComposeMedia(_return, req_id, media_types, media_ids, carrier, context);
     return;
   }
 
@@ -305,8 +312,8 @@ class MediaServiceConcurrentClient : virtual public MediaServiceIf {
   apache::thrift::stdcxx::shared_ptr< ::apache::thrift::protocol::TProtocol> getOutputProtocol() {
     return poprot_;
   }
-  void ComposeMedia(std::vector<Media> & _return, const int64_t req_id, const std::vector<std::string> & media_types, const std::vector<int64_t> & media_ids, const std::map<std::string, std::string> & carrier);
-  int32_t send_ComposeMedia(const int64_t req_id, const std::vector<std::string> & media_types, const std::vector<int64_t> & media_ids, const std::map<std::string, std::string> & carrier);
+  void ComposeMedia(std::vector<Media> & _return, const int64_t req_id, const std::vector<std::string> & media_types, const std::vector<int64_t> & media_ids, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context);
+  int32_t send_ComposeMedia(const int64_t req_id, const std::vector<std::string> & media_types, const std::vector<int64_t> & media_ids, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context);
   void recv_ComposeMedia(std::vector<Media> & _return, const int32_t seqid);
  protected:
   apache::thrift::stdcxx::shared_ptr< ::apache::thrift::protocol::TProtocol> piprot_;

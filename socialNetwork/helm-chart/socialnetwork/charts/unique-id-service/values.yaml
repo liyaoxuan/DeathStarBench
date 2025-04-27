@@ -1,18 +1,20 @@
 name: unique-id-service
 nodeName: cpu-16
-hostPID: true
 
 ports:
   - port: 9090
     targetPort: 9090
 
+hostPID: true
+
 container:
   command: UniqueIdService
-  image: yxlee/socialnetwork-profile #deathstarbench/social-network-microservices
+  image: socialnetwork #deathstarbench/social-network-microservices #yxlee/socialnetwork-profile
+  imageVersion: ext #latest #jammy
+  dockerRegistry: local.registry #docker.io #localhost
   name: unique-id-service
   ports: 
   - containerPort: 9090
-  imageVersion: debug
 
 configMaps:
   - name: jaeger-config.yml

@@ -5,12 +5,16 @@ ports:
   - port: 9090
     targetPort: 9090
 
+hostPID: true
+
 container:
   command: HomeTimelineService
-  image: deathstarbench/social-network-microservices
   name: home-timeline-service
   ports: 
   - containerPort: 9090
+  dockerRegistry: local.registry #docker.io #localhost
+  image: socialnetwork #deathstarbench/social-network-microservices
+  imageVersion: ext #latest #jammy
 
 configMaps:
   - name: jaeger-config.yml

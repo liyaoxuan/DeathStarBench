@@ -29,6 +29,7 @@ target_link_libraries(
     /usr/local/lib/libhiredis_ssl.a
     /usr/local/lib/libredis++.a
     OpenSSL::SSL
+    -lrt
 )
 
 install(TARGETS UserTimelineService DESTINATION ./)

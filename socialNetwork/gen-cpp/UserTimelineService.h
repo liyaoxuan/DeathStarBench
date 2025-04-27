@@ -15,14 +15,14 @@ namespace social_network {
 
 #ifdef _MSC_VER
   #pragma warning( push )
-  #pragma warning (disable : 4250 ) //inheriting methods via dominance
+  #pragma warning (disable : 4250 ) //inheriting methods via dominance 
 #endif
 
 class UserTimelineServiceIf {
  public:
   virtual ~UserTimelineServiceIf() {}
-  virtual void WriteUserTimeline(const int64_t req_id, const int64_t post_id, const int64_t user_id, const int64_t timestamp, const std::map<std::string, std::string> & carrier) = 0;
-  virtual void ReadUserTimeline(std::vector<Post> & _return, const int64_t req_id, const int64_t user_id, const int32_t start, const int32_t stop, const std::map<std::string, std::string> & carrier) = 0;
+  virtual void WriteUserTimeline(const int64_t req_id, const int64_t post_id, const int64_t user_id, const int64_t timestamp, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context) = 0;
+  virtual void ReadUserTimeline(std::vector<Post> & _return, const int64_t req_id, const int64_t user_id, const int32_t start, const int32_t stop, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context) = 0;
 };
 
 class UserTimelineServiceIfFactory {
@@ -52,21 +52,22 @@ class UserTimelineServiceIfSingletonFactory : virtual public UserTimelineService
 class UserTimelineServiceNull : virtual public UserTimelineServiceIf {
  public:
   virtual ~UserTimelineServiceNull() {}
-  void WriteUserTimeline(const int64_t /* req_id */, const int64_t /* post_id */, const int64_t /* user_id */, const int64_t /* timestamp */, const std::map<std::string, std::string> & /* carrier */) {
+  void WriteUserTimeline(const int64_t /* req_id */, const int64_t /* post_id */, const int64_t /* user_id */, const int64_t /* timestamp */, const std::map<std::string, std::string> & /* carrier */, const std::map<std::string, std::string> & /* context */) {
     return;
   }
-  void ReadUserTimeline(std::vector<Post> & /* _return */, const int64_t /* req_id */, const int64_t /* user_id */, const int32_t /* start */, const int32_t /* stop */, const std::map<std::string, std::string> & /* carrier */) {
+  void ReadUserTimeline(std::vector<Post> & /* _return */, const int64_t /* req_id */, const int64_t /* user_id */, const int32_t /* start */, const int32_t /* stop */, const std::map<std::string, std::string> & /* carrier */, const std::map<std::string, std::string> & /* context */) {
     return;
   }
 };
 
 typedef struct _UserTimelineService_WriteUserTimeline_args__isset {
-  _UserTimelineService_WriteUserTimeline_args__isset() : req_id(false), post_id(false), user_id(false), timestamp(false), carrier(false) {}
+  _UserTimelineService_WriteUserTimeline_args__isset() : req_id(false), post_id(false), user_id(false), timestamp(false), carrier(false), context(false) {}
   bool req_id :1;
   bool post_id :1;
   bool user_id :1;
   bool timestamp :1;
   bool carrier :1;
+  bool context :1;
 } _UserTimelineService_WriteUserTimeline_args__isset;
 
 class UserTimelineService_WriteUserTimeline_args {
@@ -83,6 +84,7 @@ class UserTimelineService_WriteUserTimeline_args {
   int64_t user_id;
   int64_t timestamp;
   std::map<std::string, std::string>  carrier;
+  std::map<std::string, std::string>  context;
 
   _UserTimelineService_WriteUserTimeline_args__isset __isset;
 
@@ -96,6 +98,8 @@ class UserTimelineService_WriteUserTimeline_args {
 
   void __set_carrier(const std::map<std::string, std::string> & val);
 
+  void __set_context(const std::map<std::string, std::string> & val);
+
   bool operator == (const UserTimelineService_WriteUserTimeline_args & rhs) const
   {
     if (!(req_id == rhs.req_id))
@@ -107,6 +111,8 @@ class UserTimelineService_WriteUserTimeline_args {
     if (!(timestamp == rhs.timestamp))
       return false;
     if (!(carrier == rhs.carrier))
+      return false;
+    if (!(context == rhs.context))
       return false;
     return true;
   }
@@ -132,6 +138,7 @@ class UserTimelineService_WriteUserTimeline_pargs {
   const int64_t* user_id;
   const int64_t* timestamp;
   const std::map<std::string, std::string> * carrier;
+  const std::map<std::string, std::string> * context;
 
   uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
 
@@ -193,12 +200,13 @@ class UserTimelineService_WriteUserTimeline_presult {
 };
 
 typedef struct _UserTimelineService_ReadUserTimeline_args__isset {
-  _UserTimelineService_ReadUserTimeline_args__isset() : req_id(false), user_id(false), start(false), stop(false), carrier(false) {}
+  _UserTimelineService_ReadUserTimeline_args__isset() : req_id(false), user_id(false), start(false), stop(false), carrier(false), context(false) {}
   bool req_id :1;
   bool user_id :1;
   bool start :1;
   bool stop :1;
   bool carrier :1;
+  bool context :1;
 } _UserTimelineService_ReadUserTimeline_args__isset;
 
 class UserTimelineService_ReadUserTimeline_args {
@@ -215,6 +223,7 @@ class UserTimelineService_ReadUserTimeline_args {
   int32_t start;
   int32_t stop;
   std::map<std::string, std::string>  carrier;
+  std::map<std::string, std::string>  context;
 
   _UserTimelineService_ReadUserTimeline_args__isset __isset;
 
@@ -228,6 +237,8 @@ class UserTimelineService_ReadUserTimeline_args {
 
   void __set_carrier(const std::map<std::string, std::string> & val);
 
+  void __set_context(const std::map<std::string, std::string> & val);
+
   bool operator == (const UserTimelineService_ReadUserTimeline_args & rhs) const
   {
     if (!(req_id == rhs.req_id))
@@ -239,6 +250,8 @@ class UserTimelineService_ReadUserTimeline_args {
     if (!(stop == rhs.stop))
       return false;
     if (!(carrier == rhs.carrier))
+      return false;
+    if (!(context == rhs.context))
       return false;
     return true;
   }
@@ -264,6 +277,7 @@ class UserTimelineService_ReadUserTimeline_pargs {
   const int32_t* start;
   const int32_t* stop;
   const std::map<std::string, std::string> * carrier;
+  const std::map<std::string, std::string> * context;
 
   uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
 
@@ -357,11 +371,11 @@ class UserTimelineServiceClient : virtual public UserTimelineServiceIf {
   apache::thrift::stdcxx::shared_ptr< ::apache::thrift::protocol::TProtocol> getOutputProtocol() {
     return poprot_;
   }
-  void WriteUserTimeline(const int64_t req_id, const int64_t post_id, const int64_t user_id, const int64_t timestamp, const std::map<std::string, std::string> & carrier);
-  void send_WriteUserTimeline(const int64_t req_id, const int64_t post_id, const int64_t user_id, const int64_t timestamp, const std::map<std::string, std::string> & carrier);
+  void WriteUserTimeline(const int64_t req_id, const int64_t post_id, const int64_t user_id, const int64_t timestamp, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context);
+  void send_WriteUserTimeline(const int64_t req_id, const int64_t post_id, const int64_t user_id, const int64_t timestamp, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context);
   void recv_WriteUserTimeline();
-  void ReadUserTimeline(std::vector<Post> & _return, const int64_t req_id, const int64_t user_id, const int32_t start, const int32_t stop, const std::map<std::string, std::string> & carrier);
-  void send_ReadUserTimeline(const int64_t req_id, const int64_t user_id, const int32_t start, const int32_t stop, const std::map<std::string, std::string> & carrier);
+  void ReadUserTimeline(std::vector<Post> & _return, const int64_t req_id, const int64_t user_id, const int32_t start, const int32_t stop, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context);
+  void send_ReadUserTimeline(const int64_t req_id, const int64_t user_id, const int32_t start, const int32_t stop, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context);
   void recv_ReadUserTimeline(std::vector<Post> & _return);
  protected:
   apache::thrift::stdcxx::shared_ptr< ::apache::thrift::protocol::TProtocol> piprot_;
@@ -413,22 +427,22 @@ class UserTimelineServiceMultiface : virtual public UserTimelineServiceIf {
     ifaces_.push_back(iface);
   }
  public:
-  void WriteUserTimeline(const int64_t req_id, const int64_t post_id, const int64_t user_id, const int64_t timestamp, const std::map<std::string, std::string> & carrier) {
+  void WriteUserTimeline(const int64_t req_id, const int64_t post_id, const int64_t user_id, const int64_t timestamp, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context) {
     size_t sz = ifaces_.size();
     size_t i = 0;
     for (; i < (sz - 1); ++i) {
-      ifaces_[i]->WriteUserTimeline(req_id, post_id, user_id, timestamp, carrier);
+      ifaces_[i]->WriteUserTimeline(req_id, post_id, user_id, timestamp, carrier, context);
     }
-    ifaces_[i]->WriteUserTimeline(req_id, post_id, user_id, timestamp, carrier);
+    ifaces_[i]->WriteUserTimeline(req_id, post_id, user_id, timestamp, carrier, context);
   }
 
-  void ReadUserTimeline(std::vector<Post> & _return, const int64_t req_id, const int64_t user_id, const int32_t start, const int32_t stop, const std::map<std::string, std::string> & carrier) {
+  void ReadUserTimeline(std::vector<Post> & _return, const int64_t req_id, const int64_t user_id, const int32_t start, const int32_t stop, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context) {
     size_t sz = ifaces_.size();
     size_t i = 0;
     for (; i < (sz - 1); ++i) {
-      ifaces_[i]->ReadUserTimeline(_return, req_id, user_id, start, stop, carrier);
+      ifaces_[i]->ReadUserTimeline(_return, req_id, user_id, start, stop, carrier, context);
     }
-    ifaces_[i]->ReadUserTimeline(_return, req_id, user_id, start, stop, carrier);
+    ifaces_[i]->ReadUserTimeline(_return, req_id, user_id, start, stop, carrier, context);
     return;
   }
 
@@ -462,11 +476,11 @@ class UserTimelineServiceConcurrentClient : virtual public UserTimelineServiceIf
   apache::thrift::stdcxx::shared_ptr< ::apache::thrift::protocol::TProtocol> getOutputProtocol() {
     return poprot_;
   }
-  void WriteUserTimeline(const int64_t req_id, const int64_t post_id, const int64_t user_id, const int64_t timestamp, const std::map<std::string, std::string> & carrier);
-  int32_t send_WriteUserTimeline(const int64_t req_id, const int64_t post_id, const int64_t user_id, const int64_t timestamp, const std::map<std::string, std::string> & carrier);
+  void WriteUserTimeline(const int64_t req_id, const int64_t post_id, const int64_t user_id, const int64_t timestamp, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context);
+  int32_t send_WriteUserTimeline(const int64_t req_id, const int64_t post_id, const int64_t user_id, const int64_t timestamp, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context);
   void recv_WriteUserTimeline(const int32_t seqid);
-  void ReadUserTimeline(std::vector<Post> & _return, const int64_t req_id, const int64_t user_id, const int32_t start, const int32_t stop, const std::map<std::string, std::string> & carrier);
-  int32_t send_ReadUserTimeline(const int64_t req_id, const int64_t user_id, const int32_t start, const int32_t stop, const std::map<std::string, std::string> & carrier);
+  void ReadUserTimeline(std::vector<Post> & _return, const int64_t req_id, const int64_t user_id, const int32_t start, const int32_t stop, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context);
+  int32_t send_ReadUserTimeline(const int64_t req_id, const int64_t user_id, const int32_t start, const int32_t stop, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context);
   void recv_ReadUserTimeline(std::vector<Post> & _return, const int32_t seqid);
  protected:
   apache::thrift::stdcxx::shared_ptr< ::apache::thrift::protocol::TProtocol> piprot_;

@@ -50,11 +50,18 @@ int main(int argc, char *argv[]) {
     std::shared_ptr<TServerSocket> server_socket = get_server_socket(config_json, "0.0.0.0", port);
     TThreadedServer server(
         std::make_shared<TextServiceProcessor>(std::make_shared<TextHandler>(
-            &url_client_pool, &user_mention_pool)),
+            &url_client_pool, &user_mention_pool, &config_json)),
         server_socket,
         std::make_shared<TFramedTransportFactory>(),
         std::make_shared<TBinaryProtocolFactory>());
 
+    pid_t pid = getpid();
+    struct sched_param param;
+    param.sched_priority = 0;
+    if (sched_setscheduler(pid, 7, &param) == -1) {
+        std::cerr << "Failed to set schedule class to SCHED_EXT" << std::endl;
+        return 1;
+    }
     LOG(info) << "Starting the text-service server...";
     server.serve();
   } else

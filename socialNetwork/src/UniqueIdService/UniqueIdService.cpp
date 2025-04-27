@@ -57,6 +57,13 @@ int main(int argc, char *argv[]) {
       std::make_shared<TFramedTransportFactory>(),
       std::make_shared<TBinaryProtocolFactory>());
 
+  pid_t pid = getpid();
+  struct sched_param param;
+  param.sched_priority = 0;
+  if (sched_setscheduler(pid, 7, &param) == -1) {
+      std::cerr << "Failed to set schedule class to SCHED_EXT" << std::endl;
+      return 1;
+  }
   LOG(info) << "Starting the unique-id-service server ...";
   server.serve();
 }

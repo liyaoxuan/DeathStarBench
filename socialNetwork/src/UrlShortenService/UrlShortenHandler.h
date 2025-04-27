@@ -26,10 +26,12 @@ class UrlShortenHandler : public UrlShortenServiceIf {
 
   void ComposeUrls(std::vector<Url> &, int64_t,
       const std::vector<std::string> &,
+      const std::map<std::string, std::string> &,
       const std::map<std::string, std::string> &) override;
 
   void GetExtendedUrls(std::vector<std::string> &, int64_t,
                        const std::vector<std::string> &,
+                       const std::map<std::string, std::string> &,
                        const std::map<std::string, std::string> &) override ;
 
  private:
@@ -69,7 +71,8 @@ void UrlShortenHandler::ComposeUrls(
     std::vector<Url> &_return,
     int64_t req_id,
     const std::vector<std::string> &urls,
-    const std::map<std::string, std::string> &carrier) {
+    const std::map<std::string, std::string> &carrier,
+    const std::map<std::string, std::string> &context) {
 
   // Initialize a span
   TextMapReader reader(carrier);
@@ -170,7 +173,8 @@ void UrlShortenHandler::GetExtendedUrls(
     std::vector<std::string> &_return,
     int64_t req_id,
     const std::vector<std::string> &shortened_id,
-    const std::map<std::string, std::string> &carrier) {
+    const std::map<std::string, std::string> &carrier,
+    const std::map<std::string, std::string> &context) {
 
   // TODO: Implement GetExtendedUrls
 }

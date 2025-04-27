@@ -21,7 +21,8 @@ class HomeTimelineHandler : public HomeTimelineServiceIf {
  public:
   HomeTimelineHandler(Redis *,
                       ClientPool<ThriftClient<PostStorageServiceClient>> *,
-                      ClientPool<ThriftClient<SocialGraphServiceClient>> *);
+                      ClientPool<ThriftClient<SocialGraphServiceClient>> *,
+                      json *);
 
 
   HomeTimelineHandler(Redis *,Redis *,
@@ -37,10 +38,12 @@ class HomeTimelineHandler : public HomeTimelineServiceIf {
   bool IsRedisReplicationEnabled();
 
   void ReadHomeTimeline(std::vector<Post> &, int64_t, int64_t, int, int,
+                        const std::map<std::string, std::string> &,
                         const std::map<std::string, std::string> &) override;
 
   void WriteHomeTimeline(int64_t, int64_t, int64_t, int64_t,
                          const std::vector<int64_t> &,
+                         const std::map<std::string, std::string> &,
                          const std::map<std::string, std::string> &) override;
 
  private:
@@ -50,19 +53,22 @@ class HomeTimelineHandler : public HomeTimelineServiceIf {
      RedisCluster *_redis_cluster_client_pool;
      ClientPool<ThriftClient<PostStorageServiceClient>> *_post_client_pool;
      ClientPool<ThriftClient<SocialGraphServiceClient>> *_social_graph_client_pool;
+     json *_config_json;
 };
 
 HomeTimelineHandler::HomeTimelineHandler(
     Redis *redis_pool,
     ClientPool<ThriftClient<PostStorageServiceClient>> *post_client_pool,
     ClientPool<ThriftClient<SocialGraphServiceClient>>
-        *social_graph_client_pool) {
+        *social_graph_client_pool,
+    json *config_json) {
     _redis_primary_pool = nullptr;
     _redis_replica_pool = nullptr;
     _redis_client_pool = redis_pool;
     _redis_cluster_client_pool = nullptr;
     _post_client_pool = post_client_pool;
     _social_graph_client_pool = social_graph_client_pool;
+    _config_json = config_json;
 }
 
 HomeTimelineHandler::HomeTimelineHandler(
@@ -76,6 +82,7 @@ HomeTimelineHandler::HomeTimelineHandler(
     _redis_cluster_client_pool = redis_pool; 
     _post_client_pool = post_client_pool;
     _social_graph_client_pool = social_graph_client_pool;
+    _config_json = nullptr;
 }
 
 HomeTimelineHandler::HomeTimelineHandler(
@@ -90,6 +97,7 @@ HomeTimelineHandler::HomeTimelineHandler(
     _redis_cluster_client_pool = nullptr;
     _post_client_pool = post_client_pool;
     _social_graph_client_pool = social_graph_client_pool;
+    _config_json = nullptr;
 }
 
 bool HomeTimelineHandler::IsRedisReplicationEnabled() {
@@ -99,7 +107,8 @@ bool HomeTimelineHandler::IsRedisReplicationEnabled() {
 void HomeTimelineHandler::WriteHomeTimeline(
     int64_t req_id, int64_t post_id, int64_t user_id, int64_t timestamp,
     const std::vector<int64_t> &user_mentions_id,
-    const std::map<std::string, std::string> &carrier) {
+    const std::map<std::string, std::string> &carrier,
+    const std::map<std::string, std::string> &context) {
   // Initialize a span
   TextMapReader reader(carrier);
   auto parent_span = opentracing::Tracer::Global()->Extract(reader);
@@ -113,6 +122,11 @@ void HomeTimelineHandler::WriteHomeTimeline(
   TextMapWriter writer(writer_text_map);
   opentracing::Tracer::Global()->Inject(followers_span->context(), writer);
 
+  auto new_context = context;
+  std::string sched_time_next = "0";
+  std::string sched_time_remaining = "0";
+  new_context["sched-time-next"] = sched_time_next;
+  new_context["sched-time-remaining"] = sched_time_remaining;
   auto social_graph_client_wrapper = _social_graph_client_pool->Pop();
   if (!social_graph_client_wrapper) {
     ServiceException se;
@@ -124,7 +138,7 @@ void HomeTimelineHandler::WriteHomeTimeline(
   std::vector<int64_t> followers_id;
   try {
     social_graph_client->GetFollowers(followers_id, req_id, user_id,
-                                      writer_text_map);
+                                      writer_text_map, new_context);
   } catch (...) {
     LOG(error) << "Failed to get followers from social-network-service";
     _social_graph_client_pool->Remove(social_graph_client_wrapper);
@@ -213,7 +227,8 @@ void HomeTimelineHandler::WriteHomeTimeline(
 
 void HomeTimelineHandler::ReadHomeTimeline(
     std::vector<Post> &_return, int64_t req_id, int64_t user_id, int start_idx,
-    int stop_idx, const std::map<std::string, std::string> &carrier) {
+    int stop_idx, const std::map<std::string, std::string> &carrier,
+    const std::map<std::string, std::string> &context) {
   // Initialize a span
   TextMapReader reader(carrier);
   std::map<std::string, std::string> writer_text_map;
@@ -226,6 +241,13 @@ void HomeTimelineHandler::ReadHomeTimeline(
   if (stop_idx <= start_idx || start_idx < 0) {
     return;
   }
+  auto new_context = context;
+  std::string sched_time_next = "0";
+  std::string sched_time_remaining = "0";
+  new_context["sched-time-next"] = sched_time_next;
+  new_context["sched-time-remaining"] = sched_time_remaining;
+  std::cout << "sched-enable: " << new_context["sched-enable"] << std::endl;
+  std::cout << "sched-sla" << new_context["sched-sla"] << std::endl;
 
   auto redis_span = opentracing::Tracer::Global()->StartSpan(
       "read_home_timeline_redis_find_client",
@@ -269,7 +291,7 @@ void HomeTimelineHandler::ReadHomeTimeline(
   }
   auto post_client = post_client_wrapper->GetClient();
   try {
-    post_client->ReadPosts(_return, req_id, post_ids, writer_text_map);
+    post_client->ReadPosts(_return, req_id, post_ids, writer_text_map, new_context);
   } catch (...) {
     _post_client_pool->Remove(post_client_wrapper);
     LOG(error) << "Failed to read posts from post-storage-service";

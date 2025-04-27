@@ -15,14 +15,14 @@ namespace social_network {
 
 #ifdef _MSC_VER
   #pragma warning( push )
-  #pragma warning (disable : 4250 ) //inheriting methods via dominance
+  #pragma warning (disable : 4250 ) //inheriting methods via dominance 
 #endif
 
 class UrlShortenServiceIf {
  public:
   virtual ~UrlShortenServiceIf() {}
-  virtual void ComposeUrls(std::vector<Url> & _return, const int64_t req_id, const std::vector<std::string> & urls, const std::map<std::string, std::string> & carrier) = 0;
-  virtual void GetExtendedUrls(std::vector<std::string> & _return, const int64_t req_id, const std::vector<std::string> & shortened_urls, const std::map<std::string, std::string> & carrier) = 0;
+  virtual void ComposeUrls(std::vector<Url> & _return, const int64_t req_id, const std::vector<std::string> & urls, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context) = 0;
+  virtual void GetExtendedUrls(std::vector<std::string> & _return, const int64_t req_id, const std::vector<std::string> & shortened_urls, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context) = 0;
 };
 
 class UrlShortenServiceIfFactory {
@@ -52,19 +52,20 @@ class UrlShortenServiceIfSingletonFactory : virtual public UrlShortenServiceIfFa
 class UrlShortenServiceNull : virtual public UrlShortenServiceIf {
  public:
   virtual ~UrlShortenServiceNull() {}
-  void ComposeUrls(std::vector<Url> & /* _return */, const int64_t /* req_id */, const std::vector<std::string> & /* urls */, const std::map<std::string, std::string> & /* carrier */) {
+  void ComposeUrls(std::vector<Url> & /* _return */, const int64_t /* req_id */, const std::vector<std::string> & /* urls */, const std::map<std::string, std::string> & /* carrier */, const std::map<std::string, std::string> & /* context */) {
     return;
   }
-  void GetExtendedUrls(std::vector<std::string> & /* _return */, const int64_t /* req_id */, const std::vector<std::string> & /* shortened_urls */, const std::map<std::string, std::string> & /* carrier */) {
+  void GetExtendedUrls(std::vector<std::string> & /* _return */, const int64_t /* req_id */, const std::vector<std::string> & /* shortened_urls */, const std::map<std::string, std::string> & /* carrier */, const std::map<std::string, std::string> & /* context */) {
     return;
   }
 };
 
 typedef struct _UrlShortenService_ComposeUrls_args__isset {
-  _UrlShortenService_ComposeUrls_args__isset() : req_id(false), urls(false), carrier(false) {}
+  _UrlShortenService_ComposeUrls_args__isset() : req_id(false), urls(false), carrier(false), context(false) {}
   bool req_id :1;
   bool urls :1;
   bool carrier :1;
+  bool context :1;
 } _UrlShortenService_ComposeUrls_args__isset;
 
 class UrlShortenService_ComposeUrls_args {
@@ -79,6 +80,7 @@ class UrlShortenService_ComposeUrls_args {
   int64_t req_id;
   std::vector<std::string>  urls;
   std::map<std::string, std::string>  carrier;
+  std::map<std::string, std::string>  context;
 
   _UrlShortenService_ComposeUrls_args__isset __isset;
 
@@ -88,6 +90,8 @@ class UrlShortenService_ComposeUrls_args {
 
   void __set_carrier(const std::map<std::string, std::string> & val);
 
+  void __set_context(const std::map<std::string, std::string> & val);
+
   bool operator == (const UrlShortenService_ComposeUrls_args & rhs) const
   {
     if (!(req_id == rhs.req_id))
@@ -95,6 +99,8 @@ class UrlShortenService_ComposeUrls_args {
     if (!(urls == rhs.urls))
       return false;
     if (!(carrier == rhs.carrier))
+      return false;
+    if (!(context == rhs.context))
       return false;
     return true;
   }
@@ -118,6 +124,7 @@ class UrlShortenService_ComposeUrls_pargs {
   const int64_t* req_id;
   const std::vector<std::string> * urls;
   const std::map<std::string, std::string> * carrier;
+  const std::map<std::string, std::string> * context;
 
   uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
 
@@ -187,10 +194,11 @@ class UrlShortenService_ComposeUrls_presult {
 };
 
 typedef struct _UrlShortenService_GetExtendedUrls_args__isset {
-  _UrlShortenService_GetExtendedUrls_args__isset() : req_id(false), shortened_urls(false), carrier(false) {}
+  _UrlShortenService_GetExtendedUrls_args__isset() : req_id(false), shortened_urls(false), carrier(false), context(false) {}
   bool req_id :1;
   bool shortened_urls :1;
   bool carrier :1;
+  bool context :1;
 } _UrlShortenService_GetExtendedUrls_args__isset;
 
 class UrlShortenService_GetExtendedUrls_args {
@@ -205,6 +213,7 @@ class UrlShortenService_GetExtendedUrls_args {
   int64_t req_id;
   std::vector<std::string>  shortened_urls;
   std::map<std::string, std::string>  carrier;
+  std::map<std::string, std::string>  context;
 
   _UrlShortenService_GetExtendedUrls_args__isset __isset;
 
@@ -214,6 +223,8 @@ class UrlShortenService_GetExtendedUrls_args {
 
   void __set_carrier(const std::map<std::string, std::string> & val);
 
+  void __set_context(const std::map<std::string, std::string> & val);
+
   bool operator == (const UrlShortenService_GetExtendedUrls_args & rhs) const
   {
     if (!(req_id == rhs.req_id))
@@ -221,6 +232,8 @@ class UrlShortenService_GetExtendedUrls_args {
     if (!(shortened_urls == rhs.shortened_urls))
       return false;
     if (!(carrier == rhs.carrier))
+      return false;
+    if (!(context == rhs.context))
       return false;
     return true;
   }
@@ -244,6 +257,7 @@ class UrlShortenService_GetExtendedUrls_pargs {
   const int64_t* req_id;
   const std::vector<std::string> * shortened_urls;
   const std::map<std::string, std::string> * carrier;
+  const std::map<std::string, std::string> * context;
 
   uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
 
@@ -337,11 +351,11 @@ class UrlShortenServiceClient : virtual public UrlShortenServiceIf {
   apache::thrift::stdcxx::shared_ptr< ::apache::thrift::protocol::TProtocol> getOutputProtocol() {
     return poprot_;
   }
-  void ComposeUrls(std::vector<Url> & _return, const int64_t req_id, const std::vector<std::string> & urls, const std::map<std::string, std::string> & carrier);
-  void send_ComposeUrls(const int64_t req_id, const std::vector<std::string> & urls, const std::map<std::string, std::string> & carrier);
+  void ComposeUrls(std::vector<Url> & _return, const int64_t req_id, const std::vector<std::string> & urls, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context);
+  void send_ComposeUrls(const int64_t req_id, const std::vector<std::string> & urls, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context);
   void recv_ComposeUrls(std::vector<Url> & _return);
-  void GetExtendedUrls(std::vector<std::string> & _return, const int64_t req_id, const std::vector<std::string> & shortened_urls, const std::map<std::string, std::string> & carrier);
-  void send_GetExtendedUrls(const int64_t req_id, const std::vector<std::string> & shortened_urls, const std::map<std::string, std::string> & carrier);
+  void GetExtendedUrls(std::vector<std::string> & _return, const int64_t req_id, const std::vector<std::string> & shortened_urls, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context);
+  void send_GetExtendedUrls(const int64_t req_id, const std::vector<std::string> & shortened_urls, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context);
   void recv_GetExtendedUrls(std::vector<std::string> & _return);
  protected:
   apache::thrift::stdcxx::shared_ptr< ::apache::thrift::protocol::TProtocol> piprot_;
@@ -393,23 +407,23 @@ class UrlShortenServiceMultiface : virtual public UrlShortenServiceIf {
     ifaces_.push_back(iface);
   }
  public:
-  void ComposeUrls(std::vector<Url> & _return, const int64_t req_id, const std::vector<std::string> & urls, const std::map<std::string, std::string> & carrier) {
+  void ComposeUrls(std::vector<Url> & _return, const int64_t req_id, const std::vector<std::string> & urls, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context) {
     size_t sz = ifaces_.size();
     size_t i = 0;
     for (; i < (sz - 1); ++i) {
-      ifaces_[i]->ComposeUrls(_return, req_id, urls, carrier);
+      ifaces_[i]->ComposeUrls(_return, req_id, urls, carrier, context);
     }
-    ifaces_[i]->ComposeUrls(_return, req_id, urls, carrier);
+    ifaces_[i]->ComposeUrls(_return, req_id, urls, carrier, context);
     return;
   }
 
-  void GetExtendedUrls(std::vector<std::string> & _return, const int64_t req_id, const std::vector<std::string> & shortened_urls, const std::map<std::string, std::string> & carrier) {
+  void GetExtendedUrls(std::vector<std::string> & _return, const int64_t req_id, const std::vector<std::string> & shortened_urls, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context) {
     size_t sz = ifaces_.size();
     size_t i = 0;
     for (; i < (sz - 1); ++i) {
-      ifaces_[i]->GetExtendedUrls(_return, req_id, shortened_urls, carrier);
+      ifaces_[i]->GetExtendedUrls(_return, req_id, shortened_urls, carrier, context);
     }
-    ifaces_[i]->GetExtendedUrls(_return, req_id, shortened_urls, carrier);
+    ifaces_[i]->GetExtendedUrls(_return, req_id, shortened_urls, carrier, context);
     return;
   }
 
@@ -443,11 +457,11 @@ class UrlShortenServiceConcurrentClient : virtual public UrlShortenServiceIf {
   apache::thrift::stdcxx::shared_ptr< ::apache::thrift::protocol::TProtocol> getOutputProtocol() {
     return poprot_;
   }
-  void ComposeUrls(std::vector<Url> & _return, const int64_t req_id, const std::vector<std::string> & urls, const std::map<std::string, std::string> & carrier);
-  int32_t send_ComposeUrls(const int64_t req_id, const std::vector<std::string> & urls, const std::map<std::string, std::string> & carrier);
+  void ComposeUrls(std::vector<Url> & _return, const int64_t req_id, const std::vector<std::string> & urls, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context);
+  int32_t send_ComposeUrls(const int64_t req_id, const std::vector<std::string> & urls, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context);
   void recv_ComposeUrls(std::vector<Url> & _return, const int32_t seqid);
-  void GetExtendedUrls(std::vector<std::string> & _return, const int64_t req_id, const std::vector<std::string> & shortened_urls, const std::map<std::string, std::string> & carrier);
-  int32_t send_GetExtendedUrls(const int64_t req_id, const std::vector<std::string> & shortened_urls, const std::map<std::string, std::string> & carrier);
+  void GetExtendedUrls(std::vector<std::string> & _return, const int64_t req_id, const std::vector<std::string> & shortened_urls, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context);
+  int32_t send_GetExtendedUrls(const int64_t req_id, const std::vector<std::string> & shortened_urls, const std::map<std::string, std::string> & carrier, const std::map<std::string, std::string> & context);
   void recv_GetExtendedUrls(std::vector<std::string> & _return, const int32_t seqid);
  protected:
   apache::thrift::stdcxx::shared_ptr< ::apache::thrift::protocol::TProtocol> piprot_;

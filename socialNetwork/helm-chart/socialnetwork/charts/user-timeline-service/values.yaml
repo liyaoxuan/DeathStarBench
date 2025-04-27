@@ -4,11 +4,14 @@ nodeName: cpu-16
 ports:
   - port: 9090
     targetPort: 9090
+
 hostPID: true
 
 container:
   command: UserTimelineService
-  image: yxlee/socialnetwork-profile #deathstarbench/social-network-microservices
+  image: socialnetwork #deathstarbench/social-network-microservices
+  imageVersion: ext #latest #jammy
+  dockerRegistry: local.registry #docker.io #localhost
   name: user-timeline-service
   ports: 
   - containerPort: 9090

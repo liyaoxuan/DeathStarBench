@@ -1,6 +1,7 @@
 #ifndef SOCIAL_NETWORK_MICROSERVICES_SRC_COMPOSEPOSTSERVICE_COMPOSEPOSTHANDLER_H_
 #define SOCIAL_NETWORK_MICROSERVICES_SRC_COMPOSEPOSTSERVICE_COMPOSEPOSTHANDLER_H_
 
+#include <sys/syscall.h>
 #include <chrono>
 #include <future>
 #include <iostream>
@@ -36,8 +37,7 @@ class ComposePostHandler : public ComposePostServiceIf {
                      ClientPool<ThriftClient<UniqueIdServiceClient>> *,
                      ClientPool<ThriftClient<MediaServiceClient>> *,
                      ClientPool<ThriftClient<TextServiceClient>> *,
-                     ClientPool<ThriftClient<HomeTimelineServiceClient>> *,
-                     json *);
+                     ClientPool<ThriftClient<HomeTimelineServiceClient>> *);
   ~ComposePostHandler() override = default;
 
   void ComposePost(int64_t req_id, const std::string &username, int64_t user_id,
@@ -45,8 +45,7 @@ class ComposePostHandler : public ComposePostServiceIf {
                    const std::vector<int64_t> &media_ids,
                    const std::vector<std::string> &media_types,
                    PostType::type post_type,
-                   const std::map<std::string, std::string> &carrier,
-                   const std::map<std::string, std::string> &context) override;
+                   const std::map<std::string, std::string> &carrier) override;
 
  private:
   ClientPool<ThriftClient<PostStorageServiceClient>> *_post_storage_client_pool;
@@ -60,40 +59,32 @@ class ComposePostHandler : public ComposePostServiceIf {
   ClientPool<ThriftClient<TextServiceClient>> *_text_service_client_pool;
   ClientPool<ThriftClient<HomeTimelineServiceClient>>
       *_home_timeline_client_pool;
-  json *_config_json;
 
   void _UploadUserTimelineHelper(
       int64_t req_id, int64_t post_id, int64_t user_id, int64_t timestamp,
-      const std::map<std::string, std::string> &carrier,
-      const std::map<std::string, std::string> &context);
+      const std::map<std::string, std::string> &carrier);
 
   void _UploadPostHelper(int64_t req_id, const Post &post,
-                         const std::map<std::string, std::string> &carrier,
-                         const std::map<std::string, std::string> &context);
+                         const std::map<std::string, std::string> &carrier);
 
   void _UploadHomeTimelineHelper(
       int64_t req_id, int64_t post_id, int64_t user_id, int64_t timestamp,
       const std::vector<int64_t> &user_mentions_id,
-      const std::map<std::string, std::string> &carrier,
-      const std::map<std::string, std::string> &context);
+      const std::map<std::string, std::string> &carrier);
 
   Creator _ComposeCreaterHelper(
       int64_t req_id, int64_t user_id, const std::string &username,
-      const std::map<std::string, std::string> &carrier,
-      const std::map<std::string, std::string> &context);
+      const std::map<std::string, std::string> &carrier, int a);
   TextServiceReturn _ComposeTextHelper(
       int64_t req_id, const std::string &text,
-      const std::map<std::string, std::string> &carrier,
-      const std::map<std::string, std::string> &context);
+      const std::map<std::string, std::string> &carrier, int a);
   std::vector<Media> _ComposeMediaHelper(
       int64_t req_id, const std::vector<std::string> &media_types,
       const std::vector<int64_t> &media_ids,
-      const std::map<std::string, std::string> &carrier,
-      const std::map<std::string, std::string> &context);
+      const std::map<std::string, std::string> &carrier, int a);
   int64_t _ComposeUniqueIdHelper(
       int64_t req_id, PostType::type post_type,
-      const std::map<std::string, std::string> &carrier,
-      const std::map<std::string, std::string> &context);
+      const std::map<std::string, std::string> &carrier, int a);
 };
 
 ComposePostHandler::ComposePostHandler(
@@ -107,8 +98,7 @@ ComposePostHandler::ComposePostHandler(
     ClientPool<ThriftClient<MediaServiceClient>> *media_service_client_pool,
     ClientPool<ThriftClient<TextServiceClient>> *text_service_client_pool,
     ClientPool<ThriftClient<HomeTimelineServiceClient>>
-        *home_timeline_client_pool,
-    json *config_json) {
+        *home_timeline_client_pool) {
   _post_storage_client_pool = post_storage_client_pool;
   _user_timeline_client_pool = user_timeline_client_pool;
   _user_service_client_pool = user_service_client_pool;
@@ -116,28 +106,40 @@ ComposePostHandler::ComposePostHandler(
   _media_service_client_pool = media_service_client_pool;
   _text_service_client_pool = text_service_client_pool;
   _home_timeline_client_pool = home_timeline_client_pool;
-  _config_json = config_json;
 }
 
 Creator ComposePostHandler::_ComposeCreaterHelper(
     int64_t req_id, int64_t user_id, const std::string &username,
-    const std::map<std::string, std::string> &carrier,
-    const std::map<std::string, std::string> &context) {
+    const std::map<std::string, std::string> &carrier, int a) {
+
+#ifdef TRACING_COMPOSE
+  struct timespec ts;
+  clock_gettime(CLOCK_MONOTONIC, &ts);
+  uint64_t t = ts.tv_sec*1000*1000*1000 + ts.tv_nsec;
+  auto tid = syscall(__NR_gettid);
   TextMapReader reader(carrier);
   auto parent_span = opentracing::Tracer::Global()->Extract(reader);
   auto span = opentracing::Tracer::Global()->StartSpan(
-      "compose_creator_client", {opentracing::ChildOf(parent_span->get())});
+      "compose_creator_client",
+      {opentracing::ChildOf(parent_span->get()),
+      opentracing::SetTag{"time", t},
+      opentracing::SetTag{"tid", tid}});
   std::map<std::string, std::string> writer_text_map;
   TextMapWriter writer(writer_text_map);
   opentracing::Tracer::Global()->Inject(span->context(), writer);
+#else
+  std::map<std::string, std::string> writer_text_map;
+#endif
 
   auto user_client_wrapper = _user_service_client_pool->Pop();
   if (!user_client_wrapper) {
     ServiceException se;
     se.errorCode = ErrorCode::SE_THRIFT_CONN_ERROR;
     se.message = "Failed to connect to user-service";
-    LOG(error) << se.message;
+    LOG(error) << se.message << a;
+#ifdef TRACING_COMPOSE
     span->Finish();
+#endif
     throw se;
   }
 
@@ -145,77 +147,109 @@ Creator ComposePostHandler::_ComposeCreaterHelper(
   Creator _return_creator;
   try {
     user_client->ComposeCreatorWithUserId(_return_creator, req_id, user_id,
-                                          username, writer_text_map, context);
+                                          username, writer_text_map);
   } catch (...) {
     LOG(error) << "Failed to send compose-creator to user-service";
     _user_service_client_pool->Remove(user_client_wrapper);
+#ifdef TRACING_COMPOSE
     span->Finish();
+#endif
     throw;
   }
   _user_service_client_pool->Keepalive(user_client_wrapper);
+#ifdef TRACING_COMPOSE
   span->Finish();
+#endif
   return _return_creator;
 }
 
 TextServiceReturn ComposePostHandler::_ComposeTextHelper(
     int64_t req_id, const std::string &text,
-    const std::map<std::string, std::string> &carrier,
-    const std::map<std::string, std::string> &context) {
+    const std::map<std::string, std::string> &carrier, int a) {
+#ifdef TRACING_COMPOSE
+  struct timespec ts;
+  clock_gettime(CLOCK_MONOTONIC, &ts);
+  uint64_t t = ts.tv_sec*1000*1000*1000 + ts.tv_nsec;
+  auto tid = syscall(__NR_gettid);
   TextMapReader reader(carrier);
   auto parent_span = opentracing::Tracer::Global()->Extract(reader);
   auto span = opentracing::Tracer::Global()->StartSpan(
-      "compose_text_client", {opentracing::ChildOf(parent_span->get())});
+      "compose_text_client",
+      {opentracing::ChildOf(parent_span->get()),
+      opentracing::SetTag{"time", t},
+      opentracing::SetTag{"tid", tid}});
   std::map<std::string, std::string> writer_text_map;
   TextMapWriter writer(writer_text_map);
   opentracing::Tracer::Global()->Inject(span->context(), writer);
+#else
+  std::map<std::string, std::string> writer_text_map;
+#endif
 
   auto text_client_wrapper = _text_service_client_pool->Pop();
   if (!text_client_wrapper) {
     ServiceException se;
     se.errorCode = ErrorCode::SE_THRIFT_CONN_ERROR;
     se.message = "Failed to connect to text-service";
-    LOG(error) << se.message;
+    LOG(error) << se.message << a;
     ;
+#ifdef TRACING_COMPOSE
     span->Finish();
+#endif
     throw se;
   }
 
   auto text_client = text_client_wrapper->GetClient();
   TextServiceReturn _return_text;
   try {
-    text_client->ComposeText(_return_text, req_id, text, writer_text_map, context);
+    text_client->ComposeText(_return_text, req_id, text, writer_text_map);
   } catch (...) {
     LOG(error) << "Failed to send compose-text to text-service";
     _text_service_client_pool->Remove(text_client_wrapper);
+#ifdef TRACING_COMPOSE
     span->Finish();
+#endif
     throw;
   }
   _text_service_client_pool->Keepalive(text_client_wrapper);
+#ifdef TRACING_COMPOSE
   span->Finish();
+#endif
   return _return_text;
 }
 
 std::vector<Media> ComposePostHandler::_ComposeMediaHelper(
     int64_t req_id, const std::vector<std::string> &media_types,
     const std::vector<int64_t> &media_ids,
-    const std::map<std::string, std::string> &carrier,
-    const std::map<std::string, std::string> &context) {
+    const std::map<std::string, std::string> &carrier, int a) {
+#ifdef TRACING_COMPOSE
+  struct timespec ts;
+  clock_gettime(CLOCK_MONOTONIC, &ts);
+  uint64_t t = ts.tv_sec*1000*1000*1000 + ts.tv_nsec;
+  auto tid = syscall(__NR_gettid);
   TextMapReader reader(carrier);
   auto parent_span = opentracing::Tracer::Global()->Extract(reader);
   auto span = opentracing::Tracer::Global()->StartSpan(
-      "compose_media_client", {opentracing::ChildOf(parent_span->get())});
+      "compose_media_client",
+      {opentracing::ChildOf(parent_span->get()),
+      opentracing::SetTag{"time", t},
+      opentracing::SetTag{"tid", tid}});
   std::map<std::string, std::string> writer_text_map;
   TextMapWriter writer(writer_text_map);
   opentracing::Tracer::Global()->Inject(span->context(), writer);
+#else
+  std::map<std::string, std::string> writer_text_map;
+#endif
 
   auto media_client_wrapper = _media_service_client_pool->Pop();
   if (!media_client_wrapper) {
     ServiceException se;
     se.errorCode = ErrorCode::SE_THRIFT_CONN_ERROR;
     se.message = "Failed to connect to media-service";
-    LOG(error) << se.message;
+    LOG(error) << se.message << a;
     ;
+#ifdef TRACING_COMPOSE
     span->Finish();
+#endif
     throw se;
   }
 
@@ -223,37 +257,53 @@ std::vector<Media> ComposePostHandler::_ComposeMediaHelper(
   std::vector<Media> _return_media;
   try {
     media_client->ComposeMedia(_return_media, req_id, media_types, media_ids,
-                               writer_text_map, context);
+                               writer_text_map);
   } catch (...) {
     LOG(error) << "Failed to send compose-media to media-service";
     _media_service_client_pool->Remove(media_client_wrapper);
+#ifdef TRACING_COMPOSE
     span->Finish();
+#endif
     throw;
   }
   _media_service_client_pool->Keepalive(media_client_wrapper);
+#ifdef TRACING_COMPOSE
   span->Finish();
+#endif
   return _return_media;
 }
 
 int64_t ComposePostHandler::_ComposeUniqueIdHelper(
     int64_t req_id, const PostType::type post_type,
-    const std::map<std::string, std::string> &carrier,
-    const std::map<std::string, std::string> &context) {
+    const std::map<std::string, std::string> &carrier, int a) {
+#ifdef TRACING_COMPOSE
+  struct timespec ts;
+  clock_gettime(CLOCK_MONOTONIC, &ts);
+  uint64_t t = ts.tv_sec*1000*1000*1000 + ts.tv_nsec;
+  auto tid = syscall(__NR_gettid);
   TextMapReader reader(carrier);
   auto parent_span = opentracing::Tracer::Global()->Extract(reader);
   auto span = opentracing::Tracer::Global()->StartSpan(
-      "compose_unique_id_client", {opentracing::ChildOf(parent_span->get())});
+      "compose_unique_id_client",
+      {opentracing::ChildOf(parent_span->get()),
+      opentracing::SetTag{"time", t},
+      opentracing::SetTag{"tid", tid}});
   std::map<std::string, std::string> writer_text_map;
   TextMapWriter writer(writer_text_map);
   opentracing::Tracer::Global()->Inject(span->context(), writer);
+#else
+  std::map<std::string, std::string> writer_text_map;
+#endif
 
   auto unique_id_client_wrapper = _unique_id_service_client_pool->Pop();
   if (!unique_id_client_wrapper) {
     ServiceException se;
     se.errorCode = ErrorCode::SE_THRIFT_CONN_ERROR;
     se.message = "Failed to connect to unique_id-service";
-    LOG(error) << se.message;
+    LOG(error) << se.message << a;
+#ifdef TRACING_COMPOSE
     span->Finish();
+#endif
     throw se;
   }
 
@@ -261,29 +311,43 @@ int64_t ComposePostHandler::_ComposeUniqueIdHelper(
   int64_t _return_unique_id;
   try {
     _return_unique_id =
-        unique_id_client->ComposeUniqueId(req_id, post_type, writer_text_map, context);
+        unique_id_client->ComposeUniqueId(req_id, post_type, writer_text_map);
   } catch (...) {
     LOG(error) << "Failed to send compose-unique_id to unique_id-service";
     _unique_id_service_client_pool->Remove(unique_id_client_wrapper);
+#ifdef TRACING_COMPOSE
     span->Finish();
+#endif
     throw;
   }
   _unique_id_service_client_pool->Keepalive(unique_id_client_wrapper);
+#ifdef TRACING_COMPOSE
   span->Finish();
+#endif
   return _return_unique_id;
 }
 
 void ComposePostHandler::_UploadPostHelper(
     int64_t req_id, const Post &post,
-    const std::map<std::string, std::string> &carrier,
-    const std::map<std::string, std::string> &context) {
+    const std::map<std::string, std::string> &carrier) {
+#ifdef TRACING_COMPOSE
+  struct timespec ts;
+  clock_gettime(CLOCK_MONOTONIC, &ts);
+  uint64_t t = ts.tv_sec*1000*1000*1000 + ts.tv_nsec;
+  auto tid = syscall(__NR_gettid);
   TextMapReader reader(carrier);
   auto parent_span = opentracing::Tracer::Global()->Extract(reader);
   auto span = opentracing::Tracer::Global()->StartSpan(
-      "store_post_client", {opentracing::ChildOf(parent_span->get())});
+      "store_post_client",
+      {opentracing::ChildOf(parent_span->get()),
+      opentracing::SetTag{"time", t},
+      opentracing::SetTag{"tid", tid}});
   std::map<std::string, std::string> writer_text_map;
   TextMapWriter writer(writer_text_map);
   opentracing::Tracer::Global()->Inject(span->context(), writer);
+#else
+  std::map<std::string, std::string> writer_text_map;
+#endif
 
   auto post_storage_client_wrapper = _post_storage_client_pool->Pop();
   if (!post_storage_client_wrapper) {
@@ -291,33 +355,50 @@ void ComposePostHandler::_UploadPostHelper(
     se.errorCode = ErrorCode::SE_THRIFT_CONN_ERROR;
     se.message = "Failed to connect to post-storage-service";
     LOG(error) << se.message;
-    ;
+#ifdef TRACING_COMPOSE
+    span->Finish();
+#endif
     throw se;
   }
   auto post_storage_client = post_storage_client_wrapper->GetClient();
   try {
-    post_storage_client->StorePost(req_id, post, writer_text_map, context);
+    post_storage_client->StorePost(req_id, post, writer_text_map);
   } catch (...) {
     _post_storage_client_pool->Remove(post_storage_client_wrapper);
     LOG(error) << "Failed to store post to post-storage-service";
+#ifdef TRACING_COMPOSE
+    span->Finish();
+#endif
     throw;
   }
   _post_storage_client_pool->Keepalive(post_storage_client_wrapper);
 
+#ifdef TRACING_COMPOSE
   span->Finish();
+#endif
 }
 
 void ComposePostHandler::_UploadUserTimelineHelper(
     int64_t req_id, int64_t post_id, int64_t user_id, int64_t timestamp,
-    const std::map<std::string, std::string> &carrier,
-    const std::map<std::string, std::string> &context) {
+    const std::map<std::string, std::string> &carrier) {
+#ifdef TRACING_COMPOSE
+  struct timespec ts;
+  clock_gettime(CLOCK_MONOTONIC, &ts);
+  uint64_t t = ts.tv_sec*1000*1000*1000 + ts.tv_nsec;
+  auto tid = syscall(__NR_gettid);
   TextMapReader reader(carrier);
   auto parent_span = opentracing::Tracer::Global()->Extract(reader);
   auto span = opentracing::Tracer::Global()->StartSpan(
-      "write_user_timeline_client", {opentracing::ChildOf(parent_span->get())});
+      "write_user_timeline_client",
+      {opentracing::ChildOf(parent_span->get()),
+      opentracing::SetTag{"time", t},
+      opentracing::SetTag{"tid", tid}});
   std::map<std::string, std::string> writer_text_map;
   TextMapWriter writer(writer_text_map);
   opentracing::Tracer::Global()->Inject(span->context(), writer);
+#else
+  std::map<std::string, std::string> writer_text_map;
+#endif
 
   auto user_timeline_client_wrapper = _user_timeline_client_pool->Pop();
   if (!user_timeline_client_wrapper) {
@@ -331,28 +412,40 @@ void ComposePostHandler::_UploadUserTimelineHelper(
   auto user_timeline_client = user_timeline_client_wrapper->GetClient();
   try {
     user_timeline_client->WriteUserTimeline(req_id, post_id, user_id, timestamp,
-                                            writer_text_map, context);
+                                            writer_text_map);
   } catch (...) {
     _user_timeline_client_pool->Remove(user_timeline_client_wrapper);
     throw;
   }
   _user_timeline_client_pool->Keepalive(user_timeline_client_wrapper);
 
+#ifdef TRACING_COMPOSE
   span->Finish();
+#endif
 }
 
 void ComposePostHandler::_UploadHomeTimelineHelper(
     int64_t req_id, int64_t post_id, int64_t user_id, int64_t timestamp,
     const std::vector<int64_t> &user_mentions_id,
-    const std::map<std::string, std::string> &carrier,
-    const std::map<std::string, std::string> &context) {
+    const std::map<std::string, std::string> &carrier) {
+#ifdef TRACING_COMPOSE
+  struct timespec ts;
+  clock_gettime(CLOCK_MONOTONIC, &ts);
+  uint64_t t = ts.tv_sec*1000*1000*1000 + ts.tv_nsec;
+  auto tid = syscall(__NR_gettid);
   TextMapReader reader(carrier);
   auto parent_span = opentracing::Tracer::Global()->Extract(reader);
   auto span = opentracing::Tracer::Global()->StartSpan(
-      "write_home_timeline_client", {opentracing::ChildOf(parent_span->get())});
+      "write_home_timeline_client",
+      {opentracing::ChildOf(parent_span->get()),
+      opentracing::SetTag{"time", t},
+      opentracing::SetTag{"tid", tid}});
   std::map<std::string, std::string> writer_text_map;
   TextMapWriter writer(writer_text_map);
   opentracing::Tracer::Global()->Inject(span->context(), writer);
+#else
+  std::map<std::string, std::string> writer_text_map;
+#endif
 
   auto home_timeline_client_wrapper = _home_timeline_client_pool->Pop();
   if (!home_timeline_client_wrapper) {
@@ -366,7 +459,7 @@ void ComposePostHandler::_UploadHomeTimelineHelper(
   auto home_timeline_client = home_timeline_client_wrapper->GetClient();
   try {
     home_timeline_client->WriteHomeTimeline(req_id, post_id, user_id, timestamp,
-                                            user_mentions_id, writer_text_map, context);
+                                            user_mentions_id, writer_text_map);
   } catch (...) {
     _home_timeline_client_pool->Remove(home_timeline_client_wrapper);
     LOG(error) << "Failed to write home timeline to home-timeline-service";
@@ -374,40 +467,111 @@ void ComposePostHandler::_UploadHomeTimelineHelper(
   }
   _home_timeline_client_pool->Keepalive(home_timeline_client_wrapper);
 
+#ifdef TRACING_COMPOSE
   span->Finish();
+#endif
+}
+
+__attribute__((noinline)) int myfoo(int tid, int idx) {
+  asm volatile ("");
+    return tid+idx;
 }
 
 void ComposePostHandler::ComposePost(
     const int64_t req_id, const std::string &username, int64_t user_id,
     const std::string &text, const std::vector<int64_t> &media_ids,
     const std::vector<std::string> &media_types, const PostType::type post_type,
-    const std::map<std::string, std::string> &carrier,
-    const std::map<std::string, std::string> &context) {
+    const std::map<std::string, std::string> &carrier) {
+#ifdef TRACING_COMPOSE
   TextMapReader reader(carrier);
   auto parent_span = opentracing::Tracer::Global()->Extract(reader);
+  struct timespec ts;
+  clock_gettime(CLOCK_MONOTONIC, &ts);
+  uint64_t t = ts.tv_sec*1000*1000*1000 + ts.tv_nsec;
+  auto tid = syscall(__NR_gettid);
   auto span = opentracing::Tracer::Global()->StartSpan(
-      "compose_post_server", {opentracing::ChildOf(parent_span->get())});
+      "compose_post_server",
+      {opentracing::ChildOf(parent_span->get()),
+      opentracing::SetTag{"time", t},
+      opentracing::SetTag{"tid", tid}});
   std::map<std::string, std::string> writer_text_map;
   TextMapWriter writer(writer_text_map);
   opentracing::Tracer::Global()->Inject(span->context(), writer);
-  
-  auto new_context = context;
-  std::string sched_time_next = "0";
-  std::string sched_time_remaining = "0";
-  new_context["sched-time-next"] = sched_time_next;
-  new_context["sched-time-remaining"] = sched_time_remaining;
+#else
+  std::map<std::string, std::string> writer_text_map;
+#endif
+  auto tid = syscall(__NR_gettid);
+  auto a = myfoo(tid, 0);
   auto text_future =
       std::async(std::launch::async, &ComposePostHandler::_ComposeTextHelper,
-                 this, req_id, text, writer_text_map, new_context);
+                 this, req_id, text, writer_text_map, a);
+  myfoo(tid, 1);
+
+#ifdef TRACING_COMPOSE
+  TextMapReader reader_1(writer_text_map);
+  auto parent_span_1 = opentracing::Tracer::Global()->Extract(reader_1);
+  clock_gettime(CLOCK_MONOTONIC, &ts);
+  t = ts.tv_sec*1000*1000*1000 + ts.tv_nsec;
+  auto span_1 = opentracing::Tracer::Global()->StartSpan(
+      "async_creater",
+      {opentracing::ChildOf(parent_span_1->get()),
+      opentracing::SetTag{"time", t}});
+  std::map<std::string, std::string> writer_text_map_1;
+  TextMapWriter writer_1(writer_text_map_1);
+  opentracing::Tracer::Global()->Inject(span->context(), writer_1);
+#endif
+  a = myfoo(tid, 2);
   auto creator_future =
       std::async(std::launch::async, &ComposePostHandler::_ComposeCreaterHelper,
-                 this, req_id, user_id, username, writer_text_map, new_context);
+                 this, req_id, user_id, username, writer_text_map, a);
+  myfoo(tid, 3);
+#ifdef TRACING_COMPOSE
+  span_1->Finish();
+#endif
+
+#ifdef TRACING_COMPOSE
+  TextMapReader reader_2(writer_text_map);
+  auto parent_span_2 = opentracing::Tracer::Global()->Extract(reader_2);
+  clock_gettime(CLOCK_MONOTONIC, &ts);
+  t = ts.tv_sec*1000*1000*1000 + ts.tv_nsec;
+  auto span_2 = opentracing::Tracer::Global()->StartSpan(
+      "async_media",
+      {opentracing::ChildOf(parent_span_2->get()),
+      opentracing::SetTag{"time", t}});
+  std::map<std::string, std::string> writer_text_map_2;
+  TextMapWriter writer_2(writer_text_map_2);
+  opentracing::Tracer::Global()->Inject(span->context(), writer_2);
+#endif
+  a = myfoo(tid, 4);
   auto media_future =
       std::async(std::launch::async, &ComposePostHandler::_ComposeMediaHelper,
-                 this, req_id, media_types, media_ids, writer_text_map, new_context);
+                 this, req_id, media_types, media_ids, writer_text_map, a);
+  myfoo(tid, 5);
+#ifdef TRACING_COMPOSE
+  span_2->Finish();
+#endif
+
+#ifdef TRACING_COMPOSE
+  TextMapReader reader_3(writer_text_map);
+  auto parent_span_3 = opentracing::Tracer::Global()->Extract(reader_3);
+  clock_gettime(CLOCK_MONOTONIC, &ts);
+  t = ts.tv_sec*1000*1000*1000 + ts.tv_nsec;
+  auto span_3 = opentracing::Tracer::Global()->StartSpan(
+      "async_unique_id",
+      {opentracing::ChildOf(parent_span_3->get()),
+      opentracing::SetTag{"time", t}});
+  std::map<std::string, std::string> writer_text_map_3;
+  TextMapWriter writer_3(writer_text_map_3);
+  opentracing::Tracer::Global()->Inject(span->context(), writer_3);
+#endif
+  a = myfoo(tid, 6);
   auto unique_id_future = std::async(
       std::launch::async, &ComposePostHandler::_ComposeUniqueIdHelper, this,
-      req_id, post_type, writer_text_map, new_context);
+      req_id, post_type, writer_text_map, a);
+  myfoo(tid, 7);
+#ifdef TRACING_COMPOSE
+  span_3->Finish();
+#endif
 
   Post post;
   auto timestamp =
@@ -417,10 +581,71 @@ void ComposePostHandler::ComposePost(
 
   // try
   // {
+
+#ifdef TRACING_COMPOSE
+  TextMapReader reader_7(writer_text_map);
+  auto parent_span_7 = opentracing::Tracer::Global()->Extract(reader_7);
+  auto span_7 = opentracing::Tracer::Global()->StartSpan(
+      "async_unique_id_get",
+      {opentracing::ChildOf(parent_span_7->get()),
+      });
+  std::map<std::string, std::string> writer_text_map_7;
+  TextMapWriter writer_7(writer_text_map_7);
+  opentracing::Tracer::Global()->Inject(span->context(), writer_7);
+#endif
   post.post_id = unique_id_future.get();
+#ifdef TRACING_COMPOSE
+  span_7->Finish();
+#endif
+
+#ifdef TRACING_COMPOSE
+  TextMapReader reader_8(writer_text_map);
+  auto parent_span_8 = opentracing::Tracer::Global()->Extract(reader_8);
+  auto span_8 = opentracing::Tracer::Global()->StartSpan(
+      "async_creator_get",
+      {opentracing::ChildOf(parent_span_8->get()),
+      });
+  std::map<std::string, std::string> writer_text_map_8;
+  TextMapWriter writer_8(writer_text_map_8);
+  opentracing::Tracer::Global()->Inject(span->context(), writer_8);
+#endif
   post.creator = creator_future.get();
+#ifdef TRACING_COMPOSE
+  span_8->Finish();
+#endif
+
+#ifdef TRACING_COMPOSE
+  TextMapReader reader_9(writer_text_map);
+  auto parent_span_9 = opentracing::Tracer::Global()->Extract(reader_9);
+  auto span_9 = opentracing::Tracer::Global()->StartSpan(
+      "async_media_get",
+      {opentracing::ChildOf(parent_span_9->get()),
+      });
+  std::map<std::string, std::string> writer_text_map_9;
+  TextMapWriter writer_9(writer_text_map_9);
+  opentracing::Tracer::Global()->Inject(span->context(), writer_9);
+#endif
   post.media = media_future.get();
+#ifdef TRACING_COMPOSE
+  span_9->Finish();
+#endif
+
+#ifdef TRACING_COMPOSE
+  TextMapReader reader_10(writer_text_map);
+  auto parent_span_10 = opentracing::Tracer::Global()->Extract(reader_10);
+  auto span_10 = opentracing::Tracer::Global()->StartSpan(
+      "async_text_get",
+      {opentracing::ChildOf(parent_span_10->get()),
+      });
+  std::map<std::string, std::string> writer_text_map_10;
+  TextMapWriter writer_10(writer_text_map_10);
+  opentracing::Tracer::Global()->Inject(span->context(), writer_10);
+#endif
   auto text_return = text_future.get();
+#ifdef TRACING_COMPOSE
+  span_10->Finish();
+#endif
+
   post.text = text_return.text;
   post.urls = text_return.urls;
   post.user_mentions = text_return.user_mentions;
@@ -441,16 +666,66 @@ void ComposePostHandler::ComposePost(
   //Before _UploadUserTimelineHelper and _UploadHomeTimelineHelper.
   //Change _UploadUserTimelineHelper and _UploadHomeTimelineHelper to deferred.
   //To let them start execute after post_future.get() return.
-  auto post_future =
-      std::async(std::launch::async, &ComposePostHandler::_UploadPostHelper,
-                 this, req_id, post, writer_text_map, new_context);
+#ifdef TRACING_COMPOSE
+  TextMapReader reader_4(writer_text_map);
+  auto parent_span_4 = opentracing::Tracer::Global()->Extract(reader_4);
+  clock_gettime(CLOCK_MONOTONIC, &ts);
+  t = ts.tv_sec*1000*1000*1000 + ts.tv_nsec;
+  auto span_4 = opentracing::Tracer::Global()->StartSpan(
+      "async_upload_post",
+      {opentracing::ChildOf(parent_span_4->get()),
+      opentracing::SetTag{"time", t}});
+  std::map<std::string, std::string> writer_text_map_4;
+  TextMapWriter writer_4(writer_text_map_4);
+  opentracing::Tracer::Global()->Inject(span->context(), writer_4);
+#endif
+  auto post_future = std::async(
+      std::launch::async, &ComposePostHandler::_UploadPostHelper, this,
+      req_id, post, writer_text_map);
+#ifdef TRACING_COMPOSE
+  span_4->Finish();
+#endif
+
+#ifdef TRACING_COMPOSE
+  TextMapReader reader_5(writer_text_map);
+  auto parent_span_5 = opentracing::Tracer::Global()->Extract(reader_5);
+  clock_gettime(CLOCK_MONOTONIC, &ts);
+  t = ts.tv_sec*1000*1000*1000 + ts.tv_nsec;
+  auto span_5 = opentracing::Tracer::Global()->StartSpan(
+      "async_user_timeline",
+      {opentracing::ChildOf(parent_span_5->get()),
+      opentracing::SetTag{"time", t}});
+  std::map<std::string, std::string> writer_text_map_5;
+  TextMapWriter writer_5(writer_text_map_5);
+  opentracing::Tracer::Global()->Inject(span->context(), writer_5);
+#endif
   auto user_timeline_future = std::async(
       std::launch::deferred, &ComposePostHandler::_UploadUserTimelineHelper, this,
-      req_id, post.post_id, user_id, timestamp, writer_text_map, new_context);
+      req_id, post.post_id, user_id, timestamp, writer_text_map);
+#ifdef TRACING_COMPOSE
+  span_5->Finish();
+#endif
+
+#ifdef TRACING_COMPOSE
+  TextMapReader reader_6(writer_text_map);
+  auto parent_span_6 = opentracing::Tracer::Global()->Extract(reader_6);
+  clock_gettime(CLOCK_MONOTONIC, &ts);
+  t = ts.tv_sec*1000*1000*1000 + ts.tv_nsec;
+  auto span_6 = opentracing::Tracer::Global()->StartSpan(
+      "async_user_timeline",
+      {opentracing::ChildOf(parent_span_6->get()),
+      opentracing::SetTag{"time", t}});
+  std::map<std::string, std::string> writer_text_map_6;
+  TextMapWriter writer_6(writer_text_map_6);
+  opentracing::Tracer::Global()->Inject(span->context(), writer_6);
+#endif
   auto home_timeline_future = std::async(
       std::launch::deferred, &ComposePostHandler::_UploadHomeTimelineHelper, this,
       req_id, post.post_id, user_id, timestamp, user_mention_ids,
-      writer_text_map, new_context);
+      writer_text_map);
+#ifdef TRACING_COMPOSE
+  span_6->Finish();
+#endif
 
   // try
   // {
@@ -462,7 +737,9 @@ void ComposePostHandler::ComposePost(
   // {
   //   throw;
   // }
+#ifdef TRACING_COMPOSE
   span->Finish();
+#endif
 }
 
 }  // namespace social_network

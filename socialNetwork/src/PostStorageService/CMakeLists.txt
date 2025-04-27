@@ -23,6 +23,7 @@ target_link_libraries(
     Boost::log
     Boost::log_setup
     jaegertracing
+    -lrt
 )
 
 install(TARGETS PostStorageService DESTINATION ./)

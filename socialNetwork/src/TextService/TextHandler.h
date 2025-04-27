@@ -19,28 +19,34 @@ namespace social_network {
 class TextHandler : public TextServiceIf {
  public:
   TextHandler(ClientPool<ThriftClient<UrlShortenServiceClient>> *,
-              ClientPool<ThriftClient<UserMentionServiceClient>> *);
+              ClientPool<ThriftClient<UserMentionServiceClient>> *,
+              json *);
   ~TextHandler() override = default;
 
   void ComposeText(TextServiceReturn &_return, int64_t, const std::string &,
+                   const std::map<std::string, std::string> &,
                    const std::map<std::string, std::string> &) override;
 
  private:
   ClientPool<ThriftClient<UrlShortenServiceClient>> *_url_client_pool;
   ClientPool<ThriftClient<UserMentionServiceClient>> *_user_mention_client_pool;
+  json *_config_json;
 };
 
 TextHandler::TextHandler(
     ClientPool<ThriftClient<UrlShortenServiceClient>> *url_client_pool,
     ClientPool<ThriftClient<UserMentionServiceClient>>
-        *user_mention_client_pool) {
+        *user_mention_client_pool,
+    json *config_json) {
   _url_client_pool = url_client_pool;
   _user_mention_client_pool = user_mention_client_pool;
+  _config_json = config_json;
 }
 
 void TextHandler::ComposeText(
     TextServiceReturn &_return, int64_t req_id, const std::string &text,
-    const std::map<std::string, std::string> &carrier) {
+    const std::map<std::string, std::string> &carrier,
+    const std::map<std::string, std::string> &context) {
   // Initialize a span
   TextMapReader reader(carrier);
   std::map<std::string, std::string> writer_text_map;
@@ -50,6 +56,11 @@ void TextHandler::ComposeText(
       "compose_text_server", {opentracing::ChildOf(parent_span->get())});
   opentracing::Tracer::Global()->Inject(span->context(), writer);
 
+  auto new_context = context;
+  std::string sched_time_next = "0";
+  std::string sched_time_remaining = "0";
+  new_context["sched-time-next"] = sched_time_next;
+  new_context["sched-time-remaining"] = sched_time_remaining;
   std::vector<std::string> mention_usernames;
   std::smatch m;
   std::regex e("@[a-zA-Z0-9-_]+");
@@ -71,8 +82,10 @@ void TextHandler::ComposeText(
   }
 
   auto shortened_urls_future = std::async(std::launch::async, [&]() {
+    TextMapReader reader(writer_text_map);
+    auto parent_span = opentracing::Tracer::Global()->Extract(reader);
     auto url_span = opentracing::Tracer::Global()->StartSpan(
-        "compose_urls_client", {opentracing::ChildOf(&span->context())});
+        "compose_urls_client", {opentracing::ChildOf(parent_span->get())});
 
     std::map<std::string, std::string> url_writer_text_map;
     TextMapWriter url_writer(url_writer_text_map);
@@ -88,7 +101,7 @@ void TextHandler::ComposeText(
     std::vector<Url> _return_urls;
     auto url_client = url_client_wrapper->GetClient();
     try {
-      url_client->ComposeUrls(_return_urls, req_id, urls, url_writer_text_map);
+      url_client->ComposeUrls(_return_urls, req_id, urls, url_writer_text_map, new_context);
     } catch (...) {
       LOG(error) << "Failed to upload urls to url-shorten-service";
       _url_client_pool->Remove(url_client_wrapper);
@@ -99,9 +112,11 @@ void TextHandler::ComposeText(
   });
 
   auto user_mention_future = std::async(std::launch::async, [&]() {
+    TextMapReader reader(writer_text_map);
+    auto parent_span = opentracing::Tracer::Global()->Extract(reader);
     auto user_mention_span = opentracing::Tracer::Global()->StartSpan(
         "compose_user_mentions_client",
-        {opentracing::ChildOf(&span->context())});
+        {opentracing::ChildOf(parent_span->get())});
 
     std::map<std::string, std::string> user_mention_writer_text_map;
     TextMapWriter user_mention_writer(user_mention_writer_text_map);
@@ -120,7 +135,7 @@ void TextHandler::ComposeText(
     try {
       user_mention_client->ComposeUserMentions(_return_user_mentions, req_id,
                                                mention_usernames,
-                                               user_mention_writer_text_map);
+                                               user_mention_writer_text_map, new_context);
     } catch (...) {
       LOG(error) << "Failed to upload user_mentions to user-mention-service";
       _user_mention_client_pool->Remove(user_mention_client_wrapper);
