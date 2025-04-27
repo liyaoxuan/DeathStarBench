@@ -1434,3 +1434,7 @@ function InsertUser_result:write(oprot)
   oprot:writeFieldStop()
   oprot:writeStructEnd()
 end
+
+return {
+  SocialGraphServiceClient = SocialGraphServiceClient
+}

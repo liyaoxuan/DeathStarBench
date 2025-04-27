@@ -498,3 +498,7 @@ function ReadUserTimeline_result:write(oprot)
   oprot:writeFieldStop()
   oprot:writeStructEnd()
 end
+
+return {
+  UserTimelineServiceClient = UserTimelineServiceClient
+}

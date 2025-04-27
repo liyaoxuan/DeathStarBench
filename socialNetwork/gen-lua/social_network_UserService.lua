@@ -1336,3 +1336,7 @@ function GetUserId_result:write(oprot)
   oprot:writeFieldStop()
   oprot:writeStructEnd()
 end
+
+return {
+  UserServiceClient=UserServiceClient
+}
