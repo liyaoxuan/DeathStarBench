@@ -82,17 +82,22 @@ function _M.ReadHomeTimeline()
   local context = {}
   local enable = 0
   local sla = 10000000
+  local reqid = 0
   if (not _StrIsEmpty(args.enable)) then
     enable = tonumber(args.enable)
   end
   if (not _StrIsEmpty(args.sla)) then
     sla = tonumber(args.sla)
   end
+  if (not _StrIsEmpty(args.reqid)) then
+    reqid = tonumber(args.reqid)
+  end
   context["sched-enable"] = enable
   context["sched-sla"] = sla
   context["sched-time-next"] = 0
   context["sched-time-remaining"] = 0
   context["sched-time-start"] = math.floor(socket.gettime() * 1000)
+  context["req-id"] = reqid
 
 
   local client = GenericObjectPool:connection(
