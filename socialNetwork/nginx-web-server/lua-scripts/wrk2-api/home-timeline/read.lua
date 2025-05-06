@@ -4,6 +4,25 @@ if (k8s_suffix == nil) then
   k8s_suffix = ""
 end
 
+-- local socket = require "socket"
+local ffi = require("ffi")
+
+-- 定义系统调用
+ffi.cdef[[
+    typedef struct timespec {
+        long tv_sec;
+        long tv_nsec;
+    } timespec;
+    int clock_gettime(int clockid, struct timespec *tp);
+]]
+
+-- 获取毫秒级时间戳
+local function get_time_ns()
+    local tv = ffi.new("timespec")
+    ffi.C.clock_gettime(1, tv)
+    return tonumber(tv.tv_sec) * 1000000000 + tonumber(tv.tv_nsec)
+end
+
 local function _StrIsEmpty(s)
   return s == nil or s == ''
 end
@@ -77,25 +96,6 @@ function _M.ReadHomeTimeline()
 
   local carrier = {}
   tracer:text_map_inject(span:context(), carrier)
-
-  -- local socket = require "socket"
-  local ffi = require("ffi")
-
-  -- 定义系统调用
-  ffi.cdef[[
-      typedef struct timespec {
-          long tv_sec;
-          long tv_nsec;
-      } timespec;
-      int clock_gettime(int clockid, struct timespec *tp);
-  ]]
-
-  -- 获取毫秒级时间戳
-  local function get_time_ns()
-      local tv = ffi.new("timespec")
-      ffi.C.clock_gettime(1, tv)
-      return tonumber(tv.tv_sec) * 1000000000 + tonumber(tv.tv_nsec)
-  end
 
   local context = {}
   local enable = 0
