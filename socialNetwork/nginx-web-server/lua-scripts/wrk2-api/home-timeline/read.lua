@@ -78,7 +78,25 @@ function _M.ReadHomeTimeline()
   local carrier = {}
   tracer:text_map_inject(span:context(), carrier)
 
-  local socket = require "socket"
+  -- local socket = require "socket"
+  local ffi = require("ffi")
+
+  -- 定义系统调用
+  ffi.cdef[[
+      typedef struct timespec {
+          long tv_sec;
+          long tv_nsec;
+      } timespec;
+      int clock_gettime(int clockid, struct timespec *tp);
+  ]]
+
+  -- 获取毫秒级时间戳
+  local function get_time_ns()
+      local tv = ffi.new("timespec")
+      ffi.C.clock_gettime(1, tv)
+      return tonumber(tv.tv_sec) * 1000000000 + tonumber(tv.tv_nsec)
+  end
+
   local context = {}
   local enable = 0
   local sla = 10000000
@@ -96,7 +114,8 @@ function _M.ReadHomeTimeline()
   context["sched-sla"] = sla
   context["sched-time-next"] = 0
   context["sched-time-remaining"] = 0
-  context["sched-time-start"] = math.floor(socket.gettime() * 1000)
+  -- context["sched-time-start"] = math.floor(socket.gettime() * 1000)
+  context["sched-time-start"] = math.floor(get_time_ns())
   context["req-id"] = reqid
 
 
