@@ -110,13 +110,13 @@ function _M.ReadHomeTimeline()
   if (not _StrIsEmpty(args.reqid)) then
     reqid = tonumber(args.reqid)
   end
-  context["sched-enable"] = enable
-  context["sched-sla"] = sla
-  context["sched-time-next"] = 0
-  context["sched-time-remaining"] = 0
+  context["sched-enable"] = tostring(enable)
+  context["sched-sla"] = tostring(sla)
+  context["sched-time-next"] = tostring(0)
+  context["sched-time-remaining"] = tostring(0)
   -- context["sched-time-start"] = math.floor(socket.gettime() * 1000)
-  context["sched-time-start"] = math.floor(get_time_ns())
-  context["req-id"] = reqid
+  context["sched-time-start"] = tostring(get_time_ns())
+  context["req-id"] = tostring(reqid)
 
 
   local client = GenericObjectPool:connection(
