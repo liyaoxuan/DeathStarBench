@@ -16,11 +16,17 @@ ffi.cdef[[
     int clock_gettime(int clockid, struct timespec *tp);
 ]]
 
--- 获取毫秒级时间戳
+-- 获取纳秒级时间戳
 local function get_time_ns()
     local tv = ffi.new("timespec")
     ffi.C.clock_gettime(1, tv)
     return tonumber(tv.tv_sec) * 1000000000 + tonumber(tv.tv_nsec)
+end
+
+local function get_time_us()
+    local tv = ffi.new("timespec")
+    ffi.C.clock_gettime(1, tv)
+    return tonumber(tv.tv_sec) * 1000000 + tonumber(tv.tv_nsec) / 1000
 end
 
 local function _StrIsEmpty(s)
@@ -115,7 +121,7 @@ function _M.ReadHomeTimeline()
   context["sched-time-next"] = tostring(0)
   context["sched-time-remaining"] = tostring(0)
   -- context["sched-time-start"] = math.floor(socket.gettime() * 1000)
-  context["sched-time-start"] = tostring(get_time_ns())
+  context["sched-time-start"] = tostring(math.floor(get_time_us()))
   context["req-id"] = tostring(reqid)
 
 
